@@ -9,13 +9,22 @@ import { useRouter } from 'next/navigation'
 export function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const router = useRouter()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle login logic here
-    console.log('Login attempted with:', { username, password })
+  const handleSubmit = async (e: React.FormEvent) => {e.preventDefault()
+    
+    // Example validation - replace with your actual authentication logic
+    if (username === 'admin' && password === 'password') {
+      // Successful login
+      console.log('Login successful')
+      router.push('/dashboard') // Redirect to dashboard
+    } else {
+      // Failed login
+      alert('Invalid username or password')
+    }
   }
 
+  // Rest of the component remains the same
   return (
     <div className="min-h-screen flex flex-col items-center bg-[#f0f4f8] relative">
       {/* Background Pattern */}
