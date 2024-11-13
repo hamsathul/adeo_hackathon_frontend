@@ -99,7 +99,7 @@ export function LoginPage() {
             </div>
 
             <div className="text-right">
-              <Link href="/trouble-signing-in" className="text-sm text-blue-600 hover:text-blue-500">
+              <Link href="/" className="text-sm text-blue-600 hover:text-blue-500">
                 {isArabic ? 'واجهت مشكلة في تسجيل الدخول؟' : 'Having trouble signing in?'}
               </Link>
             </div>
@@ -108,7 +108,7 @@ export function LoginPage() {
               type="submit"
               className="w-full bg-[#4A90E2] text-white py-2 px-4 rounded-md hover:bg-[#357ABD] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              {isArabic ? 'دخول' : 'Logon'}
+              {isArabic ? 'دخول' : 'Login'}
             </button>
           </form>
         </div>
@@ -116,7 +116,7 @@ export function LoginPage() {
 
       <footer className="py-6 text-center text-sm text-gray-600">
         <p>{isArabic ? '© مكتب أبوظبي التنفيذي. جميع الحقوق محفوظة.' : '© Abu Dhabi Executive Office. All rights reserved.'}</p>
-        <Link href="/terms" className="text-blue-600 hover:text-blue-500">
+        <Link href="https://www.abudhabi.gov.ae"   target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500">
           {isArabic ? 'الشروط والأحكام' : 'Terms and Conditions'}
         </Link>
       </footer>
