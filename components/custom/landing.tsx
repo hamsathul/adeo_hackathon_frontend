@@ -33,7 +33,7 @@ export function LandingPage() {
               {/* Logo */}
               <div className="flex-shrink-0">
                 <Image
-                  src="/ADEO.svg"
+                  src="/ADEO.png"
                   alt="Department of Economic Development"
                   width={150}
                   height={50}
