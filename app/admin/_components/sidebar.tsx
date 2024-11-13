@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Lucide } from 'lucide-react';
+import { X } from 'lucide-react';
 
-const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   return (
     <aside
       className={`bg-gray-800 text-white h-screen w-64 fixed top-0 left-0 transition-transform duration-300 ${
@@ -45,9 +44,9 @@ const Sidebar = () => {
       </div>
       <button
         className="absolute top-4 right-4 text-gray-400 hover:text-white focus:outline-none"
-        onClick={toggleSidebar}
+        onClick={onClose}
       >
-        <Lucide icon="X" className="w-6 h-6" />
+        <X className="w-6 h-6" />
       </button>
     </aside>
   );
