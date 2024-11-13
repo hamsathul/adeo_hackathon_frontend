@@ -29,7 +29,7 @@ export function LandingPage() {
         {/* Navigation */}
         <header className="bg-white/95">
           <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-20">
+            <div className={`flex items-center justify-between h-20 ${isArabic ? 'flex-row-reverse' : ''}`}>
               {/* Logo */}
               <div className="flex-shrink-0">
                 <Image
@@ -42,22 +42,7 @@ export function LandingPage() {
               </div>
 
               {/* Right Navigation */}
-              <div className="flex items-center space-x-4">
-                <button
-                  type="button"
-                  className="p-2 text-gray-700 hover:text-gray-900"
-                  aria-label="Search"
-                >
-                  <Search className="h-5 w-5" />
-                </button>
-                <button
-                  type="button"
-                  className="p-2 text-gray-700 hover:text-gray-900"
-                  aria-label="Accessibility options"
-                >
-                  <Eye className="h-5 w-5" />
-                </button>
-                
+              <div className={`flex items-center space-x-4 ${isArabic ? 'space-x-reverse' : ''}`}>
                 {/* Arabic Translation Button */}
                 <button
                   type="button"
@@ -74,15 +59,14 @@ export function LandingPage() {
                 >
                     {isArabic ? 'تسجيل الدخول' : 'Login'}
                 </Link>
-
               </div>
             </div>
           </nav>
         </header>
 
         {/* Hero Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-64">
-          <div className="max-w-2xl">
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-64 ${isArabic ? 'text-right' : 'text-left'}`}>
+          <div className={`max-w-2xl ${isArabic ? 'ml-auto' : ''}`}>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-8">
               {isArabic ? 'مكتب أبوظبي التنفيذي' : 'Abu Dhabi Executive Office (ADEO)'}
             </h1>
@@ -92,7 +76,7 @@ export function LandingPage() {
               className="bg-black text-white hover:bg-gray-900 group"
             >
               {isArabic ? 'اقرأ المزيد' : 'READ MORE'}
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className={`ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 ${isArabic ? 'transform -scale-x-100' : ''}`} />
             </Button>
           </div>
         </div>
