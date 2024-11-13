@@ -85,12 +85,13 @@ export function LandingPage() {
               {isArabic ? 'مكتب أبوظبي التنفيذي' : 'Abu Dhabi Executive Office (ADEO)'}
             </h1>
             <Button 
-              variant="default"
-              size="lg"
-              className="bg-black text-white hover:bg-gray-900 group"
+            variant="default"
+            size="lg"
+            className="bg-black text-white hover:bg-gray-900 group"
+            onClick={() => window.open('https://www.mediaoffice.abudhabi/en/topic/abu-dhabi-executive-office-adeo/', '_blank')}
             >
-              {isArabic ? 'اقرأ المزيد' : 'READ MORE'}
-              <ArrowRight className={`ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 ${isArabic ? 'transform -scale-x-100' : ''}`} />
+            {isArabic ? 'اقرأ المزيد' : 'READ MORE'}
+            <ArrowRight className={`ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 ${isArabic ? 'transform -scale-x-100' : ''}`} />
             </Button>
           </div>
         </div>
