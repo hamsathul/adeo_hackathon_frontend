@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { Button } from "@/components/ui/button"
 import { Search, ArrowRight, Eye } from 'lucide-react'
 
+
 export function LandingPage() {
   const [isPlaying, setIsPlaying] = useState(true)
   const [isArabic, setIsArabic] = useState(false)

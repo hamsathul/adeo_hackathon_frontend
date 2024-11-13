@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image"
 import Link from "next/link"
 import { User, Lock } from 'lucide-react'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
-export default function LoginPage() {
+export function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -24,7 +27,7 @@ export default function LoginPage() {
       {/* Logo */}
       <div className="w-full max-w-[200px] mt-8 mb-12 relative">
         <Image
-          src="/placeholder.svg"
+          src="/ADEO.png"
           alt="Abu Dhabi Executive Office"
           width={200}
           height={80}
@@ -83,7 +86,7 @@ export default function LoginPage() {
               type="submit" 
               className="w-full bg-[#4285b4] hover:bg-[#3b769e] text-white font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out"
             >
-              Logon
+              Login
             </button>
           </form>
         </div>
