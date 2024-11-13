@@ -1,15 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from "@/components/ui/button"
-import { Search, ArrowRight, Eye } from 'lucide-react'
-
+import { ArrowRight } from 'lucide-react'
 
 export function LandingPage() {
   const [isPlaying, setIsPlaying] = useState(true)
   const [isArabic, setIsArabic] = useState(false)
+
+  useEffect(() => {
+    // Load the language preference from localStorage
+    const savedLanguage = localStorage.getItem('language')
+    if (savedLanguage) {
+      setIsArabic(savedLanguage === 'ar')
+    }
+  }, [])
+
+  const handleLanguageToggle = () => {
+    const newLanguage = isArabic ? 'en' : 'ar'
+    setIsArabic(!isArabic)
+    localStorage.setItem('language', newLanguage)  // Save the selected language
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -47,7 +60,7 @@ export function LandingPage() {
                 {/* Arabic Translation Button */}
                 <button
                   type="button"
-                  onClick={() => setIsArabic(!isArabic)}
+                  onClick={handleLanguageToggle}
                   className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
                 >
                   {isArabic ? 'EN' : 'AR'}
@@ -72,12 +85,13 @@ export function LandingPage() {
               {isArabic ? 'مكتب أبوظبي التنفيذي' : 'Abu Dhabi Executive Office (ADEO)'}
             </h1>
             <Button 
-              variant="default"
-              size="lg"
-              className="bg-black text-white hover:bg-gray-900 group"
+            variant="default"
+            size="lg"
+            className="bg-black text-white hover:bg-gray-900 group"
+            onClick={() => window.open('https://www.mediaoffice.abudhabi/en/topic/abu-dhabi-executive-office-adeo/', '_blank')}
             >
-              {isArabic ? 'اقرأ المزيد' : 'READ MORE'}
-              <ArrowRight className={`ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 ${isArabic ? 'transform -scale-x-100' : ''}`} />
+            {isArabic ? 'اقرأ المزيد' : 'READ MORE'}
+            <ArrowRight className={`ml-2 h-4 w-4 transition-transform group-hover:translate-x-1 ${isArabic ? 'transform -scale-x-100' : ''}`} />
             </Button>
           </div>
         </div>
