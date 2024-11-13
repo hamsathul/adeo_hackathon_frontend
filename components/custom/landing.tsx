@@ -47,7 +47,7 @@ export function LandingPage() {
               {/* Logo */}
               <div className="flex-shrink-0">
                 <Image
-                  src="/ADEO.png"
+                  src="/ADEO2.png"
                   alt="Department of Economic Development"
                   width={150}
                   height={50}

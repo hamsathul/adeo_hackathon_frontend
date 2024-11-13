@@ -34,7 +34,7 @@ export function LoginPage() {
       {/* Language Toggle */}
       <header className="w-full bg-white py-4 px-6 flex justify-between items-center shadow-sm">
         <Image
-          src="/ADEO.png"
+          src="/ADEO2.png"
           alt="Abu Dhabi Executive Office Logo"
           width={200}
           height={60}
