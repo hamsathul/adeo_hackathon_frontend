@@ -5,6 +5,7 @@ import Link from "next/link"
 import { User, Lock } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useLanguageStore } from '@/store/useLanguageStore'
 import axios from 'axios'
 
 const server_url = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000/api/v1'
@@ -12,18 +13,10 @@ const server_url = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000/
 export function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [isArabic, setIsArabic] = useState(false)  // Arabic/English toggle state
+  const { isArabic, toggleLanguage } = useLanguageStore()
   const [error, setError] = useState('') // State for error messages
   const [loading, setLoading] = useState(false) // Loading state for API request
   const router = useRouter()
-
-  // Load the language preference from localStorage
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language')
-    if (savedLanguage) {
-      setIsArabic(savedLanguage === 'ar')
-    }
-  }, [])
 
   // Validate inputs
   const validateInputs = () => {
@@ -105,11 +98,7 @@ export function LoginPage() {
         />
         <button
           type="button"
-          onClick={() => {
-            const newLanguage = isArabic ? 'en' : 'ar'
-            setIsArabic(!isArabic)
-            localStorage.setItem('language', newLanguage)  // Save the selected language
-          }}
+          onClick={toggleLanguage}
           className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
         >
           {isArabic ? 'EN' : 'AR'}
