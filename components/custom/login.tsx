@@ -5,11 +5,16 @@ import Link from "next/link"
 import { User, Lock } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import axios from 'axios'
+
+const server_url = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000/api/v1'
 
 export function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isArabic, setIsArabic] = useState(false)  // Arabic/English toggle state
+  const [error, setError] = useState('') // State for error messages
+  const [loading, setLoading] = useState(false) // Loading state for API request
   const router = useRouter()
 
   // Load the language preference from localStorage
@@ -20,11 +25,68 @@ export function LoginPage() {
     }
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Validate inputs
+  const validateInputs = () => {
+    if (!username.trim()) {
+      setError(isArabic ? 'الرجاء إدخال اسم المستخدم' : 'Please enter a username')
+      return false
+    }
+    if (username.length < 4) {
+      setError(isArabic ? 'اسم المستخدم يجب أن يكون أطول من 3 أحرف' : 'Username must be at least 4 characters')
+      return false
+    }
+    if (!password) {
+      setError(isArabic ? 'الرجاء إدخال كلمة المرور' : 'Please enter a password')
+      return false
+    }
+    if (password.length < 6) {
+      setError(isArabic ? 'كلمة المرور يجب أن تكون أطول من 5 أحرف' : 'Password must be at least 6 characters')
+      return false
+    }
+    return true
+  }
+
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Add your authentication logic here
-    console.log('Login attempted with:', username)
-    router.push('/admin')
+
+    // Clear any previous error
+    setError('')
+
+    // Validate form inputs
+    if (!validateInputs()) {
+      return
+    }
+
+    setLoading(true)
+    try {
+      const formData = new URLSearchParams();
+      formData.append('username', username);
+      formData.append('password', password);
+      const response = await axios.post(`${server_url}/auth/token`, formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      })
+
+      const token = response.data.token
+      localStorage.setItem('token', token) // Store token in localStorage
+      router.push('/admin') // Redirect to admin page
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          setError(isArabic ? 'بيانات تسجيل الدخول غير صحيحة' : 'Invalid login credentials')
+        } else if (error.response?.status === 500) {
+          setError(isArabic ? 'حدث خطأ في الخادم' : 'Server error occurred')
+        } else {
+          setError(isArabic ? 'حدث خطأ غير متوقع. الرجاء المحاولة مرة أخرى.' : 'An unexpected error occurred. Please try again.')
+        }
+      } else {
+        setError(isArabic ? 'فشل الاتصال بالخادم' : 'Failed to connect to server')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -60,6 +122,9 @@ export function LoginPage() {
             {isArabic ? 'الخدمات الرقمية لمكتب أبوظبي التنفيذي' : 'ADEO Digital Services'}
           </h1>
           
+          {/* Display error message */}
+          {error && <div className="mb-4 text-red-600 text-sm text-center">{error}</div>}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
@@ -108,8 +173,9 @@ export function LoginPage() {
             <button
               type="submit"
               className="w-full bg-[#4A90E2] text-white py-2 px-4 rounded-md hover:bg-[#357ABD] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              disabled={loading}
             >
-              {isArabic ? 'دخول' : 'Login'}
+              {loading ? (isArabic ? 'جارٍ التحميل...' : 'Loading...') : (isArabic ? 'دخول' : 'Login')}
             </button>
           </form>
         </div>
@@ -117,7 +183,7 @@ export function LoginPage() {
 
       <footer className="py-6 text-center text-sm text-gray-600">
         <p>{isArabic ? '© مكتب أبوظبي التنفيذي. جميع الحقوق محفوظة.' : '© Abu Dhabi Executive Office. All rights reserved.'}</p>
-        <Link href="https://www.abudhabi.gov.ae"   target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500">
+        <Link href="https://www.abudhabi.gov.ae" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500">
           {isArabic ? 'الشروط والأحكام' : 'Terms and Conditions'}
         </Link>
       </footer>
