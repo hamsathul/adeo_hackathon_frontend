@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import Sidebar from '@/app/admin/_components/sidebar';
+import Header from '@/app/admin/_components/header';
 import {
   DndContext,
   DragEndEvent,
@@ -126,6 +128,7 @@ export function KanbanBoard() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
