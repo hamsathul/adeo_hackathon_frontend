@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import Sidebar from '@/app/admin/_components/sidebar';
 import Header from '@/app/admin/_components/header';
+import Sidebar from '@/app/admin/_components/sidebar';
 import {
   DndContext,
   DragEndEvent,
@@ -27,7 +27,7 @@ const initialTasks: Task[] = [
   { id: '5', title: 'Deploy v1.0.0', status: 'done', taskId: 'CPG-19', assignee: 'YD', department: 'Engineering' },
 ];
 
-const columns: Status[] = ['todo', 'in-progress', 'testing', 'review', 'done'];
+const columns: Status[] = ['todo', 'in-progress', 'testing', 'review', 'done', 'on-hold', 'rejected'];
 
 export function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
@@ -61,7 +61,6 @@ export function KanbanBoard() {
     
     if (!activeTask) return;
 
-    // Check if dropping over a column
     if (columns.includes(overColumnId as Status)) {
       setTasks(tasks.map((t) => {
         if (t.id === activeTaskId) {
@@ -70,7 +69,6 @@ export function KanbanBoard() {
         return t;
       }));
     } else {
-      // Dropping over another task
       const overTask = tasks.find((t) => t.id === overColumnId);
       if (!overTask) return;
 
@@ -127,32 +125,32 @@ export function KanbanBoard() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Header />
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-[#f8f9fa]">
+      < Header />
+      <div className="container mx-auto px-6 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <div className="text-sm text-gray-500 mb-1">Departments/ Opinions</div>
-              <h1 className="text-2xl font-bold">Opinion Board</h1>
+              <div className="text-sm text-gray-500 mb-1 tracking-wide">Departments/ Opinions</div>
+              <h1 className="text-3xl font-bold tracking-tight">Opinion Board</h1>
             </div>
             <div className="flex items-center gap-4">
-              <button className="p-2 hover:bg-gray-200 rounded-lg">
+              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <Zap className="w-5 h-5" />
               </button>
-              <button className="p-2 hover:bg-gray-200 rounded-lg">
+              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <Share2 className="w-5 h-5" />
               </button>
-              <button className="p-2 hover:bg-gray-200 rounded-lg">
+              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                 <Settings className="w-5 h-5" />
               </button>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Add Opinion
+              <button className="bg-black text-white px-6 py-2.5 rounded-lg hover:bg-gray-900 transition-colors font-medium">
+                Start stand-up
               </button>
             </div>
           </div>
           
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-8">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -160,12 +158,12 @@ export function KanbanBoard() {
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5 bg-white"
               />
             </div>
             <button
               onClick={() => setIsFilterDialogOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-white transition-colors bg-transparent"
             >
               <Filter className="w-5 h-5" />
               Filter
@@ -181,7 +179,7 @@ export function KanbanBoard() {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-5 gap-4">
+          <div className="kanban-grid grid gap-4 overflow-x-auto pb-4">
             {columns.map((column) => (
               <KanbanColumn
                 key={column}

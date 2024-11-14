@@ -11,3 +11,7 @@ body {
     --radius: 0.5rem;
   }
 }
+
+.kanban-grid {
+  grid-template-columns: repeat(7, minmax(280px, 1fr));
+}
