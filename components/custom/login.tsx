@@ -24,6 +24,7 @@ export function LoginPage() {
     e.preventDefault()
     // Add your authentication logic here
     console.log('Login attempted with:', username)
+    router.push('/admin')
   }
 
   return (
