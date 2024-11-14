@@ -22,7 +22,7 @@ const initialTasks: Task[] = [
   { id: '5', title: 'Deploy v1.0.0', status: 'done', taskId: 'CPG-19', assignee: 'YD', department: 'Engineering' },
 ];
 
-const columns: Status[] = ['todo', 'in-progress', 'testing', 'review', 'done', 'on-hold', 'rejected'];
+const columns: Status[] = ['unassigned', 'todo', 'in-progress', 'testing', 'review', 'done', 'on-hold', 'rejected'];
 
 export function KanbanBoard() {
   const { isArabic } = useLanguageStore(); // Access language state
