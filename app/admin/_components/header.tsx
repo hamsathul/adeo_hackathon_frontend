@@ -16,9 +16,6 @@ const Header = () => {
     // Add logout logic here
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   const ButtonWithHoverEffect = ({ icon: Icon, text, onClick }: { icon: React.ElementType, text: string, onClick: () => void }) => (
     <button
@@ -42,16 +39,8 @@ const Header = () => {
       <header className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-4 px-6">
         <div className="max-w-7xl mx-auto flex items-center">
           {/* Menu Icon - Now on the left */}
-          <button
-            className="p-2 rounded-lg hover:bg-gray-800 transition-colors duration-300"
-            onClick={toggleSidebar}
-          >
-            {isSidebarOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
+          
+          
 
           {/* Brand - Now in the center */}
           <div className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500 flex-1 text-center">
