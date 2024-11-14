@@ -1,47 +1,24 @@
 'use client'
 
-// import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { ArrowDown, ArrowUp, Clock, DollarSign, Users } from 'lucide-react'
-
+import { Clock, DollarSign, Users, Bot } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Header from "../admin/_components/header"
 import Sidebar from "../admin/_components/sidebar"
-
-// Sample data for the chart
-const data = [
-  {
-    name: "Jan",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Feb",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Mar",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Apr",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "May",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-  {
-    name: "Jun",
-    total: Math.floor(Math.random() * 5000) + 1000,
-  },
-]
+import { useState } from 'react'
+import Chatbot from '@/components/custom/chatbot'  // Import the Chatbot component
 
 export default function Dashboard() {
+  const [showChatbot, setShowChatbot] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen)
+  }
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar isOpen={false} onClose={function (): void {
-			  throw new Error('Function not implemented.')
-		  } } />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+      <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-16'}`}>
         <Header />
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
           <div className="container mx-auto px-6 py-8">
@@ -108,25 +85,7 @@ export default function Dashboard() {
                   <CardTitle>Overview</CardTitle>
                 </CardHeader>
                 <CardContent className="pl-2">
-                  {/* <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={data}>
-                      <XAxis
-                        dataKey="name"
-                        stroke="#888888"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis
-                        stroke="#888888"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                        tickFormatter={(value) => `$${value}`}
-                      />
-                      <Bar dataKey="total" fill="#adfa1d" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer> */}
+                  {/* You can add content here */}
                 </CardContent>
               </Card>
             </div>
@@ -148,7 +107,6 @@ export default function Dashboard() {
                             customer{i + 1}@example.com
                           </p>
                         </div>
-                        <div className="ml-auto font-medium">+${(Math.random() * 100).toFixed(2)}</div>
                       </div>
                     ))}
                   </div>
@@ -169,19 +127,6 @@ export default function Dashboard() {
                             Category {String.fromCharCode(65 + i)}
                           </p>
                         </div>
-                        <div className="ml-auto font-medium">
-                          {Math.random() > 0.5 ? (
-                            <span className="text-green-600 flex items-center">
-                              <ArrowUp className="mr-1 h-4 w-4" />
-                              {(Math.random() * 10).toFixed(1)}%
-                            </span>
-                          ) : (
-                            <span className="text-red-600 flex items-center">
-                              <ArrowDown className="mr-1 h-4 w-4" />
-                              {(Math.random() * 10).toFixed(1)}%
-                            </span>
-                          )}
-                        </div>
                       </div>
                     ))}
                   </div>
@@ -191,6 +136,26 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
+
+      {/* AI Assistant Button */}
+      <div className="fixed bottom-4 right-4">
+        <div
+          className={`relative rounded-full p-3 cursor-pointer transition-all duration-300 ease-in-out 
+                      ${isHovered ? 'w-36 bg-gray-300' : 'w-12 border border-black'}`}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onClick={() => setShowChatbot(true)}
+        >
+          <Bot className="w-6 h-6" />
+          {isHovered && (
+            <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
+              AI Assistant
+            </span>
+          )}
+        </div>
+      </div>
+      {/* Chatbot Component */}
+      <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />
     </div>
   )
 }
