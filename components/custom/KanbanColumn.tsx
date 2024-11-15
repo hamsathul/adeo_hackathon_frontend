@@ -2,9 +2,9 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
-import { Task, TaskFormData } from '../../../components/custom/TaskDialog';
+import { Task, TaskFormData } from './TaskDialog';
 import { KanbanTask } from './KanbanTask';
-import { TaskDialog } from '../../../components/custom/TaskDialog';
+import { TaskDialog } from './TaskDialog';
 import { cn } from '../utils';
 import { translations } from './translation';
 
