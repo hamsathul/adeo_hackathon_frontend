@@ -1,4 +1,4 @@
-export type Status = 'todo' | 'in-progress' | 'testing' | 'review' | 'done' | 'on-hold' | 'rejected';
+export type Status = 'todo' | 'in-progress' | 'testing' | 'review' | 'done' | 'on-hold' | 'rejected' | 'unassigned';
 export type Department = 'Engineering' | 'Design' | 'Marketing' | 'Product' | 'Sales';
 
 export interface Task {
