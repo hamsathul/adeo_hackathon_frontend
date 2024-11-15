@@ -5,11 +5,14 @@ import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import { Task, TaskFormData } from '../types';
 import { TaskDialog } from './TaskDialog';
 import { cn } from '../utils';
+import { translations } from './translation';
+import { useCallback } from 'react';
 
 interface KanbanTaskProps {
   task: Task;
   onEdit: (taskId: string, data: TaskFormData) => void;
   onDelete: (taskId: string) => void;
+  text: typeof translations.en | typeof translations.ar;
 }
 
 const assigneeColors: Record<string, string> = {
@@ -42,11 +45,11 @@ export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
     onEdit(task.id, data);
   };
 
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
+  const handleDelete = useCallback(() => {
+    if (typeof window !== 'undefined' && window.confirm('Are you sure you want to delete this task?')) {
       onDelete(task.id);
     }
-  };
+  }, [task.id, onDelete]);
 
   return (
     <>

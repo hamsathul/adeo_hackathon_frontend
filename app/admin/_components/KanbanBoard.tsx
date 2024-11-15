@@ -7,7 +7,7 @@ import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, u
 import { arrayMove } from '@dnd-kit/sortable';
 import { Filter, Search, Settings, Share2, Zap } from 'lucide-react';
 import { Department, Status, Task, TaskFilters, TaskFormData } from '../types';
-import { KanbanColumn } from '../../app/admin/_components/KanbanColumn';
+import { KanbanColumn } from './KanbanColumn';
 import { KanbanTask } from './KanbanTask';
 import { FilterDialog } from './FilterDialog';
 import { translations } from './translation';
