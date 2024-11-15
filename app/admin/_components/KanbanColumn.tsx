@@ -18,13 +18,14 @@ interface KanbanColumnProps {
 }
 
 const statusConfig = {
-  'todo': { color: 'bg-gray-50 border-t-gray-300' },
+  'todo': { color: 'bg-gray-200 border-t-gray-300' },
   'in-progress': { color: 'bg-blue-50 border-t-blue-400' },
   'testing': { color: 'bg-purple-50 border-t-purple-400' },
   'review': { color: 'bg-yellow-50 border-t-yellow-400' },
   'done': { color: 'bg-green-50 border-t-green-400' },
   'on-hold': { color: 'bg-orange-50 border-t-orange-400' },
-  'rejected': { color: 'bg-red-50 border-t-red-400' }
+  'rejected': { color: 'bg-red-50 border-t-red-400' },
+  'unassigned': { color: 'bg-gray-50 border-t-gray-300' },
 };
 
 export function KanbanColumn({ status, tasks, onAddTask, onEditTask, onDeleteTask, text }: KanbanColumnProps) {
