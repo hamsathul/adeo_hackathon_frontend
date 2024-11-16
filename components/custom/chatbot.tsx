@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { X, Menu, Send, Mic } from 'lucide-react' // Import the X icon
+import { X, Send, Mic } from 'lucide-react' // Import the X icon
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 
@@ -10,7 +10,6 @@ interface ChatbotProps {
 
 const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
   const [inputMessage, setInputMessage] = useState('')
-  const [isHovered, setIsHovered] = useState(false)
   const chatbotRef = useRef(null)
 
   // Handle closing chatbot when clicking outside
