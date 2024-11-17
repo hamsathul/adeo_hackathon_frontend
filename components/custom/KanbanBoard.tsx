@@ -8,7 +8,6 @@ import { Opinion, Status, OpinionFormData, TaskFilters, RemarkFormData } from '.
 import { FilterDialog } from './FilterDialog';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { translations } from '@/components/custom/translation';
-import Chatbot from '@/components/custom/chatbot';
 import { KanbanBoardDnd } from './KanbanBoardDnd';
 
 const initialOpinions: Opinion[] = [
@@ -55,8 +54,7 @@ const columns: Status[] = ['unassigned', 'todo', 'in-progress', 'testing', 'revi
 
 export function KanbanBoard() {
   const [isClient, setIsClient] = useState(false);
-  const [showChatbot, setShowChatbot] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+
   const [opinions, setOpinions] = useState<Opinion[]>(initialOpinions);
   const [activeOpinion, setActiveOpinion] = useState<Opinion | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -214,26 +212,9 @@ export function KanbanBoard() {
         filters={filters}
         onApplyFilters={setFilters}
       />
+     
       
-      {/* AI Assistant Button */}
-      <div className="fixed bottom-4 right-4">
-        <div
-          className={`relative rounded-full bg-primary text-primary-foreground p-3 cursor-pointer transition-all duration-300 ease-in-out ${isHovered ? 'w-36' : 'w-12'}`}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          onClick={() => setShowChatbot(true)}
-        >
-          <Bot className="w-6 h-6" />
-          {isHovered && (
-            <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
-              {text.ai}
-            </span>
-          )}
-        </div>
-      </div>
-      
-      {/* Chatbot component */}
-      <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)}  />
+
     </>
   );
 }

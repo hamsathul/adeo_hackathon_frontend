@@ -3,7 +3,7 @@ import { X, Send, Mic } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/ui/avatar'
 import { io, Socket } from 'socket.io-client'
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation'
 
 
@@ -19,10 +19,9 @@ interface Message {
 interface ChatbotProps {
   isOpen: boolean
   onClose: () => void
-  userId: number 
 }
 
-const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, userId }) => {
+const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
   const [inputMessage, setInputMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [socket, setSocket] = useState<Socket | null>(null)
@@ -32,6 +31,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, userId }) => {
   const router = useRouter()
   const [, setIsAuthenticated] = useState<boolean>(false)
   const [token, setToken] = useState<string | null>(null)
+  const [userId, setUserId] = useState<number>(0)
   // Scroll to bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -44,9 +44,19 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, userId }) => {
   useEffect(() => {
     // Get token when component mounts
     const storedToken = localStorage.getItem('token')
+	if (storedToken) {
+		try {
+			const decoded = jwtDecode(storedToken) as { user_id: number };
+			const userId = decoded.user_id;
+			setUserId(userId);
+			setIsAuthenticated(true);
+		} catch (error) {
+			console.error('Error decoding token:', error);
+			router.push('/login');
+		}
+	}
     setToken(storedToken)
   }, [])
-
 
 
   useEffect(() => {
@@ -339,5 +349,6 @@ const handleSendMessage = () => {
 }
 
 export default Chatbot
+
 
 
