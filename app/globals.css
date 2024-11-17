@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+/* body {
   font-family: Arial, Helvetica, sans-serif;
-}
+} */
 
 @layer base {
   :root {
@@ -12,6 +12,27 @@ body {
   }
 }
 
+@font-face {
+  font-family: 'Uber Move';
+  src: url('https://cdn.jsdelivr.net/gh/ubermanu/uber-move/fonts/UberMoveMedium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Uber Move';
+  src: url('https://cdn.jsdelivr.net/gh/ubermanu/uber-move/fonts/UberMoveBold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@layer base {
+  html {
+    font-family: 'Uber Move', system-ui, sans-serif;
+  }
+}
+
 .kanban-grid {
   grid-template-columns: repeat(4, minmax(280px, 1fr));
+  grid-template-rows: repeat(2, auto);
 }

@@ -2,74 +2,62 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
-import { Task, TaskFormData } from './TaskDialog';
-import { KanbanTask } from './KanbanTask';
+import { Status, Opinion, OpinionFormData, RemarkFormData } from '../types';
+import { KanbanOpinion } from './KanbanOpinion';
 import { TaskDialog } from './TaskDialog';
 import { cn } from '../utils';
-import { translations } from './translation';
 
 interface KanbanColumnProps {
   status: Status;
-  tasks: Task[];
-  onAddTask: (status: Status, data: TaskFormData) => void;
-  onEditTask: (taskId: string, data: TaskFormData) => void;
-  onDeleteTask: (taskId: string) => void;
-  text: typeof translations.en | typeof translations.ar;
+  items: Opinion[];
+  onAdd: (status: Status, data: OpinionFormData) => void;
+  onEdit: (opinionId: string, data: OpinionFormData) => void;
+  onDelete: (opinionId: string) => void;
+  onAddRemark: (opinionId: string, remark: RemarkFormData) => void;
 }
 
-const statusConfig = {
-  'todo': { color: 'bg-gray-200 border-t-gray-300' },
-  'in-progress': { color: 'bg-blue-50 border-t-blue-400' },
-  'testing': { color: 'bg-purple-50 border-t-purple-400' },
-  'review': { color: 'bg-yellow-50 border-t-yellow-400' },
-  'done': { color: 'bg-green-50 border-t-green-400' },
-  'on-hold': { color: 'bg-orange-50 border-t-orange-400' },
-  'rejected': { color: 'bg-red-50 border-t-red-400' },
-  'unassigned': { color: 'bg-gray-50 border-t-gray-300' },
+const statusConfig: Record<Status, { title: string; color: string }> = {
+  'unassigned': { title: 'UNASSIGNED', color: 'bg-gray-50 border-t-gray-300' },
+  'todo': { title: 'TO DO', color: 'bg-gray-50 border-t-gray-300' },
+  'in-progress': { title: 'IN PROGRESS', color: 'bg-blue-50 border-t-blue-400' },
+  'testing': { title: 'TESTING', color: 'bg-purple-50 border-t-purple-400' },
+  'review': { title: 'REVIEW', color: 'bg-yellow-50 border-t-yellow-400' },
+  'done': { title: 'DONE', color: 'bg-green-50 border-t-green-400' },
+  'on-hold': { title: 'ON HOLD', color: 'bg-orange-50 border-t-orange-400' },
+  'rejected': { title: 'REJECTED', color: 'bg-red-50 border-t-red-400' }
 };
 
-export function KanbanColumn({ status, tasks, onAddTask, onEditTask, onDeleteTask, text }: KanbanColumnProps) {
+export function KanbanColumn({ status, items, onAdd, onEdit, onDelete, onAddRemark }: KanbanColumnProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const { setNodeRef } = useDroppable({ id: status });
 
-  const handleAddTask = (data: TaskFormData) => {
-    onAddTask(status, data);
-  };
-
-  const getColumnTitle = (status: Status) => {
-    switch(status) {
-      case 'todo': return text.todocard;
-      case 'in-progress': return text.progressCard;
-      case 'testing': return text.testingCard;
-      case 'review': return text.reviewCard;
-      case 'done': return text.completedCard;
-      case 'on-hold': return text.onholdCard;
-      case 'rejected': return text.rejectedCard;
-      default: return status;
-    }
+  const handleAddOpinion = (data: OpinionFormData) => {
+    onAdd(status, data);
   };
 
   return (
     <div
       ref={setNodeRef}
       className={cn(
-        'rounded-lg border border-gray-200 bg-white shadow-sm',
-        'border-t-2 transition-colors min-w-[280px]',
+        'rounded-xl border border-gray-200 bg-white shadow-sm',
+        'border-t-[3px] transition-colors',
         statusConfig[status].color
       )}
     >
-      <div className="p-4 border-b border-gray-100">
+      <div className="px-4 py-3 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 flex items-center gap-2 tracking-wide">
-            {getColumnTitle(status)}
-            <span className="text-sm bg-gray-100 px-2 py-0.5 rounded-full text-gray-600 font-medium">
-              {tasks.length}
-            </span>
-          </h3>
+          <div>
+            <h3 className="font-semibold text-gray-900 tracking-wide">
+              {statusConfig[status].title}
+            </h3>
+            <p className="text-sm text-gray-500 mt-0.5">
+              {items.length} {items.length === 1 ? 'opinion' : 'opinions'}
+            </p>
+          </div>
           <button
             onClick={() => setIsAddDialogOpen(true)}
             className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-            title={text.addTask}
+            title="Add opinion"
           >
             <Plus className="w-4 h-4" />
           </button>
@@ -77,17 +65,17 @@ export function KanbanColumn({ status, tasks, onAddTask, onEditTask, onDeleteTas
       </div>
       
       <SortableContext
-        items={tasks}
+        items={items}
         strategy={verticalListSortingStrategy}
       >
         <div className="p-2 flex flex-col gap-2 min-h-[200px]">
-          {tasks.map((task) => (
-            <KanbanTask
-              key={task.id}
-              task={task}
-              onEdit={onEditTask}
-              onDelete={onDeleteTask}
-              text={text}
+          {items.map((opinion) => (
+            <KanbanOpinion
+              key={opinion.id}
+              opinion={opinion}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onAddRemark={onAddRemark}
             />
           ))}
         </div>
@@ -96,8 +84,8 @@ export function KanbanColumn({ status, tasks, onAddTask, onEditTask, onDeleteTas
       <TaskDialog
         isOpen={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
-        onSubmit={handleAddTask}
-        title={`${text.addTask} ${getColumnTitle(status)}`}
+        onSubmit={handleAddOpinion}
+        title={`Add Opinion to ${statusConfig[status].title}`}
       />
     </div>
   );
