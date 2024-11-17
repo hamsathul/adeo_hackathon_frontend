@@ -7,9 +7,12 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Download, Filter, Grid2X2, Import, LayoutList, MoreVertical, Plus, Search, UserPlus } from 'lucide-react'
+import { Bot, Download, Filter, Grid2X2, Import, LayoutList, MoreVertical, Plus, Search, UserPlus } from 'lucide-react'
 import Sidebar from '../admin/_components/sidebar'
 import Header from '../admin/_components/header'
+import Chatbot from '@/components/custom/chatbot'
+import { translations } from '@/components/custom/translation'
+import { useLanguageStore } from '@/store/useLanguageStore'
 
 interface Employee {
   id: string
@@ -27,9 +30,13 @@ interface Employee {
 
 export default function Component() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [showChatbot, setShowChatbot] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
       };
+    const { isArabic } = useLanguageStore();
+  const text = isArabic ? translations.ar : translations.en;
   const [view, setView] = useState<'grid' | 'list'>('grid')
   const [employees] = useState<Employee[]>([
     {
@@ -247,6 +254,24 @@ export default function Component() {
             </CardContent>
           </Card>
         ))}
+         {/* AI Assistant Button */}
+          <div className="fixed bottom-4 right-4">
+            <div
+              className={`relative rounded-full bg-primary text-primary-foreground p-3 cursor-pointer transition-all duration-300 ease-in-out ${isHovered ? 'w-36' : 'w-12'}`}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              onClick={() => setShowChatbot(true)}
+            >
+              <Bot className="w-6 h-6" />
+              {isHovered && (
+                <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
+                  {text.ai}
+                </span>
+              )}
+            </div>
+          </div>
+          {/* Chatbot component */}
+          <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />
       </div>
     </div>
     </>
