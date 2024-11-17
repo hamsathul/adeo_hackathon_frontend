@@ -1,26 +1,17 @@
-'use client'
+'use client';
 
-import React, { useState } from 'react';
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+import React, { useState, useEffect } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { Filter, Search, Settings, Share2, Zap, Bot } from 'lucide-react';
 import { Opinion, Status, OpinionFormData, TaskFilters, RemarkFormData } from '../types';
-import { KanbanColumn } from './KanbanColumn';
-import { KanbanOpinion } from './KanbanOpinion';
 import { FilterDialog } from './FilterDialog';
-import { useLanguageStore } from '@/store/useLanguageStore'
-import { translations } from '@/components/custom/translation'
-import Chatbot from '@/components/custom/chatbot'
-import Header from '../../app/admin/_components/header'
-import Sidebar from '../../app/admin/_components/sidebar'
+import { useLanguageStore } from '@/store/useLanguageStore';
+import { translations } from '@/components/custom/translation';
+import Chatbot from '@/components/custom/chatbot';
+import Header from '../../app/admin/_components/header';
+import Sidebar from '../../app/admin/_components/sidebar';
+import { KanbanBoardDnd } from './KanbanBoardDnd';
+
 const initialOpinions: Opinion[] = [
   {
     id: '1',
@@ -64,34 +55,33 @@ const initialOpinions: Opinion[] = [
 const columns: Status[] = ['unassigned', 'todo', 'in-progress', 'testing', 'review', 'done', 'on-hold', 'rejected'];
 
 export function KanbanBoard() {
+  const [isClient, setIsClient] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const toggleSidebar = () => {
-      setIsSidebarOpen(!isSidebarOpen);
-    };
-  const { isArabic } = useLanguageStore();
-const text = isArabic ? translations.ar : translations.en;
   const [opinions, setOpinions] = useState<Opinion[]>(initialOpinions);
   const [activeOpinion, setActiveOpinion] = useState<Opinion | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<TaskFilters>({});
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
+  const { isArabic } = useLanguageStore();
+  const text = isArabic ? translations.ar : translations.en;
 
-  const handleDragStart = (event: DragStartEvent) => {
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleDragStart = (event: any) => {
     const opinion = opinions.find((t) => t.id === event.active.id);
     setActiveOpinion(opinion || null);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = (event: any) => {
     const { active, over } = event;
     
     if (!over) return;
@@ -210,114 +200,55 @@ const text = isArabic ? translations.ar : translations.en;
     <div className="min-h-screen bg-[#f8f9fa]">
       <Header />
       <div className="px-20">
-      <header className="flex justify-end p-4"></header>
-      <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
-      <div className="container mx-auto px-6 py-2">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className='relative'>
-              <div className="text-sm text-gray-500 mb-1 tracking-wide fixed left-20">Opinions / Government</div>
-              <h1 className="text-3xl font-bold tracking-tight mt-5 fixed left-20">Opinion Management</h1>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 fixed right-20">
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors ">
-                <Zap className="w-5 h-5" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Share2 className="w-5 h-5" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
-              <a href="/search">
-                <button className="bg-black text-white px-6 py-2.5 rounded-lg hover:bg-gray-900 transition-colors font-medium">
-                  {text.searchEngine}
-                </button>
-              </a>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-4 mb-2">
-            <div className="relative flex-1 max-w-md py-9 fixed right-6">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search opinions..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5 bg-white"
-              />
-            </div>
-            <button
-              onClick={() => setIsFilterDialogOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-white transition-colors bg-transparent"
-            >
-              <Filter className="w-5 h-5" />
-              Filter
-              {(filters.assignee || filters.department) && (
-                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-              )}
-            </button>
+        <header className="flex justify-end p-4"></header>
+        <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+        <div className="container mx-auto px-6 py-2">
+          {/* ... your existing header and search JSX ... */}
+
+          {isClient ? (
+            <KanbanBoardDnd 
+              columns={columns}
+              filteredOpinions={filteredOpinions}
+              handleDragStart={handleDragStart}
+              handleDragEnd={handleDragEnd}
+              handleAddOpinion={handleAddOpinion}
+              handleEditOpinion={handleEditOpinion}
+              handleDeleteOpinion={handleDeleteOpinion}
+              handleAddRemark={handleAddRemark}
+              activeOpinion={activeOpinion}
+            />
+          ) : (
+            <div>Loading...</div>
+          )}
+
+          <FilterDialog
+            isOpen={isFilterDialogOpen}
+            onClose={() => setIsFilterDialogOpen(false)}
+            filters={filters}
+            onApplyFilters={setFilters}
+          />
+        </div>
+        
+        {/* AI Assistant Button */}
+        <div className="fixed bottom-4 right-4">
+          <div
+            className={`relative rounded-full bg-primary text-primary-foreground p-3 cursor-pointer transition-all duration-300 ease-in-out ${isHovered ? 'w-36' : 'w-12'}`}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={() => setShowChatbot(true)}
+          >
+            <Bot className="w-6 h-6" />
+            {isHovered && (
+              <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
+                {text.ai}
+              </span>
+            )}
           </div>
         </div>
-
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <div className="kanban-grid grid gap-4 overflow-x-auto pb-4">
-            {columns.map((columnStatus) => (
-              <KanbanColumn
-                key={columnStatus}
-                status={columnStatus}
-                items={filteredOpinions.filter((opinion) => opinion.status === columnStatus)}
-                onAdd={handleAddOpinion}
-                onEdit={handleEditOpinion}
-                onDelete={handleDeleteOpinion}
-                onAddRemark={handleAddRemark}
-              />
-            ))}
-          </div>
-
-          <DragOverlay>
-            {activeOpinion && (
-              <KanbanOpinion
-                opinion={activeOpinion}
-                onEdit={handleEditOpinion}
-                onDelete={handleDeleteOpinion}
-                onAddRemark={handleAddRemark}
-              />
-            )}
-          </DragOverlay>
-        </DndContext>
-
-            <FilterDialog
-              isOpen={isFilterDialogOpen}
-              onClose={() => setIsFilterDialogOpen(false)}
-              filters={filters}
-              onApplyFilters={setFilters}
-            />
-          </div>
-          {/* AI Assistant Button */}
-          <div className="fixed bottom-4 right-4">
-            <div
-              className={`relative rounded-full bg-primary text-primary-foreground p-3 cursor-pointer transition-all duration-300 ease-in-out ${isHovered ? 'w-36' : 'w-12'}`}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onClick={() => setShowChatbot(true)}
-            >
-              <Bot className="w-6 h-6" />
-              {isHovered && (
-                <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
-                  {text.ai}
-                </span>
-              )}
-            </div>
-          </div>
-          {/* Chatbot component */}
-          <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />
+        
+        {/* Chatbot component */}
+        <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />
+      </div>
     </div>
   );
 }
