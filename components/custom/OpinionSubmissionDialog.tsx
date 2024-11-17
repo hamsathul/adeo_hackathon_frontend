@@ -1,18 +1,17 @@
-import React from 'react';
-import { X, Flag, Tag, User, FileText, AlertTriangle, Info, Upload, Trash2 } from 'lucide-react';
-import { Department, OpinionFormData, Priority } from '../types';
+import React, { useState, useEffect } from 'react';
+import { X, Upload, Trash2, FileText, AlertTriangle, Info } from 'lucide-react';
+import { Opinion, Department, Priority } from '../types';
 import { cn } from '../utils';
 
-interface TaskDialogProps {
+interface OpinionSubmissionDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: OpinionFormData) => void;
-  initialData?: OpinionFormData;
-  title: string;
+  onSubmit: (opinion: Opinion) => void;
+  initialData?: Opinion;
+  isEditing?: boolean;
 }
 
 const DEPARTMENTS: Department[] = ['Engineering', 'Design', 'Marketing', 'Product', 'Sales'];
-const ASSIGNEES = ['BS', 'YD', 'FK'];
 const PRIORITIES: Priority[] = ['urgent', 'high', 'medium', 'low'];
 
 const priorityConfig = {
@@ -26,32 +25,52 @@ interface UploadedFile {
   name: string;
   size: number;
   type: string;
+  lastModified: number;
 }
 
-export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: TaskDialogProps) {
-  const [formData, setFormData] = React.useState<OpinionFormData>(
-    initialData || {
-      title: '',
-      assignee: '',
-      department: 'Engineering',
-      priority: 'medium',
-      submitter: {
-        name: '',
-        email: '',
-        description: ''
-      }
+export function OpinionSubmissionDialog({ isOpen, onClose, onSubmit, initialData, isEditing }: OpinionSubmissionDialogProps) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [department, setDepartment] = useState<Department>('Engineering');
+  const [priority, setPriority] = useState<Priority>('medium');
+  const [submitterName, setSubmitterName] = useState('');
+  const [submitterEmail, setSubmitterEmail] = useState('');
+  const [files, setFiles] = useState<UploadedFile[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Initialize form with existing data when editing
+  useEffect(() => {
+    if (initialData && isEditing) {
+      setTitle(initialData.title);
+      setDescription(initialData.submitter.description);
+      setDepartment(initialData.department);
+      setPriority(initialData.priority);
+      setSubmitterName(initialData.submitter.name);
+      setSubmitterEmail(initialData.submitter.email || '');
+      // Convert existing documents to UploadedFile format
+      setFiles(initialData.submitter.documents.map(doc => ({
+        name: doc.name,
+        size: 0, // Size not available from existing documents
+        type: doc.name.split('.').pop() || '',
+        lastModified: Date.now()
+      })));
     }
-  );
-  const [files, setFiles] = React.useState<UploadedFile[]>([]);
-  const [isDragging, setIsDragging] = React.useState(false);
+  }, [initialData, isEditing, isOpen]);
+
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      setTitle('');
+      setDescription('');
+      setDepartment('Engineering');
+      setPriority('medium');
+      setSubmitterName('');
+      setSubmitterEmail('');
+      setFiles([]);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-    onClose();
-  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -79,7 +98,8 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
     const processedFiles = newFiles.map(file => ({
       name: file.name,
       size: file.size,
-      type: file.type
+      type: file.type,
+      lastModified: file.lastModified
     }));
     setFiles(prevFiles => [...prevFiles, ...processedFiles]);
   };
@@ -96,16 +116,39 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const opinionData: Opinion = {
+      id: initialData?.id || Math.random().toString(36).substr(2, 9),
+      opinionId: initialData?.opinionId || `GOV-${Math.floor(Math.random() * 1000)}`,
+      title,
+      status: initialData?.status || 'unassigned',
+      department,
+      priority,
+      submitter: {
+        name: submitterName,
+        email: submitterEmail,
+        description,
+        documents: files.map(file => ({
+          name: file.name,
+          url: '#'
+        }))
+      },
+      remarks: initialData?.remarks || []
+    };
+
+    onSubmit(opinionData);
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start justify-center z-50 p-4 pt-[10vh]">
-      <div className="bg-white rounded-xl w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl w-full max-w-2xl">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <FileText className="w-5 h-5 text-blue-600" />
-            </div>
-            <h2 className="text-xl font-semibold">{title}</h2>
-          </div>
+          <h2 className="text-xl font-semibold">
+            {isEditing ? 'Edit Opinion' : 'Submit New Opinion'}
+          </h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -114,17 +157,17 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4">
-          <div className="grid gap-4">
+        <form onSubmit={handleSubmit} className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Opinion Title
               </label>
               <input
                 type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter a clear, descriptive title"
                 required
               />
@@ -133,15 +176,12 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4" />
-                    Department
-                  </div>
+                  Department
                 </label>
                 <select
-                  value={formData.department}
-                  onChange={(e) => setFormData({ ...formData, department: e.target.value as Department })}
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value as Department)}
+                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                   required
                 >
                   {DEPARTMENTS.map((dept) => (
@@ -154,53 +194,28 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  <div className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Assignee
-                  </div>
-                </label>
-                <select
-                  value={formData.assignee}
-                  onChange={(e) => setFormData({ ...formData, assignee: e.target.value })}
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                  required
-                >
-                  <option value="">Select assignee</option>
-                  {ASSIGNEES.map((assignee) => (
-                    <option key={assignee} value={assignee}>
-                      {assignee}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                <div className="flex items-center gap-2">
-                  <Flag className="w-4 h-4" />
                   Priority Level
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {PRIORITIES.map((p) => {
+                    const PriorityIcon = priorityConfig[p].icon;
+                    return (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setPriority(p)}
+                        className={cn(
+                          'p-2 border rounded-lg flex items-center justify-center gap-1.5',
+                          'transition-colors hover:bg-gray-50 text-sm',
+                          priority === p ? priorityConfig[p].color : 'border-gray-200'
+                        )}
+                      >
+                        <PriorityIcon className="w-3.5 h-3.5" />
+                        <span className="font-medium capitalize">{p}</span>
+                      </button>
+                    );
+                  })}
                 </div>
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {PRIORITIES.map((p) => {
-                  const PriorityIcon = priorityConfig[p].icon;
-                  return (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, priority: p })}
-                      className={cn(
-                        'p-2 border rounded-lg flex items-center justify-center gap-1.5',
-                        'transition-colors hover:bg-gray-50 text-sm',
-                        formData.priority === p ? priorityConfig[p].color : 'border-gray-200'
-                      )}
-                    >
-                      <PriorityIcon className="w-3.5 h-3.5" />
-                      <span className="font-medium capitalize">{p}</span>
-                    </button>
-                  );
-                })}
               </div>
             </div>
 
@@ -211,12 +226,9 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
                 </label>
                 <input
                   type="text"
-                  value={formData.submitter.name}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    submitter: { ...formData.submitter, name: e.target.value }
-                  })}
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={submitterName}
+                  onChange={(e) => setSubmitterName(e.target.value)}
+                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter your full name"
                   required
                 />
@@ -227,12 +239,9 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
                 </label>
                 <input
                   type="email"
-                  value={formData.submitter.email}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    submitter: { ...formData.submitter, email: e.target.value }
-                  })}
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={submitterEmail}
+                  onChange={(e) => setSubmitterEmail(e.target.value)}
+                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter your email"
                   required
                 />
@@ -244,14 +253,10 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
                 Description
               </label>
               <textarea
-                value={formData.submitter.description}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  submitter: { ...formData.submitter, description: e.target.value }
-                })}
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Provide a detailed description..."
-                rows={2}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[120px]"
+                placeholder="Provide a detailed description of your opinion..."
                 required
               />
             </div>
@@ -265,7 +270,7 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 className={cn(
-                  'border-2 border-dashed rounded-lg p-4 transition-colors',
+                  'border-2 border-dashed rounded-lg p-6 transition-colors',
                   isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300',
                   'text-center'
                 )}
@@ -282,18 +287,18 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
                   htmlFor="file-input"
                   className="cursor-pointer inline-flex flex-col items-center"
                 >
-                  <Upload className="w-5 h-5 text-gray-400 mb-1" />
+                  <Upload className="w-6 h-6 text-gray-400 mb-2" />
                   <span className="text-sm text-gray-600">
                     Drop files here or click to upload
                   </span>
-                  <span className="text-xs text-gray-500 mt-0.5">
+                  <span className="text-xs text-gray-500 mt-1">
                     PDF, DOC, DOCX, XLS, XLSX up to 10MB each
                   </span>
                 </label>
               </div>
 
               {files.length > 0 && (
-                <div className="mt-2 space-y-2">
+                <div className="mt-3 space-y-2">
                   {files.map((file, index) => (
                     <div
                       key={index}
@@ -324,19 +329,19 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 mt-4">
+          <div className="flex justify-end gap-2 mt-6">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             >
-              Save Changes
+              {isEditing ? 'Save Changes' : 'Submit Opinion'}
             </button>
           </div>
         </form>

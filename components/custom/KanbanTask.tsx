@@ -1,24 +1,31 @@
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
-import { Task, TaskFormData } from '../types';
+import { Clock, MoreVertical, Pencil, Tag, Trash2 } from 'lucide-react';
+import { Opinion, OpinionFormData } from '../types';
 import { TaskDialog } from './TaskDialog';
 import { cn } from '../utils';
-import { translations } from './translation';
-import { useCallback } from 'react';
 
 interface KanbanTaskProps {
-  task: Task;
-  onEdit: (taskId: string, data: TaskFormData) => void;
+  task: Opinion;
+  onEdit: (taskId: string, data: OpinionFormData) => void;
   onDelete: (taskId: string) => void;
-  text: typeof translations.en | typeof translations.ar;
 }
 
 const assigneeColors: Record<string, string> = {
   'BS': 'bg-blue-500',
   'YD': 'bg-yellow-500',
   'FK': 'bg-green-500',
+};
+
+const statusColors: Record<string, string> = {
+  'todo': 'bg-gray-100 text-gray-700',
+  'in-progress': 'bg-blue-100 text-blue-700',
+  'testing': 'bg-purple-100 text-purple-700',
+  'review': 'bg-yellow-100 text-yellow-700',
+  'done': 'bg-green-100 text-green-700',
+  'on-hold': 'bg-orange-100 text-orange-700',
+  'rejected': 'bg-red-100 text-red-700',
 };
 
 export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
@@ -41,15 +48,15 @@ export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
     transition,
   };
 
-  const handleEdit = (data: TaskFormData) => {
+  const handleEdit = (data: OpinionFormData) => {
     onEdit(task.id, data);
   };
 
-  const handleDelete = useCallback(() => {
-    if (typeof window !== 'undefined' && window.confirm('Are you sure you want to delete this task?')) {
+  const handleDelete = () => {
+    if (window.confirm('Are you sure you want to delete this task?')) {
       onDelete(task.id);
     }
-  }, [task.id, onDelete]);
+  };
 
   return (
     <>
@@ -59,25 +66,25 @@ export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
         {...attributes}
         {...listeners}
         className={cn(
-          'bg-white p-4 rounded-lg shadow-sm border border-gray-200 cursor-move group',
-          'hover:shadow-md transition-shadow duration-200',
-          isDragging && 'opacity-50'
+          'bg-white p-4 rounded-xl shadow-sm border border-gray-100 cursor-move group',
+          'hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5',
+          isDragging && 'opacity-50 rotate-2'
         )}
       >
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-blue-600">
-              {task.taskId}
-            </span>
-            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
-              {task.department}
+            <span className={cn(
+              'text-xs font-medium px-2 py-1 rounded-full',
+              statusColors[task.status]
+            )}>
+              {task.opinionId}
             </span>
           </div>
           <div className="flex items-center gap-2">
             {task.assignee && (
               <div
                 className={cn(
-                  'w-6 h-6 rounded-full text-white flex items-center justify-center text-xs font-medium',
+                  'w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium shadow-sm',
                   assigneeColors[task.assignee]
                 )}
               >
@@ -87,18 +94,18 @@ export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
             <div className="relative">
               <button
                 onClick={() => setShowActions(!showActions)}
-                className="p-1 hover:bg-gray-100 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                className="p-1.5 hover:bg-gray-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <MoreVertical className="w-4 h-4" />
               </button>
               {showActions && (
-                <div className="absolute right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 w-32 z-10">
+                <div className="absolute right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-100 py-1 w-36 z-10">
                   <button
                     onClick={() => {
                       setIsEditDialogOpen(true);
                       setShowActions(false);
                     }}
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 flex items-center gap-2"
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
                   >
                     <Pencil className="w-4 h-4" />
                     Edit
@@ -108,7 +115,7 @@ export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
                       handleDelete();
                       setShowActions(false);
                     }}
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 text-red-600 flex items-center gap-2"
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-50 text-red-600 flex items-center gap-2"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete
@@ -118,14 +125,24 @@ export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
             </div>
           </div>
         </div>
-        <p className="text-gray-700">{task.title}</p>
+        <h3 className="text-gray-900 font-medium mb-2">{task.title}</h3>
+        <div className="flex items-center gap-3 text-sm text-gray-500">
+          <div className="flex items-center gap-1">
+            <Tag className="w-4 h-4" />
+            {task.department}
+          </div>
+          <div className="flex items-center gap-1">
+            <Clock className="w-4 h-4" />
+            2d
+          </div>
+        </div>
       </div>
 
       <TaskDialog
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
         onSubmit={handleEdit}
-        initialData={{ title: task.title, assignee: task.assignee || '', department: task.department }}
+        initialData={{ title: task.title, assignee: task.assignee || '', department: task.department, priority: task.priority, submitter: task.submitter }}
         title="Edit Task"
       />
     </>

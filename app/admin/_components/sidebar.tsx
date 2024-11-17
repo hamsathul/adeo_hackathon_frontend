@@ -11,8 +11,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
   const menuItems = [
     { icon: <LayoutDashboard className="w-6 h-6" />, label: 'Dashboard', href: '/admin' },
-    { icon: <FileText className="w-6 h-6" />, label: 'Requests', href: '/request' },
-    { icon: <Users className="w-6 h-6" />, label: 'Users', href: '/user' },
+    { icon: <Users className="w-6 h-6" />, label: 'Users', href: '/employee' },
     { icon: <Settings className="w-6 h-6" />, label: 'Settings', href: '/setting' },
   ];
 

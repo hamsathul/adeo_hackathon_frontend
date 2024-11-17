@@ -1,5 +1,3 @@
-'use client'
-
 import { KanbanBoard } from '../../components/custom/KanbanBoard'
 
 export default function Component() {
