@@ -1,7 +1,4 @@
 'use client'
-<<<<<<< HEAD
-
-import { KanbanBoard } from '../../components/custom/KanbanBoard'
 
 export default function Component() {
   return (
@@ -170,8 +167,6 @@ export default function Component() {
 //     </div>
 //   )
 // }
-=======
 
 import { KanbanBoard } from '../../components/custom/KanbanBoard'
->>>>>>> 1f9dd5e41b519f7951ab96e17f5ce6b3df6d04b1
 

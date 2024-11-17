@@ -1,19 +1,26 @@
-"use client";
+'use client'
 
 import React, { useState } from 'react';
-import Header from '@/app/admin/_components/header';
-import Sidebar from '@/app/admin/_components/sidebar';
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors,} from '@dnd-kit/core';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Bot, Filter, Search, Settings, Share2, Zap } from 'lucide-react';
-import { Opinion, Status, OpinionFormData, OpinionFilters, RemarkFormData } from '../types';
+import { Filter, Search, Settings, Share2, Zap, Bot } from 'lucide-react';
+import { Opinion, Status, OpinionFormData, TaskFilters, RemarkFormData } from '../types';
 import { KanbanColumn } from './KanbanColumn';
 import { KanbanOpinion } from './KanbanOpinion';
 import { FilterDialog } from './FilterDialog';
 import { useLanguageStore } from '@/store/useLanguageStore'
 import { translations } from '@/components/custom/translation'
 import Chatbot from '@/components/custom/chatbot'
-
+import Header from '../../app/admin/_components/header'
+import Sidebar from '../../app/admin/_components/sidebar'
 const initialOpinions: Opinion[] = [
   {
     id: '1',
@@ -68,7 +75,7 @@ const text = isArabic ? translations.ar : translations.en;
   const [opinions, setOpinions] = useState<Opinion[]>(initialOpinions);
   const [activeOpinion, setActiveOpinion] = useState<Opinion | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<OpinionFilters>({});
+  const [filters, setFilters] = useState<TaskFilters>({});
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
 
   const sensors = useSensors(
@@ -200,14 +207,10 @@ const text = isArabic ? translations.ar : translations.en;
   });
 
   return (
-<<<<<<< HEAD
-    <div className="flex h-screen bg-[#f8f9fa] overflow-hidden margin-left-">
-=======
     <div className="min-h-screen bg-[#f8f9fa]">
       <Header />
       <div className="px-20">
       <header className="flex justify-end p-4"></header>
->>>>>>> 1f9dd5e41b519f7951ab96e17f5ce6b3df6d04b1
       <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
       <div className="container mx-auto px-6 py-2">
         <div className="mb-8">

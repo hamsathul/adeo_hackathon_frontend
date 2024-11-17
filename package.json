@@ -38,12 +38,8 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.3",
-<<<<<<< HEAD
-    "zustand": "^3.7.2"
-=======
     "xlsx": "^0.18.5",
     "zustand": "^5.0.1"
->>>>>>> 1f9dd5e41b519f7951ab96e17f5ce6b3df6d04b1
   },
   "devDependencies": {
     "@types/node": "^20",
