@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { X, LayoutDashboard, FileText, Users, Settings, Menu } from 'lucide-react';
+import { translations } from '@/components/custom/translation';
+import { useLanguageStore } from '@/store/useLanguageStore';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -30,7 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
       >
         <div className="py-6 px-4">
           <div className="flex items-center justify-between">
-            <h2 className={`text-lg font-bold ${!isOpen && 'hidden'}`}>IORMS</h2>
+            <h2 className={`text-lg font-bold ${!isOpen && 'hidden'}`}>Samah</h2>
             <button
               className="text-gray-400 hover:text-white focus:outline-none flex items-center justify-center w-8 h-8"
               onClick={onToggle}

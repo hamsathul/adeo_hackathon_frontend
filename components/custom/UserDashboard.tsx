@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import React, { useState } from 'react';
 import { FileText, Plus, Search, Flag, ChevronRight } from 'lucide-react';
@@ -23,32 +23,30 @@ export function UserDashboard() {
 
   const handleSubmitOpinion = (opinionData: Opinion) => {
     if (editingOpinion) {
-      // Update existing opinion while preserving id, opinionId, and other metadata
       setMyOpinions(myOpinions.map(op => 
         op.id === editingOpinion.id ? {
-          ...editingOpinion, // Preserve existing metadata
+          ...editingOpinion,
           title: opinionData.title,
           department: opinionData.department,
           priority: opinionData.priority,
           submitter: {
-            ...editingOpinion.submitter, // Preserve existing documents
+            ...editingOpinion.submitter,
             name: opinionData.submitter.name,
             email: opinionData.submitter.email,
             description: opinionData.submitter.description,
             documents: [
-              ...editingOpinion.submitter.documents, // Keep existing documents
+              ...editingOpinion.submitter.documents,
               ...opinionData.submitter.documents.filter(newDoc => 
                 !editingOpinion.submitter.documents.some(existingDoc => 
                   existingDoc.name === newDoc.name
                 )
-              ) // Add only new documents
+              )
             ]
           }
         } : op
       ));
       setEditingOpinion(null);
     } else {
-      // Create new opinion
       setMyOpinions([...myOpinions, opinionData]);
     }
     setIsSubmissionDialogOpen(false);

@@ -46,11 +46,6 @@ export interface OpinionFormData {
   };
 }
 
-export interface OpinionFilters {
-  assignee?: string;
-  department?: Department;
-}
-
 export interface RemarkFormData {
   content: string;
   author: string;

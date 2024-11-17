@@ -433,7 +433,7 @@ const SearchEngine = () => {
               onMouseLeave={() => setIsHovered(false)}
               onClick={() => setShowChatbot(true)}
             >
-              <Bot className="w-6 h-6" />
+              <Bot className="w-8 h-8" />
               {isHovered && (
                 <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
                   {text.ai}

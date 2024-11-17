@@ -1,21 +1,22 @@
-"use client";
+'use client'
 
 import React, { useState } from 'react';
 import Header from '@/app/admin/_components/header';
 import Sidebar from '@/app/admin/_components/sidebar';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors,} from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { Bot, Filter, Search, Settings, Share2, Zap } from 'lucide-react';
-import { Opinion, Status, OpinionFormData, OpinionFilters, RemarkFormData } from '../types';
+import { Sparkles, Filter, Search, Settings, Share2, Zap } from 'lucide-react';
+import { Opinion, Status, OpinionFormData, RemarkFormData } from '../types';
 import { KanbanColumn } from './KanbanColumn';
 import { KanbanOpinion } from './KanbanOpinion';
 import { FilterDialog } from './FilterDialog';
 import { useLanguageStore } from '@/store/useLanguageStore'
 import { translations } from '@/components/custom/translation'
 import Chatbot from '@/components/custom/chatbot'
+import { TaskFilters } from '../types';
 
 const initialOpinions: Opinion[] = [
-  {
+  { 
     id: '1',
     title: 'Infrastructure Development Proposal',
     status: 'unassigned',
@@ -64,11 +65,11 @@ export function KanbanBoard() {
       setIsSidebarOpen(!isSidebarOpen);
     };
   const { isArabic } = useLanguageStore();
-const text = isArabic ? translations.ar : translations.en;
+  const text = isArabic ? translations.ar : translations.en;
   const [opinions, setOpinions] = useState<Opinion[]>(initialOpinions);
   const [activeOpinion, setActiveOpinion] = useState<Opinion | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<OpinionFilters>({});
+  const [filters, setFilters] = useState<TaskFilters>({});
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
 
   const sensors = useSensors(
@@ -201,58 +202,44 @@ const text = isArabic ? translations.ar : translations.en;
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
-      <Header />
-      <div className="px-20">
-      <header className="flex justify-end p-4"></header>
-      <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
-      <div className="container mx-auto px-6 py-2">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className='relative'>
-              <div className="text-sm text-gray-500 mb-1 tracking-wide fixed left-20">Opinions / Government</div>
-              <h1 className="text-3xl font-bold tracking-tight mt-5 fixed left-20">Opinion Management</h1>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 fixed right-20">
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors ">
-                <Zap className="w-5 h-5" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Share2 className="w-5 h-5" />
-              </button>
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
-              <a href="/search">
-                <button className="bg-black text-white px-6 py-2.5 rounded-lg hover:bg-gray-900 transition-colors font-medium">
-                  {text.searchEngine}
-                </button>
-              </a>
-            </div>
+  <Header />
+  <div className="px-20">
+    <header className="flex justify-end p-4"></header>
+    <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+    <div className="container mx-auto px-6 py-2">
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-6">
+          {/* Left Section: Opinions / Government and Opinion Management */}
+          <div>
+            <div className="text-sm text-gray-500 mb-1 tracking-wide">{text.opinionsGovernment}</div>
+            <h1 className="text-3xl font-bold tracking-tight mt-2">{text.opinionManagement}</h1>
           </div>
           
-          <div className="flex items-center gap-4 mb-2">
-            <div className="relative flex-1 max-w-md py-9 fixed right-6">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search opinions..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5 bg-white"
-              />
-            </div>
-            <button
-              onClick={() => setIsFilterDialogOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-white transition-colors bg-transparent"
-            >
-              <Filter className="w-5 h-5" />
-              Filter
-              {(filters.assignee || filters.department) && (
-                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-              )}
-            </button>
+          {/* Right Section: Icons */}
+            <div className="flex items-center gap-4">
+          <div className="relative flex-1 max-w-xl">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder={text.searchOpinion}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5 bg-white"
+            />
           </div>
+          <button
+            onClick={() => setIsFilterDialogOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-white transition-colors bg-transparent"
+          >
+            <Filter className="w-5 h-5" />
+            {text.filter}
+            {(filters.assignee || filters.department) && (
+              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+            )}
+          </button>
+          </div>
+        </div>
+        </div>
         </div>
 
         <DndContext
@@ -295,22 +282,33 @@ const text = isArabic ? translations.ar : translations.en;
           </div>
           {/* AI Assistant Button */}
           <div className="fixed bottom-4 right-4">
-            <div
-              className={`relative rounded-full bg-primary text-primary-foreground p-3 cursor-pointer transition-all duration-300 ease-in-out ${isHovered ? 'w-36' : 'w-12'}`}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onClick={() => setShowChatbot(true)}
-            >
-              <Bot className="w-6 h-6" />
-              {isHovered && (
-                <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
-                  {text.ai}
-                </span>
-              )}
-            </div>
-          </div>
-          {/* Chatbot component */}
-          <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />
+      <div
+        className={`relative rounded-full bg-gradient-to-r from-blue-500 to-purple-500 p-4 cursor-pointer transition-all duration-500 ease-in-out ${
+          isHovered ? "scale-125 shadow-2xl" : "scale-100 shadow-lg"
+        }`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={() => setShowChatbot(true)}
+      >
+        {/* Animated Pulsating Circle */}
+        <div
+          className={`absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 blur-md opacity-70 ${
+            isHovered ? "animate-pulse" : ""
+          }`}
+        ></div>
+        {/* Sparkles Icon */}
+        <Sparkles
+          className="relative w-12 h-12 text-white z-10"
+          strokeWidth={1.1}
+        />
+
+        {/* Hover Text */}
+        {isHovered && (
+          <span className="absolute left-14 top-1/2 transform -translate-y-1/2 text-white text-sm font-semibold whitespace-nowrap z-20"></span>
+      )}
+    </div>
+  <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)}/>
+      </div>
     </div>
   );
 }
