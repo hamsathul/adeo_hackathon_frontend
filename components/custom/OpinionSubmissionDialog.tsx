@@ -7,7 +7,7 @@ interface OpinionSubmissionDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (opinion: Opinion) => void;
-  initialData?: Opinion;
+  initialData?: Opinion | null;
   isEditing?: boolean;
 }
 
@@ -38,7 +38,6 @@ export function OpinionSubmissionDialog({ isOpen, onClose, onSubmit, initialData
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Initialize form with existing data when editing
   useEffect(() => {
     if (initialData && isEditing) {
       setTitle(initialData.title);
@@ -47,17 +46,15 @@ export function OpinionSubmissionDialog({ isOpen, onClose, onSubmit, initialData
       setPriority(initialData.priority);
       setSubmitterName(initialData.submitter.name);
       setSubmitterEmail(initialData.submitter.email || '');
-      // Convert existing documents to UploadedFile format
       setFiles(initialData.submitter.documents.map(doc => ({
         name: doc.name,
-        size: 0, // Size not available from existing documents
+        size: 0,
         type: doc.name.split('.').pop() || '',
         lastModified: Date.now()
       })));
     }
   }, [initialData, isEditing, isOpen]);
 
-  // Reset form when dialog closes
   useEffect(() => {
     if (!isOpen) {
       setTitle('');

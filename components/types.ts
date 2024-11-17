@@ -2,6 +2,11 @@ export type Status = 'unassigned' | 'todo' | 'in-progress' | 'testing' | 'review
 export type Department = 'Engineering' | 'Design' | 'Marketing' | 'Product' | 'Sales';
 export type Priority = 'low' | 'medium' | 'high' | 'urgent';
 
+export interface TaskFilters {
+  assignee?: string;
+  department?: Department;
+}
+
 export interface Remark {
   id: string;
   content: string;
@@ -39,11 +44,6 @@ export interface OpinionFormData {
     email: string;
     description: string;
   };
-}
-
-export interface OpinionFilters {
-  assignee?: string;
-  department?: Department;
 }
 
 export interface RemarkFormData {

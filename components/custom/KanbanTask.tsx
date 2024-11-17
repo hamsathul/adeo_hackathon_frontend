@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Clock, MoreVertical, Pencil, Tag, Trash2 } from 'lucide-react';
-import { Task, TaskFormData } from '../types';
+import { Opinion, OpinionFormData } from '../types';
 import { TaskDialog } from './TaskDialog';
 import { cn } from '../utils';
 
 interface KanbanTaskProps {
-  task: Task;
-  onEdit: (taskId: string, data: TaskFormData) => void;
+  task: Opinion;
+  onEdit: (taskId: string, data: OpinionFormData) => void;
   onDelete: (taskId: string) => void;
 }
 
@@ -48,7 +48,7 @@ export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
     transition,
   };
 
-  const handleEdit = (data: TaskFormData) => {
+  const handleEdit = (data: OpinionFormData) => {
     onEdit(task.id, data);
   };
 
@@ -77,7 +77,7 @@ export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
               'text-xs font-medium px-2 py-1 rounded-full',
               statusColors[task.status]
             )}>
-              {task.taskId}
+              {task.opinionId}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ export function KanbanTask({ task, onEdit, onDelete }: KanbanTaskProps) {
         isOpen={isEditDialogOpen}
         onClose={() => setIsEditDialogOpen(false)}
         onSubmit={handleEdit}
-        initialData={{ title: task.title, assignee: task.assignee || '', department: task.department }}
+        initialData={{ title: task.title, assignee: task.assignee || '', department: task.department, priority: task.priority, submitter: task.submitter }}
         title="Edit Task"
       />
     </>

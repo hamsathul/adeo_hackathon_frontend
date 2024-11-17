@@ -1,8 +1,6 @@
-"use client";
+'use client'
 
 import React, { useState } from 'react';
-import Header from '@/app/admin/_components/header';
-import Sidebar from '@/app/admin/_components/sidebar';
 import {
   DndContext,
   DragEndEvent,
@@ -14,7 +12,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { Filter, Search, Settings, Share2, Zap } from 'lucide-react';
-import { Opinion, Status, OpinionFormData, OpinionFilters, RemarkFormData } from '../types';
+import { Opinion, Status, OpinionFormData, TaskFilters, RemarkFormData } from '../types';
 import { KanbanColumn } from './KanbanColumn';
 import { KanbanOpinion } from './KanbanOpinion';
 import { FilterDialog } from './FilterDialog';
@@ -65,7 +63,7 @@ export function KanbanBoard() {
   const [opinions, setOpinions] = useState<Opinion[]>(initialOpinions);
   const [activeOpinion, setActiveOpinion] = useState<Opinion | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<OpinionFilters>({});
+  const [filters, setFilters] = useState<TaskFilters>({});
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
 
   const sensors = useSensors(
