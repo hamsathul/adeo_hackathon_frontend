@@ -1,5 +1,5 @@
 // store/useLanguageStore.ts
-import { create } from 'zustand'
+import  create  from 'zustand'
 import { persist } from 'zustand/middleware'
 
 interface LanguageState {
@@ -7,8 +7,8 @@ interface LanguageState {
   toggleLanguage: () => void
 }
 
-export const useLanguageStore = create<LanguageState>()(
-  persist(
+export const useLanguageStore = create<LanguageState>(
+  persist<LanguageState>(
     (set) => ({
       isArabic: false,
       toggleLanguage: () => set((state) => ({ isArabic: !state.isArabic })),

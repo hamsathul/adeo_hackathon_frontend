@@ -127,7 +127,7 @@ export function KanbanBoard() {
   });
 
   return (
-    <div className="flex h-screen bg-[#f8f9fa] overflow-hidden">
+    <div className="flex h-screen bg-[#f8f9fa] overflow-hidden margin-left-">
       <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
       <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-16'}`}>
         <Header />

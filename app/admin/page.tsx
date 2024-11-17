@@ -1,4 +1,14 @@
-// 'use client'
+'use client'
+
+import { KanbanBoard } from '../../components/custom/KanbanBoard'
+
+export default function Component() {
+  return (
+    <div className="flex flex-col min-h-screen  ">
+      <KanbanBoard />
+    </div>
+  )
+}
 
 // import { Clock, DollarSign, Users, Bot } from 'lucide-react'
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -159,12 +169,4 @@
 //     </div>
 //   )
 // }
-import { KanbanBoard } from '../../components/custom/KanbanBoard'
 
-export default function Component() {
-  return (
-    <div className="flex flex-col min-h-screen">
-      <KanbanBoard />
-    </div>
-  )
-}
