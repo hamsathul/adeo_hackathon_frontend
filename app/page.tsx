@@ -6,6 +6,6 @@ import { StaffDashboard } from '@/components/custom/StaffDashboard'
 
 export default function Component() {
   return (
-    < StaffDashboard/>
+    < LandingPage/>
   )
 }
