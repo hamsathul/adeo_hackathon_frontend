@@ -135,7 +135,7 @@ export default function Component() {
         <header className="flex justify-end p-4"></header>
     <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Employee Management</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{text.employeeManagement}</h1>
         <div className="flex items-center gap-2">
           <input
             type="file"
@@ -147,52 +147,52 @@ export default function Component() {
           <label htmlFor="import" className="cursor-pointer">
             <Button variant="outline" size="sm">
               <Import className="h-4 w-4 mr-2" />
-              Import
+              {text.import}
             </Button>
           </label>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-2" />
-                Export
+                {text.export}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onClick={() => handleExport('pdf')}>Export as PDF</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('excel')}>Export as Excel</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('csv')}>Export as CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('pdf')}>{text.exportPDF}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('excel')}>{text.exportExcel}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('csv')}>{text.exportCSV}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <Dialog open={showAddEmployee} onOpenChange={setShowAddEmployee}>
             <DialogTrigger asChild>
               <Button size="sm">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Employee
+                {text.addEmployee}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add New Employee</DialogTitle>
+                <DialogTitle>{text.addNewEmployee}</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <Input
-                  placeholder="Name"
+                  placeholder={text.name}
                   value={newEmployee.name || ''}
                   onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
                 />
                 <Input
-                  placeholder="Email"
+                  placeholder={text.email}
                   type="email"
                   value={newEmployee.email || ''}
                   onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
                 />
                 <Input
-                  placeholder="Position"
+                  placeholder={text.position}
                   value={newEmployee.position || ''}
                   onChange={(e) => setNewEmployee({ ...newEmployee, position: e.target.value })}
                 />
                 <Input
-                  placeholder="Employee ID"
+                  placeholder={text.employeeID}
                   value={newEmployee.employeeId || ''}
                   onChange={(e) => setNewEmployee({ ...newEmployee, employeeId: e.target.value })}
                 />
@@ -201,7 +201,7 @@ export default function Component() {
                   onValueChange={(value) => setNewEmployee({ ...newEmployee, workType: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Work Type" />
+                    <SelectValue placeholder={text.workType} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Fulltime">Full Time</SelectItem>
@@ -210,12 +210,12 @@ export default function Component() {
                   </SelectContent>
                 </Select>
                 <Input
-                  placeholder="Department"
+                  placeholder={text.department}
                   value={newEmployee.department || ''}
                   onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })}
                 />
                 <Input
-                  placeholder="Phone"
+                  placeholder={text.phone}
                   value={newEmployee.phone || ''}
                   onChange={(e) => setNewEmployee({ ...newEmployee, phone: e.target.value })}
                 />
@@ -234,7 +234,7 @@ export default function Component() {
                   }}
                 />
               </div>
-              <Button onClick={handleAddEmployee}>Add Employee</Button>
+              <Button onClick={handleAddEmployee}>{text.addEmployee}</Button>
             </DialogContent>
           </Dialog>
         </div>
@@ -245,7 +245,7 @@ export default function Component() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               className="pl-8"
-              placeholder="Search employees..."
+              placeholder= {text.searchEmployee}
               type="search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -256,7 +256,7 @@ export default function Component() {
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="all">{text.allTypes}</SelectItem>
               <SelectItem value="fulltime">Full Time</SelectItem>
               <SelectItem value="parttime">Part Time</SelectItem>
               <SelectItem value="contract">Contract</SelectItem>
@@ -267,7 +267,7 @@ export default function Component() {
               <SelectValue placeholder="Department" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
+              <SelectItem value="all">{text.allDepartments}</SelectItem>
               <SelectItem value="managerial">Managerial</SelectItem>
               <SelectItem value="it">IT</SelectItem>
               <SelectItem value="hr">HR</SelectItem>
@@ -279,7 +279,7 @@ export default function Component() {
               <SelectValue placeholder="Role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="all">{text.allRoles}</SelectItem>
               <SelectItem value="ceo">CEO</SelectItem>
               <SelectItem value="manager">Manager</SelectItem>
               <SelectItem value="designer">Designer</SelectItem>
@@ -413,23 +413,23 @@ export default function Component() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <Input
-                placeholder="Name"
+                placeholder={text.name}
                 value={editingEmployee.name}
                 onChange={(e) => setEditingEmployee({ ...editingEmployee, name: e.target.value })}
               />
               <Input
-                placeholder="Email"
+                placeholder={text.email}
                 type="email"
                 value={editingEmployee.email}
                 onChange={(e) => setEditingEmployee({ ...editingEmployee, email: e.target.value })}
               />
               <Input
-                placeholder="Position"
+                placeholder={text.position}
                 value={editingEmployee.position}
                 onChange={(e) => setEditingEmployee({ ...editingEmployee, position: e.target.value })}
               />
               <Input
-                placeholder="Employee ID"
+                placeholder={text.employeeID}
                 value={editingEmployee.employeeId}
                 onChange={(e) => setEditingEmployee({ ...editingEmployee, employeeId: e.target.value })}
               />
@@ -438,7 +438,7 @@ export default function Component() {
                 onValueChange={(value) => setEditingEmployee({ ...editingEmployee, workType: value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Work Type" />
+                  <SelectValue placeholder={text.workType} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Fulltime">Full Time</SelectItem>

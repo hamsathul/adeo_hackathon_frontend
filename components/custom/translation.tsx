@@ -1,6 +1,4 @@
-import Requests from "@/app/request/page";
-import { profile } from "console";
-import { Languages, LogOut } from "lucide-react";
+import { all } from "axios";
 
 export const translations = {
     en: {
@@ -52,6 +50,25 @@ export const translations = {
       changePassword: "Change Password",
       deletepic: "Delete Picture",
       saveChanges: "Save Changes",
+      employeeManagement: "Employee Management",
+      addEmployee: "Add Employee",
+      addNewEmployee: "Add New Employee",
+      import: "Import",
+      export: "Export",
+      exportPDF: "Export as PDF",
+      exportExcel: "Export as Excel",
+      exportCSV: "Export as CSV",
+      searchEmployee: "Search Employee",
+      allTypes: "All Types",
+      allDepartments: "All Departments",
+      allRoles: "All Roles",
+      searchEmployees: "Search employees",
+      position: "Position",
+      employeeID: "Employee ID",
+      workType: "Work Type",
+      department: "Department",
+      phone: "Phone",
+      name: "Name",
     },
     ar: {
       ai: "مساعد الذكاء الاصطناعي",
@@ -102,6 +119,25 @@ export const translations = {
       changePassword: "تغيير كلمة المرور",
       deletepic: "حذف الصورة",
       saveChanges: "حفظ التغييرات",
+      employeeManagement: "إدارة الموظفين",
+      addEmployee: "إضافة موظف",
+      addNewEmployee: "إضافة موظف جديد",
+      import: "استيراد",
+      export: "تصدير",
+      exportPDF: "تصدير كـ PDF",
+      exportExcel: "تصدير كـ Excel",
+      exportCSV: "تصدير كـ CSV",
+      searchEmployee: "البحث عن موظف",
+      allTypes: "جميع الأنواع",
+      allDepartments: "جميع الإدارات",
+      allRoles: "جميع الأدوار",
+      searchEmployees: "البحث عن الموظفين",
+      position: "المنصب",
+      employeeID: "رقم الموظف",
+      workType: "نوع العمل",
+      department: "الإدارة",
+      phone: "الهاتف",
+      name: "الاسم",
     },
   };
   
