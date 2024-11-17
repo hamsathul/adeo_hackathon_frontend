@@ -6,9 +6,9 @@ import { StaffDashboard } from '@/components/custom/StaffDashboard'
 
 export default function Component() {
   return (
-    // <KanbanBoard />
+    <KanbanBoard />
     // <UserDashboard />
     // <StaffDashboard />
-    < LandingPage/>
+    // < LandingPage/>
   )
 }

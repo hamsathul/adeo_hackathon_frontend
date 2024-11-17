@@ -17,14 +17,14 @@ interface KanbanColumnProps {
 }
 
 const statusConfig: Record<Status, { title: string; color: string }> = {
-  'unassigned': { title: 'UNASSIGNED', color: 'bg-gray-50 border-t-gray-300' },
-  'todo': { title: 'TO DO', color: 'bg-gray-50 border-t-gray-300' },
-  'in-progress': { title: 'IN PROGRESS', color: 'bg-blue-50 border-t-blue-400' },
-  'testing': { title: 'TESTING', color: 'bg-purple-50 border-t-purple-400' },
-  'review': { title: 'REVIEW', color: 'bg-yellow-50 border-t-yellow-400' },
-  'done': { title: 'DONE', color: 'bg-green-50 border-t-green-400' },
-  'on-hold': { title: 'ON HOLD', color: 'bg-orange-50 border-t-orange-400' },
-  'rejected': { title: 'REJECTED', color: 'bg-red-50 border-t-red-400' }
+  'unassigned': { title: 'UNASSIGNED', color: 'bg-gray-100 border-t-gray-300' },
+  'todo': { title: 'TO DO', color: 'bg-blue-100 border-t-blue-300' },
+  'in-progress': { title: 'IN PROGRESS', color: 'bg-teal-100 border-t-teal-300' },
+  'testing': { title: 'TESTING', color: 'bg-purple-100 border-t-purple-300' },
+  'review': { title: 'REVIEW', color: 'bg-yellow-100 border-t-yellow-300' },
+  'done': { title: 'DONE', color: 'bg-green-100 border-t-green-300' },
+  'on-hold': { title: 'ON HOLD', color: 'bg-orange-100 border-t-orange-300' },
+  'rejected': { title: 'REJECTED', color: 'bg-red-100 border-t-red-300' }
 };
 
 export function KanbanColumn({ status, items, onAdd, onEdit, onDelete, onAddRemark }: KanbanColumnProps) {
