@@ -20,10 +20,14 @@
     "@radix-ui/react-switch": "^1.1.1",
     "@radix-ui/react-tabs": "^1.1.1",
     "@radix-ui/react-toast": "^1.2.2",
+    "@radix-ui/react-tooltip": "^1.1.4",
     "@shadcn/ui": "^0.0.4",
+    "@types/jspdf": "^1.3.3",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "lucide-react": "^0.456.0",
     "nanoid": "^5.0.8",
     "next": "15.0.3",
@@ -34,7 +38,12 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.3",
+<<<<<<< HEAD
     "zustand": "^3.7.2"
+=======
+    "xlsx": "^0.18.5",
+    "zustand": "^5.0.1"
+>>>>>>> 1f9dd5e41b519f7951ab96e17f5ce6b3df6d04b1
   },
   "devDependencies": {
     "@types/node": "^20",
