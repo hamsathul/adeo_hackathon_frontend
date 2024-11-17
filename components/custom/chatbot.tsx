@@ -47,27 +47,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, userId }) => {
     setToken(storedToken)
   }, [])
 
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('../');
-      } else {
-        // Check if token is expired on mount
-        const decodedToken = jwtDecode<JWTPayload>(token);
-		console.log(decodedToken);
-        const currentTime = Date.now() / 1000;
-        
-        if (decodedToken.exp < currentTime) {
-          localStorage.clear();
-          router.push('../');
-          return;
-        }
-        setIsAuthenticated(true);
-      }
-    };
-	checkAuth();
-}, []);
+
 
   useEffect(() => {
     scrollToBottom()

@@ -1,172 +1,164 @@
 'use client'
 
-export default function Component() {
-  return (
-    <div className="flex flex-col min-h-screen  ">
-      <KanbanBoard />
-    </div>
-  )
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { jwtDecode } from 'jwt-decode';
+import { Layout } from '@/components/common/Layout';
+import { KanbanBoard } from '@/components/custom/KanbanBoard';
+import { UserDashboard } from '@/components/custom/UserDashboard';
+import { StaffDashboard } from '@/components/custom/StaffDashboard';
+
+export const roles = {
+  SUPER_ADMIN: {
+    name: "Super Admin",
+    description: "Has full system access",
+    permissions: ["ALL"]
+  },
+  SYSTEM_ADMIN: {
+    name: "System Admin",
+    description: "System administrator with limited access",
+    permissions: [
+      "manage_users",
+      "manage_departments", 
+      "view_analytics",
+      "system_admin",
+      "manage_documents"
+    ]
+  },
+  DEPARTMENT_HEAD: {
+    name: "Department Head", 
+    description: "Head of department with approval authority",
+    permissions: [
+      "view_users",
+      "manage_opinion_requests",
+      "review_opinion_requests",
+      "approve_opinion_requests", 
+      "reject_opinion_requests",
+      "view_analytics",
+      "assign_experts",
+      "manage_documents",
+      "manage_comments"
+    ]
+  },
+  SENIOR_EXPERT: {
+    name: "Senior Expert",
+    description: "Senior department expert with additional privileges",
+    permissions: [
+      "view_users",
+      "review_opinion_requests",
+      "approve_opinion_requests",
+      "view_opinion_requests",
+      "manage_documents", 
+      "add_comments",
+      "view_comments"
+    ]
+  },
+  EXPERT: {
+    name: "Expert",
+    description: "Department expert who reviews requests",
+    permissions: [
+      "view_users",
+      "review_opinion_requests",
+      "view_opinion_requests",
+      "upload_documents",
+      "view_documents",
+      "add_comments",
+      "view_comments"
+    ]
+  },
+  REGULAR_USER: {
+    name: "Regular User",
+    description: "Regular department user",
+    permissions: [
+      "create_opinion_request",
+      "view_opinion_requests",
+      "view_documents",
+      "upload_documents", 
+      "add_comments",
+      "view_comments"
+    ]
+  },
+  VIEWER: {
+    name: "Viewer",
+    description: "Can only view requests and comments",
+    permissions: [
+      "view_opinion_requests",
+      "view_documents",
+      "view_comments"
+    ]
+  }
+};
+
+interface JWTPayload {
+  exp: number;
+  roles: string[];
+  is_superuser: boolean;
 }
 
-// import { Clock, DollarSign, Users, Bot } from 'lucide-react'
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// import Header from "../admin/_components/header"
-// import Sidebar from "../admin/_components/sidebar"
-// import { useState } from 'react'
-// import Chatbot from '@/components/custom/chatbot'  // Import the Chatbot component
+export default function Component() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState<string[]>([]);
+  const router = useRouter();
 
-// export default function Dashboard() {
-//   const [showChatbot, setShowChatbot] = useState(false)
-//   const [isHovered, setIsHovered] = useState(false)
-//   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('../');
+        return;
+      }
 
-//   const toggleSidebar = () => {
-//     setIsSidebarOpen(!isSidebarOpen)
-//   }
-//   return (
-//     <div className="flex h-screen bg-gray-100">
-//       <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
-//       <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-16'}`}>
-//         <Header />
-//         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
-//           <div className="container mx-auto px-6 py-8">
-//             <h3 className="text-gray-700 text-3xl font-medium">Dashboard</h3>
-//             <div className="mt-4">
-//               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-//                 <Card>
-//                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//                     <CardTitle className="text-sm font-medium">
-//                       Total Revenue
-//                     </CardTitle>
-//                     <DollarSign className="h-4 w-4 text-muted-foreground" />
-//                   </CardHeader>
-//                   <CardContent>
-//                     <div className="text-2xl font-bold">$45,231.89</div>
-//                     <p className="text-xs text-muted-foreground">
-//                       +20.1% from last month
-//                     </p>
-//                   </CardContent>
-//                 </Card>
-//                 <Card>
-//                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//                     <CardTitle className="text-sm font-medium">
-//                       Subscriptions
-//                     </CardTitle>
-//                     <Users className="h-4 w-4 text-muted-foreground" />
-//                   </CardHeader>
-//                   <CardContent>
-//                     <div className="text-2xl font-bold">+2350</div>
-//                     <p className="text-xs text-muted-foreground">
-//                       +180.1% from last month
-//                     </p>
-//                   </CardContent>
-//                 </Card>
-//                 <Card>
-//                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//                     <CardTitle className="text-sm font-medium">Sales</CardTitle>
-//                     <Clock className="h-4 w-4 text-muted-foreground" />
-//                   </CardHeader>
-//                   <CardContent>
-//                     <div className="text-2xl font-bold">+12,234</div>
-//                     <p className="text-xs text-muted-foreground">
-//                       +19% from last month
-//                     </p>
-//                   </CardContent>
-//                 </Card>
-//                 <Card>
-//                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-//                     <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-//                     <Users className="h-4 w-4 text-muted-foreground" />
-//                   </CardHeader>
-//                   <CardContent>
-//                     <div className="text-2xl font-bold">+573</div>
-//                     <p className="text-xs text-muted-foreground">
-//                       +201 since last hour
-//                     </p>
-//                   </CardContent>
-//                 </Card>
-//               </div>
-//             </div>
-//             <div className="mt-8">
-//               <Card>
-//                 <CardHeader>
-//                   <CardTitle>Overview</CardTitle>
-//                 </CardHeader>
-//                 <CardContent className="pl-2">
-//                   {/* You can add content here */}
-//                 </CardContent>
-//               </Card>
-//             </div>
-//             <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-//               <Card>
-//                 <CardHeader>
-//                   <CardTitle>Recent Sales</CardTitle>
-//                   <CardDescription>You made 265 sales this month.</CardDescription>
-//                 </CardHeader>
-//                 <CardContent>
-//                   <div className="space-y-8">
-//                     {[...Array(5)].map((_, i) => (
-//                       <div key={i} className="flex items-center">
-//                         <div className="space-y-1">
-//                           <p className="text-sm font-medium leading-none">
-//                             Customer {i + 1}
-//                           </p>
-//                           <p className="text-sm text-muted-foreground">
-//                             customer{i + 1}@example.com
-//                           </p>
-//                         </div>
-//                       </div>
-//                     ))}
-//                   </div>
-//                 </CardContent>
-//               </Card>
-//               <Card>
-//                 <CardHeader>
-//                   <CardTitle>Trending Products</CardTitle>
-//                   <CardDescription>Your top selling items this month.</CardDescription>
-//                 </CardHeader>
-//                 <CardContent>
-//                   <div className="space-y-8">
-//                     {['Product A', 'Product B', 'Product C', 'Product D', 'Product E'].map((product, i) => (
-//                       <div key={i} className="flex items-center">
-//                         <div className="space-y-1">
-//                           <p className="text-sm font-medium leading-none">{product}</p>
-//                           <p className="text-sm text-muted-foreground">
-//                             Category {String.fromCharCode(65 + i)}
-//                           </p>
-//                         </div>
-//                       </div>
-//                     ))}
-//                   </div>
-//                 </CardContent>
-//               </Card>
-//             </div>
-//           </div>
-//         </main>
-//       </div>
+      try {
+        const decodedToken = jwtDecode<JWTPayload>(token);
+        console.log(decodedToken);
+        
+        // Check token expiration
+        const currentTime = Date.now() / 1000;
+        if (decodedToken.exp < currentTime) {
+          localStorage.clear();
+          router.push('../');
+          return;
+        }
 
-//       {/* AI Assistant Button */}
-//       <div className="fixed bottom-4 right-4">
-//         <div
-//           className={`relative rounded-full p-3 cursor-pointer transition-all duration-300 ease-in-out 
-//                       ${isHovered ? 'w-36 bg-gray-300' : 'w-12 border border-black'}`}
-//           onMouseEnter={() => setIsHovered(true)}
-//           onMouseLeave={() => setIsHovered(false)}
-//           onClick={() => setShowChatbot(true)}
-//         >
-//           <Bot className="w-6 h-6" />
-//           {isHovered && (
-//             <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
-//               AI Assistant
-//             </span>
-//           )}
-//         </div>
-//       </div>
-//       {/* Chatbot Component */}
-//       <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />
-//     </div>
-//   )
-// }
+        setUserRole(decodedToken.roles);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Token decode error:', error);
+        localStorage.clear();
+        router.push('../');
+      }
+    };
 
-import { KanbanBoard } from '../../components/custom/KanbanBoard'
+    checkAuth();
+  }, []);
 
+  const renderDashboard = () => {
+    if (!isAuthenticated) return null;
+
+    // Check for admin roles
+    if (userRole.includes("Super Admin") || userRole.includes("System Admin")) {
+      return <KanbanBoard />;
+    }
+
+    // Check for staff roles
+    if (userRole.includes("Department Head") || 
+        userRole.includes("Senior Expert") || 
+        userRole.includes("Expert")) {
+      return <StaffDashboard />;
+    }
+
+    // Default to user dashboard for Regular User and Viewer
+    if (userRole.includes("Regular User") || userRole.includes("Viewer")) {
+      return <UserDashboard />;
+    }
+
+    // Fallback case
+    return <UserDashboard />;
+  };
+
+  return (
+    <Layout>
+      {renderDashboard()}
+    </Layout>
+  );
+}

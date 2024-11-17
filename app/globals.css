@@ -12,23 +12,11 @@
   }
 }
 
-@font-face {
-  font-family: 'Uber Move';
-  src: url('https://cdn.jsdelivr.net/gh/ubermanu/uber-move/fonts/UberMoveMedium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-}
 
-@font-face {
-  font-family: 'Uber Move';
-  src: url('https://cdn.jsdelivr.net/gh/ubermanu/uber-move/fonts/UberMoveBold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-}
 
 @layer base {
   html {
-    font-family: 'Uber Move', system-ui, sans-serif;
+    font-family:  system-ui, sans-serif;
   }
 }
 

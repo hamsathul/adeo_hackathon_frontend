@@ -12,13 +12,10 @@ export default function Header() {
   const text = isArabic ? translations.ar : translations.en
   const router = useRouter()
 
-  const handleLogout = () => {
-    // Add logout logic here, such as clearing cookies, localStorage, or any authentication context
-    // Example: localStorage.removeItem('authToken');
-    
-    // After logging out, redirect to the login page
-    router.push('/login')
-  }
+const handleLogout = () => {
+	localStorage.removeItem('token')
+	router.push('/login')
+}
 
   return (
     <header className="bg-gray-300 text-gray-900 py-4 px-6">
