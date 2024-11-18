@@ -1,5 +1,5 @@
-import React from 'react';
-import { Brain, FileText, Users, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Brain, FileText, Users, AlertCircle, Lightbulb } from 'lucide-react';
 import { DocumentAnalysisResponse } from '../services/documentAnalysis';
 import { cn } from '../utils';
 
@@ -9,15 +9,66 @@ interface DocumentAnalysisProps {
   error: string | null;
 }
 
+const analysisTips = [
+  {
+    icon: Brain,
+    title: "AI Processing",
+    tip: "Our AI analyzes document structure, content, and context to provide comprehensive insights."
+  },
+  {
+    icon: FileText,
+    title: "Document Classification",
+    tip: "Documents are automatically categorized based on content, format, and purpose."
+  },
+  {
+    icon: Users,
+    title: "Stakeholder Analysis",
+    tip: "We identify key stakeholders and their roles mentioned in the document."
+  },
+  {
+    icon: Lightbulb,
+    title: "Smart Suggestions",
+    tip: "Get department routing suggestions based on document content and previous patterns."
+  }
+];
+
 export function DocumentAnalysis({ analysis, isLoading, error }: DocumentAnalysisProps) {
+  const [currentTipIndex, setCurrentTipIndex] = useState(0);
+
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setCurrentTipIndex((prev) => (prev + 1) % analysisTips.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
+
   if (isLoading) {
+    const CurrentTipIcon = analysisTips[currentTipIndex].icon;
+
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <div className="w-16 h-16 relative">
+        <div className="w-16 h-16 relative mb-6">
           <div className="w-16 h-16 rounded-full border-4 border-blue-100 animate-pulse"></div>
           <div className="w-16 h-16 rounded-full border-t-4 border-blue-600 animate-spin absolute inset-0"></div>
         </div>
-        <p className="mt-4 text-gray-600">Analyzing document...</p>
+        
+        <div className="text-center max-w-md mx-auto">
+          <p className="text-gray-600 mb-6">Analyzing document...</p>
+          
+          <div className="bg-blue-50 rounded-xl p-4 transition-all duration-500 animate-fade-in">
+            <div className="flex items-center justify-center mb-2">
+              <CurrentTipIcon className="w-5 h-5 text-blue-600 mr-2" />
+              <h4 className="font-medium text-blue-900">
+                {analysisTips[currentTipIndex].title}
+              </h4>
+            </div>
+            <p className="text-sm text-blue-700">
+              {analysisTips[currentTipIndex].tip}
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
