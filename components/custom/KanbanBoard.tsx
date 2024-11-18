@@ -13,13 +13,28 @@ import { TaskFilters } from '../types';
 import Chatbot from './chatbot';
 
 const initialOpinions: Opinion[] = [
-  { 
+  {
     id: '1',
     title: 'Infrastructure Development Proposal',
     status: 'unassigned',
     opinionId: 'GOV-15',
     department: 'Engineering',
     priority: 'high',
+    category: 'Infrastructure, Land and Assets',
+    subCategory: 'Land and Assets',
+    details: {
+      requestStatement: 'Proposal for improving city roads and bridges',
+      challengesOpportunities: 'Address aging infrastructure and increasing traffic',
+      subjectContent: 'Comprehensive infrastructure upgrade plan',
+      alternativeOptions: 'Phased implementation vs complete overhaul',
+      expectedImpact: 'Improved traffic flow and safety',
+      potentialRisks: 'Construction delays and budget overruns',
+      studiesStatistics: 'Traffic analysis and structural assessments',
+      legalFinancialOpinions: 'Budget allocation and contractor requirements',
+      stakeholderFeedback: 'Community input and contractor proposals',
+      workPlan: 'Three-phase implementation over 18 months',
+      decisionDraft: 'Approve phase 1 of infrastructure upgrade'
+    },
     submitter: {
       name: 'John Smith',
       email: 'john@example.com',
@@ -39,6 +54,21 @@ const initialOpinions: Opinion[] = [
     assignee: 'YD',
     department: 'Product',
     priority: 'urgent',
+    category: 'Policies and Strategies',
+    subCategory: 'General Policy',
+    details: {
+      requestStatement: 'Updates to environmental protection policies',
+      challengesOpportunities: 'Address climate change concerns and sustainability goals',
+      subjectContent: 'New environmental protection guidelines',
+      alternativeOptions: 'Gradual implementation vs immediate enforcement',
+      expectedImpact: 'Reduced environmental impact and improved sustainability',
+      potentialRisks: 'Business adaptation challenges and compliance costs',
+      studiesStatistics: 'Environmental impact assessments',
+      legalFinancialOpinions: 'Legal compliance requirements and cost analysis',
+      stakeholderFeedback: 'Industry feedback and public consultation',
+      workPlan: 'Six-month implementation timeline',
+      decisionDraft: 'Approve new environmental protection measures'
+    },
     submitter: {
       name: 'Sarah Johnson',
       email: 'sarah@example.com',
