@@ -53,7 +53,7 @@ export default function Component() {
         department: 'Managerial',
         email: 'a.mohamed@gmail.com',
         phone: '+971 50 123 1234',
-        avatar: '/ADEO.svg',
+        avatar: '/man.png',
         employeeId: 'EMP01',
         workType: 'Fulltime',
         position: 'Executive',
@@ -335,84 +335,83 @@ export default function Component() {
       </div>
       <div className={`grid gap-4 ${view === 'grid' ? 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : ''}`}>
         {filteredEmployees.map((employee) => (
-          <Card key={employee.id}>
-            <CardHeader className="relative">
-              <Badge variant="secondary" className="absolute right-6 top-6">
-                {employee.department}
-              </Badge>
-              <div className="flex flex-col items-center space-y-3">
-                <img
-                  alt={employee.name}
-                  className="rounded-full"
-                  height="100"
-                  src={employee.avatar}
-                  style={{
-                    aspectRatio: "100/100",
-                    objectFit: "cover",
-                  }}
-                  width="100"
-                />
-                <div className="space-y-1 text-center">
-                  <h3 className="text-lg font-semibold">{employee.name}</h3>
-                  <p className="text-muted-foreground">{employee.role}</p>
-                </div>
+          <Card key={employee.id} className="bg-slate-50 dark:bg-slate-900/50">
+        <CardHeader className="relative">
+          <Badge variant="secondary" className="absolute right-6 top-6">
+            {employee.department}
+          </Badge>
+          <div className="flex flex-col items-center space-y-3">
+            <img
+          alt={employee.name}
+          className="rounded-full"
+          height="100"
+          src={employee.avatar}
+          style={{
+            aspectRatio: "100/100",
+            objectFit: "cover",
+          }}
+          width="100"
+            />
+            <div className="space-y-1 text-center">
+          <h3 className="text-lg font-semibold">{employee.name}</h3>
+          <p className="text-muted-foreground">{employee.role}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center text-sm text-muted-foreground">
+          <span className="font-medium text-foreground">#{employee.employeeId}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+          <Badge variant="secondary">{employee.position}</Badge>
+          <span className="text-muted-foreground">·</span>
+          <Badge variant="secondary">{employee.workType}</Badge>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-sm">
+          <a className="text-blue-600 hover:underline" href={`mailto:${employee.email}`}>
+            {employee.email}
+          </a>
+            </div>
+            <div className="text-sm text-muted-foreground">{employee.phone}</div>
+          </div>
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm">
+            View details
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+            <DialogTitle>{employee.name}</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+            <img
+              alt={employee.name}
+              className="rounded-full mx-auto"
+              height="150"
+              src={employee.avatar}
+              style={{
+                aspectRatio: "150/150",
+                objectFit: "cover",
+              }}
+              width="150"
+            />
+            <p><strong>Employee ID:</strong> {employee.employeeId}</p>
+            <p><strong>Position:</strong> {employee.position}</p>
+            <p><strong>Department:</strong> {employee.department}</p>
+            <p><strong>Email:</strong> {employee.email}</p>
+            <p><strong>Phone:</strong> {employee.phone}</p>
+            <p><strong>Work Type:</strong> {employee.workType}</p>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <span className="font-medium text-foreground">#{employee.employeeId}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Badge variant="secondary">{employee.position}</Badge>
-                  <span className="text-muted-foreground">·</span>
-                  <Badge variant="secondary">{employee.workType}</Badge>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm">
-                  <a className="text-blue-600 hover:underline" href={`mailto:${employee.email}`}>
-                    {employee.email}
-                  </a>
-                </div>
-                <div className="text-sm text-muted-foreground">{employee.phone}</div>
-              </div>
-              <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center justify-between gap-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        View details
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>{employee.name}</DialogTitle>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <img
-                          alt={employee.name}
-                          className="rounded-full mx-auto"
-                          height="150"
-                          src={employee.avatar}
-                          style={{
-                            aspectRatio: "150/150",
-                            objectFit: "cover",
-                          }}
-                          width="150"
-                        />
-                        <p><strong>Employee ID:</strong> {employee.employeeId}</p>
-                        <p><strong>Position:</strong> {employee.position}</p>
-                        <p><strong>Department:</strong> {employee.department}</p>
-                        <p><strong>Email:</strong> {employee.email}</p>
-                        <p><strong>Phone:</strong> {employee.phone}</p>
-                        <p><strong>Work Type:</strong> {employee.workType}</p>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+            </DialogContent>
+          </Dialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon">
                         <MoreVertical className="h-4 w-4" />
                         <span className="sr-only">More options</span>
                       </Button>
