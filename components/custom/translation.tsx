@@ -1,10 +1,11 @@
 import { all } from "axios";
 import { request } from "http";
 import next from "next";
+import { OpinionSubmissionDialog } from "./OpinionSubmissionDialog";
 
 export const translations = {
     en: {
-      ai: "AI Assistant",
+      ai: "AI Analysis",
       samah: "Samah",
       dashboard: "Dashboard",
       users: "Users",
@@ -128,10 +129,19 @@ export const translations = {
       cancel: "Cancel",
       submit: "Submit",
       editOpinion: "Edit Opinion",
+      edit: "Edit",
+      remarks: "Remarks",
+      submittedby: "Submitted by",
+      submissionDate: "Submission Date",
+      assignmentStatus: "Assignment Status",
+      assignedTo: "Assigned To",
+      unassigned: "Unassigned",
+      existingDocument: "Existing Document",
+      opinionRemarks: "Opinion Remarks",
       opinionReview: "Please review your opinion details before submitting. Make sure all information is accurate.",
     },
     ar: {
-      ai: "AI Assistant",
+      ai: "تحليل الذكاء الاصطناعي",
       samah: "سماح",
       dashboard: "لوحة التحكم",
       users: "المستخدمين",
@@ -255,6 +265,15 @@ export const translations = {
       next: "التالي",
       submit: "إرسال",
       editOpinion: "تعديل الرأي",
+      edit: "تعديل",
+      remarks: "ملاحظات",
+      submittedby: "تم الإرسال بواسطة",
+      submissionDate: "تاريخ التقديم",
+      assignmentStatus: "حالة التعيين",
+      assignedTo: "تم تعيينه لـ",
+      unassigned: "غير معين",
+      existingDocument: "المستند الحالي",
+      opinionRemarks: "ملاحظات الرأي",
       opinionReview: "يرجى مراجعة تفاصيل الرأي الخاص بك قبل التقديم. تأكد من دقة جميع المعلومات.",
     },
   };

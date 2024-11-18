@@ -4,6 +4,8 @@ import { Opinion, RemarkFormData } from '../types';
 import { DocumentAnalysis } from './DocumentAnalysis';
 import { analyzeDocument, DocumentAnalysisResponse } from '../services/documentAnalysis';
 import { cn } from '../utils';
+import { translations } from './translation';
+import { useLanguageStore } from '@/store/useLanguageStore';
 
 interface KanbanDetailsDialogProps {
   isOpen: boolean;
@@ -69,6 +71,8 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const isArabic = useLanguageStore((state) => state.isArabic);
+  const text = isArabic ? translations.ar : translations.en;
 
   if (!isOpen) return null;
 
@@ -219,7 +223,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                 )}
               >
                 <Brain className="w-4 h-4" />
-                AI Analysis
+                {text.ai}
               </button>
               {onEdit && (
                 <button
@@ -227,7 +231,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                   className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <Pencil className="w-4 h-4" />
-                  Edit
+                  {text.edit}
                 </button>
               )}
               <button
@@ -253,7 +257,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
               >
                 <div className="flex items-center gap-2">
                   <Info className="w-4 h-4" />
-                  Details
+                  {text.details}
                 </div>
               </button>
               <button
@@ -267,7 +271,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
               >
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4" />
-                  Remarks
+                  {text.remarks}
                 </div>
               </button>
             </div>
@@ -279,12 +283,12 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
               <div className="p-6">
                 {/* Basic Information */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
+                  <h3 className="text-lg font-semibold mb-4">{text.basicInfo}</h3>
                   <div className="grid grid-cols-2 gap-6 bg-gray-50 rounded-lg p-4">
                     <div className="space-y-1">
                       <div className="text-sm text-gray-500 flex items-center gap-2">
                         <User className="w-4 h-4" />
-                        Submitted by
+                        {text.submittedby}
                       </div>
                       <div className="font-medium">{opinion.submitter.name}</div>
                       <div className="text-sm text-gray-500">{opinion.submitter.email}</div>
@@ -292,14 +296,14 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                     <div className="space-y-1">
                       <div className="text-sm text-gray-500 flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
-                        Submission Date
+                        {text.submissionDate}
                       </div>
                       <div className="font-medium">March 15, 2024</div>
                     </div>
                     <div className="space-y-1">
                       <div className="text-sm text-gray-500 flex items-center gap-2">
                         <Tag className="w-4 h-4" />
-                        Category
+                        {text.category}
                       </div>
                       <div className="font-medium">{opinion.category}</div>
                       {opinion.subCategory && (
@@ -307,7 +311,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                       )}
                     </div>
                     <div className="space-y-1">
-                      <div className="text-sm text-gray-500">Assignment Status</div>
+                      <div className="text-sm text-gray-500">{text.assignmentStatus}</div>
                       <div className="font-medium">
                         {opinion.assignee ? (
                           <div className="flex items-center gap-2">
@@ -319,10 +323,10 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                             )}>
                               {opinion.assignee}
                             </div>
-                            <span>Assigned to {opinion.assignee}</span>
+                            <span>{text.assignedTo} {opinion.assignee}</span>
                           </div>
                         ) : (
-                          <span className="text-gray-500">Unassigned</span>
+                          <span className="text-gray-500">{text.unassigned}</span>
                         )}
                       </div>
                     </div>
@@ -331,59 +335,59 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
 
                 {/* Opinion Details */}
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-4">Opinion Details</h3>
+                  <h3 className="text-lg font-semibold mb-4">{text.opinionDetails}</h3>
                   <DetailSection
-                    title="Request Statement"
+                    title={text.requestStatement}
                     content={opinion.details.requestStatement}
                     description="Clearly mention what is required from the committee, stating the purpose and reasoning"
                   />
                   <DetailSection
-                    title="Challenges / Opportunities"
+                    title={text.challengesOpportunities}
                     content={opinion.details.challengesOpportunities}
                     description="Mention the reasons for submitting the request and provide supporting information"
                   />
                   <DetailSection
-                    title="Subject Content"
+                    title={text.subjectContent}
                     content={opinion.details.subjectContent}
                     description="Provide details on the requested topic with supporting documents"
                   />
                   <DetailSection
-                    title="Alternative Options"
+                    title={text.alternativeOptions}
                     content={opinion.details.alternativeOptions}
                     description="Compare alternatives with the proposed solution"
                   />
                   <DetailSection
-                    title="Expected Impact"
+                    title={text.expectedImpact}
                     content={opinion.details.expectedImpact}
                     description="Describe implementation feasibility and impacts"
                   />
                   <DetailSection
-                    title="Potential Risks and Mitigation"
+                    title={text.potentialRisks}
                     content={opinion.details.potentialRisks}
                     description="List risks and recommended solutions"
                   />
                   <DetailSection
-                    title="Studies and Statistics"
+                    title={text.studiesStatistics}
                     content={opinion.details.studiesStatistics}
                     description="Include relevant studies and statistics"
                   />
                   <DetailSection
-                    title="Legal and Financial Opinions"
+                    title={text.legalFinancialOpinions}
                     content={opinion.details.legalFinancialOpinions}
                     description="Include approved legal and financial opinions"
                   />
                   <DetailSection
-                    title="Stakeholder Feedback"
+                    title={text.stakeholderFeedback}
                     content={opinion.details.stakeholderFeedback}
                     description="Include feedback from relevant stakeholders"
                   />
                   <DetailSection
-                    title="Work Plan"
+                    title={text.workPlan}
                     content={opinion.details.workPlan}
                     description="Detail implementation stages and timeline"
                   />
                   <DetailSection
-                    title="Decision Draft"
+                    title={text.decisionDraft}
                     content={opinion.details.decisionDraft}
                     description="Proposed draft text of the decision"
                   />
@@ -391,7 +395,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
 
                 {/* Documents Section */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Supporting Documents</h3>
+                  <h3 className="text-lg font-semibold mb-4">{text.supportingDocuments}</h3>
                   
                   {/* Document Upload Area */}
                   <div
@@ -417,10 +421,10 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                     >
                       <Upload className="w-8 h-8 text-gray-400 mb-2" />
                       <span className="text-sm text-gray-600">
-                        Drop files here or click to upload
+                        {text.dropMessage}
                       </span>
                       <span className="text-xs text-gray-500 mt-1">
-                        PDF, DOC, DOCX, XLS, XLSX up to 10MB each
+                        {text.dropMessage2}
                       </span>
                     </label>
                   </div>
@@ -442,7 +446,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                               {doc.name}
                             </div>
                             <div className="text-sm text-gray-500">
-                              Existing document
+                              {text.existingDocument}
                             </div>
                           </div>
                         </div>
@@ -506,7 +510,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
             ) : (
               <div className="p-6">
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold mb-3">Opinion Remarks</h3>
+                  <h3 className="text-lg font-semibold mb-3">{text.opinionRemarks}</h3>
                   <div className="space-y-4 mb-4">
                     {opinion.remarks?.map((remark) => (
                       <div key={remark.id} className="bg-gray-50 rounded-xl p-4">
@@ -554,7 +558,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold mb-4">
-                  AI Analysis
+                  {text.ai}
                   {selectedDocument && (
                     <span className="text-sm font-normal text-gray-500 ml-2">
                       for {selectedDocument}
