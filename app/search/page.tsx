@@ -148,6 +148,23 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
         ))}
       </ul>
     </div>
+	<div>
+	  <h4 className="font-semibold mb-2">Sources</h4>
+	  <ul className="list-disc list-inside text-sm">
+		{summarizedContent[index].sources.map((source, i) => (
+		  <li key={i}>
+			<a 
+			  href={source}
+			  target="_blank"
+			  rel="noopener noreferrer"
+			  className="text-blue-600 hover:text-blue-800 hover:underline"
+			>
+			  {source}
+			</a>
+		  </li>
+		))}
+	  </ul>
+	</div>
   </div>
 )}
 
@@ -190,9 +207,7 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 // Function to transform sampleResults into StylishCards' expected format
 const transformResultsForCards = (results: any, type: string): Array<any> => {
 	const cards = [];
-   
-	switch(type) {
-	  case 'search':
+ 
 		// Knowledge Graph
 		if (results.knowledgeGraph) {
 		  cards.push({
@@ -262,8 +277,8 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 		  });
 		}
    
-		break;
-	}
+
+	
    
 	return cards;
    };
@@ -356,14 +371,6 @@ const SearchEngine = () => {
       }
     });
 
-    // Optionally, filter based on searchQuery here
-    if (searchQuery.trim() !== '') {
-      transformedResults = transformedResults.filter((item: TransformedResult) => 
-        item.title?.toLowerCase().includes(searchQuery?.toLowerCase()) ||
-        item.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.tags.some((tag: string) => tag?.toLowerCase().includes(searchQuery?.toLowerCase()))
-      );
-    }
 
     return transformedResults;
   };
@@ -459,25 +466,7 @@ const SearchEngine = () => {
 				<p className="text-center text-gray-500">{text.enterSearch}</p>
 				)}
 			
-            {/* AI Assistant Button */}
-          <div className="fixed bottom-4 right-4">
-            <div
-              className={`relative rounded-full bg-primary text-primary-foreground p-3 cursor-pointer transition-all duration-300 ease-in-out ${isHovered ? 'w-36' : 'w-12'}`}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onClick={() => setShowChatbot(true)}
-            >
-              <Bot className="w-8 h-8" />
-              {isHovered && (
-                <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
-                  {text.ai}
-                </span>
-              )}
             </div>
-          </div>
-          {/* Chatbot component */}
-          <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />
-          </div>
         </main>
       </div>
       </Layout>
