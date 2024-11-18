@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from "react";
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { useRouter } from "next/navigation";
 import axios from 'axios';
@@ -17,16 +18,46 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { translations } from '@/components/custom/translation';
 import { Layout } from "@/components/common/Layout";
+import { jwtDecode } from 'jwt-decode';
 
-// Interface for User data
-interface User {
+const server_url = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000/api/v1'
+
+interface Department {
+  name: string;
+  code: string;
+  description: string;
   id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Permission {
+  name: string;
+  description: string;
+  id: number;
+  created_at: string;
+}
+
+interface Role {
+  name: string;
+  description: string;
+  id: number;
+  created_at: string;
+  permissions: Permission[];
+}
+
+interface UserData {
   email: string;
   username: string;
-  department: {
-    name: string;
-  };
+  is_active: boolean;
+  id: number;
+  is_superuser: boolean;
+  created_at: string;
+  roles: Role[];
+  department_id: number;
+  department: Department;
 }
+
 
 export default function Component() {
   const router = useRouter();
@@ -41,35 +72,70 @@ export default function Component() {
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const { isArabic } = useLanguageStore();
   const text = isArabic ? translations.ar : translations.en;
+  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState<UserData | null>(null);
 
   // Fetch user data
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Assuming you have the token stored in localStorage
-        const token = localStorage.getItem('Token');
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        
         if (!token) {
           toast.error("No authentication token found");
+          router.push('/login'); // Redirect to login page
           return;
         }
 
-        // Get user ID from token (you'll need to implement token decoding)
-        const userId = decodeToken(token); 
-
-        // Fetch user data
-        const response = await axios.get(`/api/v1/auth/users/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        // Add error handling for token decoding
+        let decodedToken: { user_id: number };
+        try {
+          decodedToken = jwtDecode(token);
+        } catch (error) {
+          toast.error("Invalid token format");
+          router.push('/login'); // Redirect to login page
+          return;
+        }
+        if (!decodedToken.user_id) {
+          toast.error("User ID not found in token");
+          router.push('/login'); // Redirect to login page
+          return;
+        }
+        console.log(decodedToken.user_id);
+        const response = await axios.get(`${server_url}/auth/users/${decodedToken.user_id}`,
+          {
+            headers: {'Authorization': `Bearer ${token}`}
           }
-        });
-
+        );
+        if (response.status !== 200) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        console.log(response.data);
         const userData = response.data;
+        setUserData(userData);
         setUsername(userData.username);
         setEmail(userData.email);
         setProfileName(userData.department?.name || '');
+        
       } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            // Server responded with error
+            toast.error(`Error: ${error.response.data.message || 'Failed to fetch user data'}`);
+          } else if (error.request) {
+            // Request made but no response
+            toast.error("Server not responding. Please try again later.");
+          } else {
+            // Error setting up request
+            toast.error("Error setting up request");
+          }
+        } else {
+          toast.error("An unexpected error occurred");
+        }
         console.error("Error fetching user data:", error);
-        toast.error("Failed to fetch user data");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -78,11 +144,9 @@ export default function Component() {
 
   // Token decoding function (you'll need to implement this based on your token structure)
   const decodeToken = (token: string): number => {
-    // This is a placeholder. Replace with actual token decoding logic
-    // For example, using jwt-decode or your backend's token decoding method
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.userId;
+      const decoded: { user_id: number } = jwtDecode(token);
+      return decoded.user_id;
     } catch (error) {
       toast.error("Invalid token");
       throw error;
@@ -98,7 +162,7 @@ export default function Component() {
   };
 
   const handleDeletePicture = () => {
-    setImageUrl("/placeholder.svg");
+    setImageUrl("/man.png");
   };
 
   const handleSaveChanges = async () => {
