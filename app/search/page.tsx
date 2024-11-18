@@ -85,7 +85,7 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 	  }, {});
 	
 
-	  return (
+	return (
 		<div className="space-y-8">
 		  {Object.entries(groupedItems).map(([category, categoryItems]) => (
 			<div key={category} className="mb-8">
@@ -108,10 +108,43 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 
 								{/* Card Content */}
 								<div className="mb-6">
-									<h3 className="text-xl font-bold mb-3">{item.title}</h3>
-									<p className="text-gray-700 leading-relaxed">
-										{item.description}
-									</p>
+								{item.imageUrl && (
+									<a 
+									href={item.link} 
+									target="_blank" 
+									rel="noopener noreferrer"
+									className="block mb-4 hover:opacity-90 transition-opacity"
+									>
+									<img 
+										src={item.imageUrl} 
+										alt={item.title}
+										className="w-full h-48 object-cover rounded-lg"
+									/>
+									</a>
+								)}
+								<a 
+									href={item.link}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="block"
+								>
+									<h3 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors">
+									{item.title}
+									</h3>
+								</a>
+								<p className="text-gray-700 leading-relaxed">
+									{item.description}
+								</p>
+								{item.link && (
+									<a 
+									href={item.link}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 block truncate"
+									>
+									{item.link}
+									</a>
+								)}
 								</div>
 
 								{/* Tags */}
@@ -127,29 +160,46 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 								</div>
 
 								{summarizedContent[index] && !minimizedSummaries[index] && (
-  <div className="mt-4 p-4 bg-white/50 rounded-lg space-y-4">
-    <div>
-      <h4 className="font-semibold mb-2">Summary</h4>
-      <p className="text-sm">{summarizedContent[index].summary}</p>
-    </div>
-    <div>
-      <h4 className="font-semibold mb-2">Key Points</h4>
-      <ul className="list-disc list-inside text-sm">
-        {summarizedContent[index].key_points.map((point, i) => (
-          <li key={i}>{point}</li>
-        ))}
-      </ul>
-    </div>
-    <div>
-      <h4 className="font-semibold mb-2">Trends</h4>
-      <ul className="list-disc list-inside text-sm">
-        {summarizedContent[index].trends.map((trend, i) => (
-          <li key={i}>{trend}</li>
-        ))}
-      </ul>
-    </div>
-  </div>
-)}
+					<div className="mt-4 p-4 bg-white/50 rounded-lg space-y-4">
+						<div>
+						<h4 className="font-semibold mb-2">{text.summary}</h4>
+						<p className="text-sm">{summarizedContent[index].summary}</p>
+						</div>
+						<div>
+						<h4 className="font-semibold mb-2">{text.keyPoints}</h4>
+						<ul className="list-disc list-inside text-sm">
+							{summarizedContent[index].key_points.map((point, i) => (
+							<li key={i}>{point}</li>
+							))}
+						</ul>
+						</div>
+						<div>
+						<h4 className="font-semibold mb-2">{text.trends}</h4>
+						<ul className="list-disc list-inside text-sm">
+							{summarizedContent[index].trends.map((trend, i) => (
+							<li key={i}>{trend}</li>
+							))}
+						</ul>
+						</div>
+						<div>
+						<h4 className="font-semibold mb-2">Sources</h4>
+						<ul className="list-disc list-inside text-sm">
+							{summarizedContent[index].sources.map((source, i) => (
+							<li key={i}>
+								<a 
+								href={source}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-blue-600 hover:text-blue-800 hover:underline"
+								>
+								{source}
+								</a>
+							</li>
+							))}
+						</ul>
+						</div>
+					</div>
+					)}
 
                 {/* Footer */}
                 <div className="flex justify-between items-center mt-4">
@@ -190,35 +240,70 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 // Function to transform sampleResults into StylishCards' expected format
 const transformResultsForCards = (results: any, type: string): Array<any> => {
 	const cards = [];
-   
-	switch(type) {
-	  case 'search':
-		// Knowledge Graph
-		if (results.knowledgeGraph) {
-		  cards.push({
-			date: new Date().toLocaleDateString('en-GB'),
-			title: results.knowledgeGraph.title,
-			description: results.knowledgeGraph.description,
-			tags: Object.entries(results.knowledgeGraph.attributes || {})
-			  .map(([key, value]) => `${key}: ${value}`),
-			bgColor: getBgColor(0),
-			category: 'Knowledge Graph'
-		  });
-		}
-   
+
+	if (type === 'search') {
 		// Organic Results 
 		if (results.organic) {
-		  results.organic.forEach((result: any, index: number) => {
-			cards.push({
-			  date: new Date().toLocaleDateString('en-GB'),  
-			  title: result.title,
-			  description: result.snippet,
-			  tags: result.sitelinks?.map((link: any) => link.title) || [],
-			  bgColor: getBgColor(index + 1),
-			  category: 'Search Results'
+			results.organic.forEach((result: any, index: number) => {
+				cards.push({
+					date: new Date().toLocaleDateString('en-GB'),  
+					title: result.title,
+					description: result.snippet,
+					link: result.link,
+					tags: result.sitelinks?.map((link: any) => link.title) || [],
+					bgColor: getBgColor(index + 1),
+					category: 'Search Results'
+				});
 			});
-		  });
 		}
+	} else if (type === 'news') {
+		if (Array.isArray(results.news)) {
+			results.news.forEach((newsItem: any, index: number) => {
+				cards.push({
+					date: newsItem.date || new Date().toLocaleDateString('en-GB'),
+					title: newsItem.title,
+					description: newsItem.description || newsItem.section,
+					link: newsItem.link,
+					imageUrl: newsItem.imageUrl,
+					tags: [newsItem.source || 'News'],
+					bgColor: getBgColor(index),
+					category: 'News'
+				});
+			});
+		}
+	}
+	
+			// Top Stories
+			if (results.topStories) {
+				results.topStories.forEach((story: any, index: number) => {
+				cards.push({
+					date: story.date,
+					title: story.title,
+					description: story.source,
+					link: story.link, // Add the link
+					imageUrl: story.imageUrl,
+					tags: [story.source],
+					bgColor: getBgColor(index),
+					category: 'Top Stories'
+				});
+				});
+			}
+
+			// News Results
+			if (results.news?.news) {
+				results.news.news.forEach((newsItem: any, index: number) => {
+				cards.push({
+					date: newsItem.date,
+					title: newsItem.title,
+					description: newsItem.source, // or you could use a snippet if available
+					link: newsItem.link,
+					imageUrl: newsItem.imageUrl,
+					tags: [newsItem.source],
+					bgColor: getBgColor(index),
+					category: 'News'
+				});
+				});
+			}
    
 		// Images
 		if (results.images) {
@@ -262,14 +347,14 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 		  });
 		}
    
-		break;
-	}
+
+	
    
 	return cards;
    };
 
 const getBgColor = (index: number): string => {
-	const colors = ['bg-[#F0F7FF]', 'bg-[#FFF0F3]', 'bg-[#F3F0FF]'];
+	const colors = ['bg-[#d5dbdb]', 'bg-[#f2d7d5]', 'bg-[#fadfd9]'];
 	return colors[index % colors.length];
 };
 
@@ -314,19 +399,11 @@ const SearchEngine = () => {
       newFilters.delete(filter);
     } else {
       newFilters.add(filter);
-    }
-    setSelectedFilters(newFilters);
-  };
-
-  // Gather all relevant filters based on selected search types
-  const getRelevantFilters = () => {
-    const allFilters = new Set<string>();
-    selectedTypes.forEach(type => {
       // Assuming you have defined additionalFilters, else adjust accordingly
       // For demonstration, using sampleFilters or similar
       // Example:
       // additionalFilters[type]?.forEach(filter => allFilters.add(filter));
-    });
+    }
     return Array.from(allFilters);
   };
 
@@ -349,21 +426,13 @@ const SearchEngine = () => {
       bgColor: string;
       category: string;
     }
-
+	
     selectedTypes.forEach((type) => {
+
       if (results[type]) {
         transformedResults.push(...transformResultsForCards(results[type], type));
       }
     });
-
-    // Optionally, filter based on searchQuery here
-    if (searchQuery.trim() !== '') {
-      transformedResults = transformedResults.filter((item: TransformedResult) => 
-        item.title?.toLowerCase().includes(searchQuery?.toLowerCase()) ||
-        item.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.tags.some((tag: string) => tag?.toLowerCase().includes(searchQuery?.toLowerCase()))
-      );
-    }
 
     return transformedResults;
   };
@@ -375,113 +444,94 @@ const SearchEngine = () => {
 		setIsLoading(false);
 	  };
 
-    return (
-      <Layout>
-        <div className="min-h-screen bg-white text-gray-900">
-        <main className="container mx-auto px-4 max-w-6xl">
-          {/* Logo Section */}
-          <div className="flex justify-center items-center py-4">
-            <img 
-              src="/samah-svg.svg" 
-              alt="Samah Logo" 
-              className="w-48 h-auto"
+  return (
+    <Layout>
+      <div className="min-h-screen bg-white text-gray-900">
+      <main className="container mx-auto px-4 max-w-6xl">
+        {/* Logo Section */}
+        <div className="flex justify-center items-center py-4">
+          <img 
+            src="/samah-svg.svg" 
+            alt="Samah Logo" 
+            className="w-48 h-auto"
+          />
+        </div>
+        {/* Search Section */}
+        <div className="text-center py-4">
+
+          <div className="relative max-w-2xl mx-auto">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="Search anything..."
+              className="w-full px-4 py-3 rounded-full border focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <button className="absolute right-3 top-1/2 -translate-y-1/2"
+      onClick={handleSearch}
+      >
+              <Search className="text-gray-500" />
+            </button>
           </div>
-          {/* Search Section */}
-          <div className="text-center py-4">
+        </div>
 
-            <div className="relative max-w-2xl mx-auto">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-				onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Search anything..."
-                className="w-full px-4 py-3 rounded-full border focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2"
-			  onClick={handleSearch}
-			  >
-                <Search className="text-gray-500" />
+        {/* Search Types */}
+        <div className="mb-8">
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {searchTypes.map(({ name, icon: Icon }) => (
+              <button
+                key={name}
+                onClick={() => toggleSearchType(name as keyof typeof sampleResults)}
+                className={`flex items-center px-4 py-2 rounded-full ${
+                  selectedTypes.has(name as keyof typeof sampleResults)
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700'
+                } hover:opacity-90`}
+              >
+                <Icon size={16} className="mr-2" />
+                {name}
               </button>
-            </div>
+            ))}
           </div>
+        </div>
 
-          {/* Search Types */}
-          <div className="mb-8">
-            <div className="flex flex-wrap justify-center gap-2 mb-4">
-              {searchTypes.map(({ name, icon: Icon }) => (
+        {/* Selected Filters Display */}
+        {selectedFilters.size > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {Array.from(selectedFilters).map((filter) => (
+              <div
+                key={filter}
+                className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+              >
+                {filter}
                 <button
-                  key={name}
-                  onClick={() => toggleSearchType(name as keyof typeof sampleResults)}
-                  className={`flex items-center px-4 py-2 rounded-full ${
-                    selectedTypes.has(name as keyof typeof sampleResults)
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700'
-                  } hover:opacity-90`}
+                  onClick={() => toggleFilter(filter)}
+                  className="ml-2 hover:text-blue-600"
                 >
-                  <Icon size={16} className="mr-2" />
-                  {name}
+                  <X size={14} />
                 </button>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-  
-          {/* Selected Filters Display */}
-          {selectedFilters.size > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {Array.from(selectedFilters).map((filter) => (
-                <div
-                  key={filter}
-                  className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
-                >
-                  {filter}
-                  <button
-                    onClick={() => toggleFilter(filter)}
-                    className="ml-2 hover:text-blue-600"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-  
-  {/* // Results Area */}
-			<div className="flex-1">
-			{isLoading ? (
-				<p className="text-center text-gray-500">Loading...</p>
-				) : searchResults.length > 0 ? (
-				<StylishCards items={searchResults} />
-				) : searchQuery ? (
-				<p className="text-center text-gray-500">{text.noresult}</p>
-				) : (
-				<p className="text-center text-gray-500">{text.enterSearch}</p>
-				)}
-			
-            {/* AI Assistant Button */}
-          <div className="fixed bottom-4 right-4">
-            <div
-              className={`relative rounded-full bg-primary text-primary-foreground p-3 cursor-pointer transition-all duration-300 ease-in-out ${isHovered ? 'w-36' : 'w-12'}`}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onClick={() => setShowChatbot(true)}
-            >
-              <Bot className="w-8 h-8" />
-              {isHovered && (
-                <span className="absolute left-12 top-1/2 transform -translate-y-1/2 whitespace-nowrap">
-                  {text.ai}
-                </span>
-              )}
-            </div>
-          </div>
-          {/* Chatbot component */}
-          <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />
-          </div>
-        </main>
-      </div>
-      </Layout>
-    );
-  };
-  
-  export default SearchEngine;
+        )}
+
+{/* // Results Area */}
+    <div className="flex-1">
+    {isLoading ? (
+      <p className="text-center text-gray-500">Loading...</p>
+      ) : searchResults.length > 0 ? (
+      <StylishCards items={searchResults} />
+      ) : searchQuery ? (
+      <p className="text-center text-gray-500">{text.noresult}</p>
+      ) : (
+      <p className="text-center text-gray-500">{text.enterSearch}</p>
+      )}
+        </div>
+      </main>
+    </div>
+    </Layout>
+  );
+};
+
+export default SearchEngine;

@@ -6,9 +6,6 @@ import Sidebar from '../../app/admin/_components/sidebar';
 import { Sparkles, Search } from 'lucide-react';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { translations } from '@/components/custom/translation';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input'
 import { GlobalSearchDialog } from '../custom/GlobalSearchDialog';
 import Chatbot from '@/components/custom/chatbot';
 
@@ -66,10 +63,18 @@ export function Layout({ children }: LayoutProps) {
   </div>
 </div>
 
+{/* Search Panel */}
 <div className="fixed bottom-24 right-4 mb-2">
-  {/* Search Button */}
   <div
-    className={`relative rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 p-4 cursor-pointer transition-all duration-500 ease-in-out ${
+    className={`absolute bottom-full right-0 mb-4 transition-all duration-200 ${
+      showSearch ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
+    }`}
+  >
+  </div>
+
+  {/* Search Button */}
+  <a href="/search"
+    className={`block relative rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 p-4 cursor-pointer transition-all duration-500 ease-in-out ${
       searchHovered ? "scale-125 shadow-2xl" : "scale-100 shadow-lg"
     }`}
     onMouseEnter={() => setSearchHovered(true)}
@@ -103,8 +108,7 @@ export function Layout({ children }: LayoutProps) {
           <span className="absolute left-14 top-1/2 transform -translate-y-1/2 text-white text-sm font-semibold whitespace-nowrap z-20">
           </span>
         )}
-      </div>
-  
+      </a>
           <style jsx global>{`
             @keyframes twinkle {
               0%, 100% { opacity: 0; }
@@ -115,22 +119,6 @@ export function Layout({ children }: LayoutProps) {
             }
           `}</style>
         </div>
-  
-        {/* GlobalSearchDialog Slide-out */}
-        {showSearch && (
-          <div
-            className="fixed top-0 right-0 h-full w-96 bg-white shadow-xl z-50 transition-transform duration-500 ease-in-out"
-            style={{ 
-              transform: showSearch ? "translateX(0)" : "translateX(100%)",
-              right: 0 
-            }}
-          >
-            <GlobalSearchDialog 
-              isOpen={showSearch} 
-              onClose={() => setShowSearch(false)} 
-            />
-          </div>
-        )}
       </div>
       <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />  
     </div>

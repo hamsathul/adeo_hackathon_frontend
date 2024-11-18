@@ -6,6 +6,8 @@ import { StaffFilterDialog } from './StaffFilterDialog';
 import { GlobalSearchButton } from './GlobalSearchButton';
 import { GlobalSearchDialog } from './GlobalSearchDialog';
 import { cn } from '../utils';
+import { translations } from './translation';
+import { useLanguageStore } from '@/store/useLanguageStore';
 
 const initialOpinions: Opinion[] = [
   {
@@ -50,6 +52,8 @@ export function StaffDashboard() {
   const [filters, setFilters] = useState<TaskFilters>({});
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
+  const { isArabic } = useLanguageStore();
+  const text = isArabic ? translations.ar : translations.en;  
 
   const handleAssignDepartment = (opinionId: string, department: Department) => {
     setOpinions(opinions.map(opinion =>
@@ -92,19 +96,22 @@ export function StaffDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
-      <div className="container mx-auto px-6 py-8">
+    <>
+    {/* <div className="min-h-screen bg-[#f8f9fa]"> */}
+      {/* <div className="container mx-auto px-6 py-8"> */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">My Assigned Opinions</h1>
-              <p className="text-gray-500 mt-2">Manage and process assigned opinions</p>
+            <h1 className="text-3xl font-bold tracking-tight">{text.myAssignedOpinions}</h1>
+            <p className="text-gray-500 mt-2">{text.assignedOpinionsMessage}</p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg">
-                <Users className="w-5 h-5" />
-                <span className="font-medium">Staff Portal</span>
-              </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg">
+              <Users className="w-5 h-5" />
+              <a href="/employee" className="font-medium">
+              {text.staffPortal}
+            </a>
+            </div>
             </div>
           </div>
 
@@ -113,7 +120,7 @@ export function StaffDashboard() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search opinions..."
+                placeholder={text.searchOpinion}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5 bg-white"
@@ -124,7 +131,7 @@ export function StaffDashboard() {
               className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-white transition-colors bg-transparent"
             >
               <Filter className="w-5 h-5" />
-              Filter
+              {text.filter}
               {(filters.assignee || filters.department) && (
                 <span className="w-2 h-2 rounded-full bg-blue-500"></span>
               )}
@@ -167,7 +174,6 @@ export function StaffDashboard() {
           isOpen={isGlobalSearchOpen}
           onClose={() => setIsGlobalSearchOpen(false)}
         />
-      </div>
-    </div>
+    </>
   );
 }
