@@ -49,7 +49,7 @@ export default function Component() {
 
   const handleSaveChanges = () => {
     // Show confirmation toast
-    toast.success("     Your changes have been successfully saved.");
+    toast.success("Your changes have been successfully saved.");
   };
 
   return (
@@ -57,7 +57,7 @@ export default function Component() {
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover />
       <Card className="w-full max-w-3xl mx-auto shadow-lg">
         <CardContent className="p-8">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-semibold text-primary">{text.settings}</h1>
             <Button
               variant="ghost"
@@ -71,28 +71,28 @@ export default function Component() {
           </div>
 
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
-              <TabsTrigger  value="profile">{text.profile}</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="profile">{text.profile}</TabsTrigger>
               <TabsTrigger value="account">{text.account}</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="profile" className="space-y-8">
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <Label >{text.profilePic}</Label>
-                  <div className="flex items-center gap-6">
+            <TabsContent value="profile" className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>{text.profilePic}</Label>
+                  <div className="flex items-center gap-4">
                     <Avatar className="border border-gray-500 h-24 w-24">
-                      <AvatarImage  src={imageUrl} alt="Profile picture" />
-                        <AvatarFallback >
+                      <AvatarImage src={imageUrl} alt="Profile picture" />
+                      <AvatarFallback>
                         <img src="/man.png" alt="Default profile" />
-                        </AvatarFallback>
+                      </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col gap-3">
-                      <Input 
+                    <div className="flex flex-col gap-2">
+                      <Input
                         type="file"
                         accept="image/*"
                         onChange={handleImageUpload}
-                        className="w-full border border-input file:bg-transparent file:border-0 file:text-sm file:font-medium"
+                        className="w-full border border-gray-500 file:bg-transparent file:border-0 file:text-sm file:font-medium"
                       />
                       <Button variant="destructive" size="sm" onClick={handleDeletePicture}>
                         {text.deletepic}
@@ -103,15 +103,15 @@ export default function Component() {
 
                 <div className="space-y-2">
                   <Label>{text.profileName}</Label>
-                  <Input className="border border-gray-500"  value={profileName} readOnly />
+                  <Input className="border border-gray-500" value={profileName} readOnly />
                 </div>
 
                 <div className="space-y-2">
-                  <Label >{text.username}</Label>
+                  <Label>{text.username}</Label>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5 text-muted-foreground">@</span>
-                    <Input 
-                      id="username" 
+                    <Input
+                      id="username"
                       className="border border-gray-500 pl-7"
                       value={username} readOnly
                       onChange={(e) => setUsername(e.target.value)}
@@ -123,8 +123,8 @@ export default function Component() {
                   <Label htmlFor="about">{text.aboutme}</Label>
                   <Textarea
                     id="about"
-                    defaultValue="Explane about yourself..."
-                    className="pl-7 border border-gray-500" 
+                    defaultValue="Explain about yourself..."
+                    className="pl-7 border border-gray-500"
                   />
                 </div>
               </div>
@@ -134,14 +134,14 @@ export default function Component() {
               </Button>
             </TabsContent>
 
-            <TabsContent value="account" className="space-y-8">
-              <div className="space-y-6">
+            <TabsContent value="account" className="space-y-6">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>{text.email}</Label>
                   <Input className="border border-gray-500" value={email} readOnly />
                 </div>
               </div>
-  
+
               <div className="space-y-2">
                 <Label>{text.password}</Label>
                 <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
@@ -199,6 +199,6 @@ export default function Component() {
           </Tabs>
         </CardContent>
       </Card>
-      </Layout>
+    </Layout>
   );
 }
