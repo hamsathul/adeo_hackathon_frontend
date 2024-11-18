@@ -20,7 +20,7 @@ import { Layout } from "@/components/common/Layout";
 export default function Component() {
   const router = useRouter();
   const [imageUrl, setImageUrl] = React.useState("/placeholder.svg");
-  const [username, setUsername] = React.useState("kevinunhuy");
+  const [username, setUsername] = React.useState("ahmed");
   const [profileName, setProfileName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = React.useState(false);
@@ -30,8 +30,8 @@ export default function Component() {
   // Fetch data from backend
   React.useEffect(() => {
     setTimeout(() => {
-      setProfileName("Kevin Heart");
-      setEmail("kev.heart@mail.com");
+      setProfileName("Ahmed Al Hasd");
+      setEmail("ahmdhsd@ad.ae");
     }, 1000);
   }, []);
 
@@ -72,21 +72,23 @@ export default function Component() {
 
           <Tabs defaultValue="profile" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-8">
-              <TabsTrigger value="profile">{text.profile}</TabsTrigger>
+              <TabsTrigger  value="profile">{text.profile}</TabsTrigger>
               <TabsTrigger value="account">{text.account}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-8">
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <Label>{text.profilePic}</Label>
+                  <Label >{text.profilePic}</Label>
                   <div className="flex items-center gap-6">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage src={imageUrl} alt="Profile picture" />
-                      <AvatarFallback>PP</AvatarFallback>
+                    <Avatar className="border border-gray-500 h-24 w-24">
+                      <AvatarImage  src={imageUrl} alt="Profile picture" />
+                        <AvatarFallback >
+                        <img src="/man.png" alt="Default profile" />
+                        </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col gap-3">
-                      <Input
+                      <Input 
                         type="file"
                         accept="image/*"
                         onChange={handleImageUpload}
@@ -101,7 +103,7 @@ export default function Component() {
 
                 <div className="space-y-2">
                   <Label>{text.profileName}</Label>
-                  <Input value={profileName} readOnly />
+                  <Input className="border border-gray-500"  value={profileName} readOnly />
                 </div>
 
                 <div className="space-y-2">
@@ -110,7 +112,7 @@ export default function Component() {
                     <span className="absolute left-3 top-2.5 text-muted-foreground">@</span>
                     <Input 
                       id="username" 
-                      className="pl-7" 
+                      className="border border-gray-500 pl-7"
                       value={username} readOnly
                       onChange={(e) => setUsername(e.target.value)}
                     />
@@ -121,8 +123,8 @@ export default function Component() {
                   <Label htmlFor="about">{text.aboutme}</Label>
                   <Textarea
                     id="about"
-                    defaultValue="Discuss only on work hour, unless you wanna discuss about music 🎵"
-                    className="min-h-[100px] resize-none"
+                    defaultValue="Explane about yourself..."
+                    className="pl-7 border border-gray-500" 
                   />
                 </div>
               </div>
@@ -136,7 +138,7 @@ export default function Component() {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <Label>{text.email}</Label>
-                  <Input value={email} readOnly />
+                  <Input className="border border-gray-500" value={email} readOnly />
                 </div>
               </div>
   
@@ -144,7 +146,7 @@ export default function Component() {
                 <Label>{text.password}</Label>
                 <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="secondary" className="w-full">
+                    <Button variant="default" className="bg-gray-800 text-gray-100 w-full">
                       {text.changePassword}
                     </Button>
                   </DialogTrigger>
