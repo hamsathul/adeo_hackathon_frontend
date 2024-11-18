@@ -322,7 +322,7 @@ const handleSendMessage = () => {
           </div>
   
           {/* Input Section */}
-          <div className="p-6 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+          <div className=" rounded-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
             <div className="relative">
               <input
                 type="text"
