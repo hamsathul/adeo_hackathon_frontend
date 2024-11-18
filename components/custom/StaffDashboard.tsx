@@ -24,7 +24,7 @@ const initialOpinions: Opinion[] = [
       description: 'Proposal for improving city roads and bridges.',
       documents: [
         { name: '42ArabicADEO.pdf', url: '#' },
-        { name: 'Budget.xlsx', url: '#' }
+        { name: '42CaseStudy.pdf', url: '#' }
       ]
     },
     remarks: []

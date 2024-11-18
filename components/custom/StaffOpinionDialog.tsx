@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Users, Brain, Send } from 'lucide-react';
+import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Users, Brain, Send, Upload, Save } from 'lucide-react';
 import { Opinion, Department, RemarkFormData } from '../types';
 import { DocumentAnalysis } from './DocumentAnalysis';
 import { analyzeDocument, DocumentAnalysisResponse } from '../services/documentAnalysis';
@@ -36,6 +36,13 @@ const statusColors: Record<string, string> = {
   'rejected': 'bg-red-100 text-red-700',
 };
 
+interface UploadedFile {
+  file: File;
+  url: string;
+  name: string;
+  saved?: boolean;
+}
+
 export function StaffOpinionDialog({
   isOpen,
   onClose,
@@ -52,23 +59,37 @@ export function StaffOpinionDialog({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleAnalyzeDocument = async (documentUrl: string) => {
+  const handleAnalyzeDocument = async (documentUrl: string, fileName: string) => {
     try {
       setIsAnalyzing(true);
       setAnalysisError(null);
       
-      const response = await fetch('/42ArabicADEO.pdf');
-      if (!response.ok) {
-        throw new Error('Failed to fetch document');
-      }
+      let file: File;
       
-      const blob = await response.blob();
-      const file = new File([blob], '42ArabicADEO.pdf', { 
-        type: 'application/pdf' 
-      });
+      // Handle existing documents from public folder
+      if (documentUrl.startsWith('/')) {
+        const response = await fetch(documentUrl);
+        if (!response.ok) {
+          throw new Error('Failed to fetch document');
+        }
+        const blob = await response.blob();
+        file = new File([blob], fileName, { 
+          type: fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+      } else {
+        // Handle newly uploaded files
+        const response = await fetch(documentUrl);
+        if (!response.ok) {
+          throw new Error('Failed to fetch document');
+        }
+        const blob = await response.blob();
+        file = new File([blob], fileName, { type: blob.type });
+      }
       
       const result = await analyzeDocument(file);
       setDocumentAnalysis(result);
@@ -77,6 +98,57 @@ export function StaffOpinionDialog({
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(e.dataTransfer.files);
+    handleFiles(files);
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      handleFiles(files);
+    }
+  };
+
+  const handleFiles = (files: File[]) => {
+    const newFiles = files.map(file => ({
+      file,
+      url: URL.createObjectURL(file),
+      name: file.name,
+      saved: false
+    }));
+    setUploadedFiles(prev => [...prev, ...newFiles]);
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => {
+      const newFiles = [...prev];
+      URL.revokeObjectURL(newFiles[index].url); // Clean up the URL
+      newFiles.splice(index, 1);
+      return newFiles;
+    });
+  };
+
+  const handleSaveFile = (index: number) => {
+    setUploadedFiles(prev => {
+      const newFiles = [...prev];
+      newFiles[index] = { ...newFiles[index], saved: true };
+      return newFiles;
+    });
   };
 
   const handleAddRemark = (e: React.FormEvent) => {
@@ -234,11 +306,42 @@ export function StaffOpinionDialog({
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">Attached Documents</h3>
+                  <h3 className="text-lg font-semibold mb-3">Documents</h3>
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={cn(
+                      "border-2 border-dashed rounded-lg p-4 mb-4 transition-colors",
+                      isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
+                    )}
+                  >
+                    <input
+                      type="file"
+                      onChange={handleFileInput}
+                      multiple
+                      className="hidden"
+                      id="file-input"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx"
+                    />
+                    <label
+                      htmlFor="file-input"
+                      className="cursor-pointer flex flex-col items-center"
+                    >
+                      <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                      <span className="text-sm text-gray-600">
+                        Drop files here or click to upload
+                      </span>
+                      <span className="text-xs text-gray-500 mt-1">
+                        PDF, DOC, DOCX, XLS, XLSX up to 10MB each
+                      </span>
+                    </label>
+                  </div>
+
                   <div className="grid gap-2">
                     {opinion.submitter.documents.map((doc, index) => (
                       <div
-                        key={index}
+                        key={`existing-${index}`}
                         className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
                       >
                         <div className="flex items-center gap-3">
@@ -250,7 +353,7 @@ export function StaffOpinionDialog({
                               {doc.name}
                             </div>
                             <div className="text-sm text-gray-500">
-                              Added on March 15, 2024
+                              Existing document
                             </div>
                           </div>
                         </div>
@@ -258,12 +361,61 @@ export function StaffOpinionDialog({
                           onClick={() => {
                             setSelectedFile(doc.name);
                             setShowAiPanel(true);
-                            handleAnalyzeDocument(doc.url);
+                            handleAnalyzeDocument(`/${doc.name}`, doc.name);
                           }}
                           className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
                         >
                           <Brain className="w-4 h-4 text-blue-600" />
                         </button>
+                      </div>
+                    ))}
+                    
+                    {uploadedFiles.map((doc, index) => (
+                      <div
+                        key={`uploaded-${index}`}
+                        className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-blue-100 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900 group-hover:text-blue-600">
+                              {doc.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {doc.saved ? 'Saved' : 'Pending save'}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedFile(doc.name);
+                              setShowAiPanel(true);
+                              handleAnalyzeDocument(doc.url, doc.name);
+                            }}
+                            className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
+                          >
+                            <Brain className="w-4 h-4 text-blue-600" />
+                          </button>
+                          {!doc.saved ? (
+                            <>
+                              <button
+                                onClick={() => handleSaveFile(index)}
+                                className="p-2 hover:bg-green-100 rounded-lg transition-colors"
+                              >
+                                <Save className="w-4 h-4 text-green-600" />
+                              </button>
+                              <button
+                                onClick={() => removeFile(index)}
+                                className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                              >
+                                <X className="w-4 h-4 text-red-600" />
+                              </button>
+                            </>
+                          ) : null}
+                        </div>
                       </div>
                     ))}
                   </div>
