@@ -75,6 +75,10 @@ export const translations = {
       allAssignee: "All Assignee",
       clear: "Clear",
       applyfilters: "Apply Filters",
+      passwordDialog: "Enter your current password and new password to change it.",
+      current: "Current",
+      new: "New",
+      confirm: "Confirm",
     },
     ar: {
       ai: "AI Assistant",
@@ -150,6 +154,10 @@ export const translations = {
       allAssignee: "جميع المعينين",
       clear: "مسح",
       applyfilters: "تطبيق الفلاتر",
+      passwordDialog: "أدخل كلمة المرور الحالية وكلمة المرور الجديدة لتغييرها.",
+      current: "الحالية",
+      new: "جديد",
+      confirm: "تأكيد",
     },
   };
   

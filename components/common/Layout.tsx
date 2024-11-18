@@ -55,7 +55,7 @@ export function Layout({ children }: LayoutProps) {
     ></div>
     {/* Sparkles Icon */}
     <Sparkles
-      className="relative w-12 h-12 text-white z-10"
+      className="relative w-10 h-10 text-white z-10"
       strokeWidth={1.1}
     />
 
@@ -67,7 +67,7 @@ export function Layout({ children }: LayoutProps) {
 </div>
 
 {/* Search Panel */}
-<div className="fixed bottom-24 right-4 mb-3">
+<div className="fixed bottom-24 right-4 mb-2">
   <div
     className={`absolute bottom-full right-0 mb-4 transition-all duration-300 ${
       showSearch ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
@@ -100,7 +100,7 @@ export function Layout({ children }: LayoutProps) {
     />
 
     {/* Search Icon with Sparkles */}
-    <div className="relative w-12 h-12 text-white z-10">
+    <div className="relative w-10 h-10 text-white z-10">
       <Search className="w-full h-full" strokeWidth={1.1} />
       <div className="absolute inset-0 flex items-center justify-center">
         <div
