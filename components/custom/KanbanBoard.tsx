@@ -56,7 +56,6 @@ const columns: Status[] = ['unassigned', 'todo', 'in-progress', 'testing', 'revi
 
 export function KanbanBoard() {
   const [isClient, setIsClient] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isArabic } = useLanguageStore();
   const text = isArabic ? translations.ar : translations.en;
   const [opinions, setOpinions] = useState<Opinion[]>(initialOpinions);
