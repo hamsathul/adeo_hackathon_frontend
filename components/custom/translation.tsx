@@ -84,6 +84,9 @@ export const translations = {
       current: "Current",
       new: "New",
       confirm: "Confirm",
+      keyPoints: "Key Points",
+      trends: "Trends",
+      staffPortal: "Staff Portal",
     },
     ar: {
       ai: "AI Assistant",
@@ -168,6 +171,9 @@ export const translations = {
       current: "الحالية",
       new: "جديد",
       confirm: "تأكيد",
+      keyPoints: "النقاط الرئيسية",
+      trends: "الاتجاهات",
+      staffPortal: "بوابة الموظفين",
     },
   };
   

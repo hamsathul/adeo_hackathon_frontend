@@ -91,9 +91,11 @@ export function StaffDashboard() {
             <p className="text-gray-500 mt-2">{text.assignedOpinionsMessage}</p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg">
-              <Users className="w-5 h-5" />
-              <span className="font-medium">Staff Portal</span>
+          <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg">
+            <Users className="w-5 h-5" />
+            <a href="/employee" className="font-medium">
+              {text.staffPortal}
+            </a>
             </div>
           </div>
         </div>
