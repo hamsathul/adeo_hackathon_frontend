@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Users, Brain, Send, Upload, Save } from 'lucide-react';
+import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Brain, Send } from 'lucide-react';
 import { Opinion, RemarkFormData } from '../types';
 import { DocumentAnalysis } from './DocumentAnalysis';
 import { analyzeDocument, DocumentAnalysisResponse } from '../services/documentAnalysis';
+import { DetailSection } from './DetailSection';
+import { DocumentUpload } from './DocumentUpload';
 import { cn } from '../utils';
 
 interface KanbanDetailsDialogProps {
@@ -12,15 +14,6 @@ interface KanbanDetailsDialogProps {
   onEdit?: () => void;
   onAddRemark: (opinionId: string, remark: RemarkFormData) => void;
 }
-
-interface UploadedFile {
-  file: File;
-  url: string;
-  name: string;
-  saved?: boolean;
-}
-
-type Tab = 'details' | 'remarks';
 
 const priorityConfig: Record<string, { color: string; icon: string }> = {
   'urgent': { color: 'text-red-600', icon: 'bg-red-100' },
@@ -40,79 +33,31 @@ const statusColors: Record<string, string> = {
   'rejected': 'bg-red-100 text-red-700',
 };
 
-const DetailSection = ({ title, content, description }: { title: string; content: string; description?: string }) => (
-  <div className="mb-6">
-    <div className="flex items-start justify-between mb-2">
-      <h4 className="text-sm font-medium text-gray-900">{title}</h4>
-      {description && (
-        <div className="group relative">
-          <Info className="w-4 h-4 text-gray-400 cursor-help" />
-          <div className="absolute right-0 w-64 p-2 bg-white rounded-lg shadow-lg border border-gray-100 text-xs text-gray-600 hidden group-hover:block z-10">
-            {description}
-          </div>
-        </div>
-      )}
-    </div>
-    <div className="bg-gray-50 rounded-lg p-4">
-      <p className="text-gray-700 whitespace-pre-wrap">{content}</p>
-    </div>
-  </div>
-);
-
 export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRemark }: KanbanDetailsDialogProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'remarks'>('details');
   const [remarkContent, setRemarkContent] = useState('');
   const [showAiPanel, setShowAiPanel] = useState(false);
   const [documentAnalysis, setDocumentAnalysis] = useState<DocumentAnalysisResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{ file: File; url: string; name: string; saved?: boolean }>>([]);
   const [isDragging, setIsDragging] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleAnalyzeDocument = async (documentUrl: string, fileName: string) => {
-    try {
-      setIsAnalyzing(true);
-      setAnalysisError(null);
-      setSelectedDocument(fileName);
-      setShowAiPanel(true);
-
-      let file: File;
-      
-      // For existing documents
-      if (documentUrl === '#') {
-        const response = await fetch(`/${fileName}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch document: ${response.statusText}`);
-        }
-        const blob = await response.blob();
-        const fileType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 
-                        fileName.toLowerCase().endsWith('.xlsx') ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' :
-                        fileName.toLowerCase().endsWith('.xls') ? 'application/vnd.ms-excel' :
-                        fileName.toLowerCase().endsWith('.docx') ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
-                        fileName.toLowerCase().endsWith('.doc') ? 'application/msword' : 'application/octet-stream';
-        
-        file = new File([blob], fileName, { type: fileType });
-      } else {
-        // For newly uploaded files
-        const response = await fetch(documentUrl);
-        if (!response.ok) {
-          throw new Error('Failed to fetch document');
-        }
-        const blob = await response.blob();
-        file = new File([blob], fileName, { type: blob.type });
-      }
-
-      const result = await analyzeDocument(file);
-      setDocumentAnalysis(result);
-    } catch (error) {
-      console.error('Document analysis error:', error);
-      setAnalysisError(error instanceof Error ? error.message : 'Failed to analyze document');
-    } finally {
-      setIsAnalyzing(false);
-    }
+  const details = opinion.details || {
+    requestStatement: '',
+    challengesOpportunities: '',
+    subjectContent: '',
+    alternativeOptions: '',
+    expectedImpact: '',
+    potentialRisks: '',
+    studiesStatistics: '',
+    legalFinancialOpinions: '',
+    stakeholderFeedback: '',
+    workPlan: '',
+    decisionDraft: ''
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -149,7 +94,48 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
     setUploadedFiles(prev => [...prev, ...newFiles]);
   };
 
-  const removeFile = (index: number) => {
+  const handleAnalyzeDocument = async (documentUrl: string, fileName: string) => {
+    try {
+      setIsAnalyzing(true);
+      setAnalysisError(null);
+      setSelectedDocument(fileName);
+      setShowAiPanel(true);
+
+      let file: File;
+      
+      if (documentUrl === '#') {
+        const response = await fetch(`/${fileName}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch document: ${response.statusText}`);
+        }
+        const blob = await response.blob();
+        const fileType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 
+                        fileName.toLowerCase().endsWith('.xlsx') ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' :
+                        fileName.toLowerCase().endsWith('.xls') ? 'application/vnd.ms-excel' :
+                        fileName.toLowerCase().endsWith('.docx') ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
+                        fileName.toLowerCase().endsWith('.doc') ? 'application/msword' : 'application/octet-stream';
+        
+        file = new File([blob], fileName, { type: fileType });
+      } else {
+        const response = await fetch(documentUrl);
+        if (!response.ok) {
+          throw new Error('Failed to fetch document');
+        }
+        const blob = await response.blob();
+        file = new File([blob], fileName, { type: blob.type });
+      }
+
+      const result = await analyzeDocument(file);
+      setDocumentAnalysis(result);
+    } catch (error) {
+      console.error('Document analysis error:', error);
+      setAnalysisError(error instanceof Error ? error.message : 'Failed to analyze document');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
     setUploadedFiles(prev => {
       const newFiles = [...prev];
       URL.revokeObjectURL(newFiles[index].url);
@@ -334,174 +320,74 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                   <h3 className="text-lg font-semibold mb-4">Opinion Details</h3>
                   <DetailSection
                     title="Request Statement"
-                    content={opinion.details.requestStatement}
+                    content={details.requestStatement}
                     description="Clearly mention what is required from the committee, stating the purpose and reasoning"
                   />
                   <DetailSection
                     title="Challenges / Opportunities"
-                    content={opinion.details.challengesOpportunities}
+                    content={details.challengesOpportunities}
                     description="Mention the reasons for submitting the request and provide supporting information"
                   />
                   <DetailSection
                     title="Subject Content"
-                    content={opinion.details.subjectContent}
+                    content={details.subjectContent}
                     description="Provide details on the requested topic with supporting documents"
                   />
                   <DetailSection
                     title="Alternative Options"
-                    content={opinion.details.alternativeOptions}
+                    content={details.alternativeOptions}
                     description="Compare alternatives with the proposed solution"
                   />
                   <DetailSection
                     title="Expected Impact"
-                    content={opinion.details.expectedImpact}
+                    content={details.expectedImpact}
                     description="Describe implementation feasibility and impacts"
                   />
                   <DetailSection
                     title="Potential Risks and Mitigation"
-                    content={opinion.details.potentialRisks}
+                    content={details.potentialRisks}
                     description="List risks and recommended solutions"
                   />
                   <DetailSection
                     title="Studies and Statistics"
-                    content={opinion.details.studiesStatistics}
+                    content={details.studiesStatistics}
                     description="Include relevant studies and statistics"
                   />
                   <DetailSection
                     title="Legal and Financial Opinions"
-                    content={opinion.details.legalFinancialOpinions}
+                    content={details.legalFinancialOpinions}
                     description="Include approved legal and financial opinions"
                   />
                   <DetailSection
                     title="Stakeholder Feedback"
-                    content={opinion.details.stakeholderFeedback}
+                    content={details.stakeholderFeedback}
                     description="Include feedback from relevant stakeholders"
                   />
                   <DetailSection
                     title="Work Plan"
-                    content={opinion.details.workPlan}
+                    content={details.workPlan}
                     description="Detail implementation stages and timeline"
                   />
                   <DetailSection
                     title="Decision Draft"
-                    content={opinion.details.decisionDraft}
+                    content={details.decisionDraft}
                     description="Proposed draft text of the decision"
                   />
                 </div>
 
                 {/* Documents Section */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Supporting Documents</h3>
-                  
-                  {/* Document Upload Area */}
-                  <div
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                    className={cn(
-                      "border-2 border-dashed rounded-lg p-4 mb-4 transition-colors",
-                      isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300"
-                    )}
-                  >
-                    <input
-                      type="file"
-                      onChange={handleFileInput}
-                      multiple
-                      className="hidden"
-                      id="file-input"
-                      accept=".pdf,.doc,.docx,.xls,.xlsx"
-                    />
-                    <label
-                      htmlFor="file-input"
-                      className="cursor-pointer flex flex-col items-center"
-                    >
-                      <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                      <span className="text-sm text-gray-600">
-                        Drop files here or click to upload
-                      </span>
-                      <span className="text-xs text-gray-500 mt-1">
-                        PDF, DOC, DOCX, XLS, XLSX up to 10MB each
-                      </span>
-                    </label>
-                  </div>
-
-                  {/* Document List */}
-                  <div className="grid gap-2">
-                    {/* Existing Documents */}
-                    {opinion.submitter.documents.map((doc, index) => (
-                      <div
-                        key={`existing-${index}`}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-100 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <FileText className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-900 group-hover:text-blue-600">
-                              {doc.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              Existing document
-                            </div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleAnalyzeDocument('#', doc.name)}
-                          className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
-                        >
-                          <Brain className="w-4 h-4 text-blue-600" />
-                        </button>
-                      </div>
-                    ))}
-                    
-                    {/* Newly Uploaded Documents */}
-                    {uploadedFiles.map((doc, index) => (
-                      <div
-                        key={`uploaded-${index}`}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-100 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <FileText className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-900 group-hover:text-blue-600">
-                              {doc.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {doc.saved ? 'Saved' : 'Pending save'}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleAnalyzeDocument(doc.url, doc.name)}
-                            className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
-                          >
-                            <Brain className="w-4 h-4 text-blue-600" />
-                          </button>
-                          {!doc.saved ? (
-                            <>
-                              <button
-                                onClick={() => handleSaveFile(index)}
-                                className="p-2 hover:bg-green-100 rounded-lg transition-colors"
-                              >
-                                <Save className="w-4 h-4 text-green-600" />
-                              </button>
-                              <button
-                                onClick={() => removeFile(index)}
-                                className="p-2 hover:bg-red-100 rounded-lg transition-colors"
-                              >
-                                <X className="w-4 h-4 text-red-600" />
-                              </button>
-                            </>
-                          ) : null}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <DocumentUpload
+                  isDragging={isDragging}
+                  uploadedFiles={uploadedFiles}
+                  existingDocuments={opinion.submitter.documents}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onFileInput={handleFileInput}
+                  onAnalyzeDocument={handleAnalyzeDocument}
+                  onSaveFile={handleSaveFile}
+                  onRemoveFile={handleRemoveFile}
+                />
               </div>
             ) : (
               <div className="p-6">
@@ -565,7 +451,6 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                   analysis={documentAnalysis}
                   isLoading={isAnalyzing}
                   error={analysisError}
-                  
                 />
               </div>
             </div>

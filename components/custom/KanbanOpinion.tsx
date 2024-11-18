@@ -180,6 +180,9 @@ export function KanbanOpinion({ opinion, onEdit, onDelete, onAddRemark }: Kanban
           assignee: opinion.assignee || '',
           department: opinion.department,
           priority: opinion.priority,
+          category: opinion.category,
+          subCategory: opinion.subCategory,
+          details: opinion.details,
           submitter: {
             name: opinion.submitter.name,
             email: opinion.submitter.email,
