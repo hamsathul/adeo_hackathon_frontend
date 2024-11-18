@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Brain, Send } from 'lucide-react';
+import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Brain, Send, Upload, Save } from 'lucide-react';
 import { Opinion, RemarkFormData } from '../types';
 import { DocumentAnalysis } from './DocumentAnalysis';
 import { analyzeDocument, DocumentAnalysisResponse } from '../services/documentAnalysis';
 import { DetailSection } from './DetailSection';
-import { DocumentUpload } from './DocumentUpload';
 import { cn } from '../utils';
 import { translations } from './translation';
 import { useLanguageStore } from '@/store/useLanguageStore';
@@ -480,7 +479,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                                 <Save className="w-4 h-4 text-green-600" />
                               </button>
                               <button
-                                onClick={() => removeFile(index)}
+                                onClick={() => handleRemoveFile(index)}
                                 className="p-2 hover:bg-red-100 rounded-lg transition-colors"
                               >
                                 <X className="w-4 h-4 text-red-600" />
