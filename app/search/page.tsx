@@ -354,7 +354,7 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
    };
 
 const getBgColor = (index: number): string => {
-	const colors = ['bg-[#d5dbdb]', 'bg-[#f2d7d5]', 'bg-[#fadfd9]'];
+	const colors = ['bg-[#FDFDFD]', 'bg-[#F4E7D3]', 'bg-[#AEE12]'];
 	return colors[index % colors.length];
 };
 
