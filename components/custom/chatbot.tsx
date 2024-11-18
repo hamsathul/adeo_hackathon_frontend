@@ -274,7 +274,7 @@ const handleSendMessage = () => {
         >
           {/* Header */}
           <div className="flex justify-between items-center p-0.5">
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            <Button className="rounded-full p-2 bg-blur hover:bg-blur-20 transition duration-300" variant="ghost" size="icon" onClick={onClose}>
               <X className="w-5 h-5 text-white" />
             </Button>
           </div>
