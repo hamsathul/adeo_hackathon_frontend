@@ -1,7 +1,7 @@
 // components/custom/KanbanBoard.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/app/admin/_components/header';
 import Sidebar from '@/app/admin/_components/sidebar';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors,} from '@dnd-kit/core';
@@ -65,15 +65,15 @@ const columns: Status[] = ['unassigned', 'todo', 'in-progress', 'testing', 'revi
 
 export function KanbanBoard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const sensors = useSensors(useSensor(PointerSensor));
   const [showChatbot, setShowChatbot] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const toggleSidebar = () => {
       setIsSidebarOpen(!isSidebarOpen);
     };
+  const [isClient, setIsClient] = useState(false);
   const [searchHovered, setSearchHovered] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const { isArabic } = useLanguageStore();
-  const text = isArabic ? translations.ar : translations.en;
   const [opinions, setOpinions] = useState<Opinion[]>(initialOpinions);
   const [activeOpinion, setActiveOpinion] = useState<Opinion | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -209,7 +209,7 @@ export function KanbanBoard() {
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
-  <Header />
+  {/* <Header /> */}
   <div className="px-20">
     <header className="flex justify-end p-4"></header>
     <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
