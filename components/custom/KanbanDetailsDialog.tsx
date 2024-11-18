@@ -77,6 +77,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
       setIsAnalyzing(true);
       setAnalysisError(null);
       setSelectedDocument(fileName);
+      setShowAiPanel(true);
 
       let file: File;
       
@@ -564,6 +565,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                   analysis={documentAnalysis}
                   isLoading={isAnalyzing}
                   error={analysisError}
+                  
                 />
               </div>
             </div>
