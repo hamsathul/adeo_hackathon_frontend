@@ -404,10 +404,20 @@ export default function Component() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{text.allDepartments}</SelectItem>
-              <SelectItem value="managerial">Managerial</SelectItem>
-              <SelectItem value="it">IT</SelectItem>
-              <SelectItem value="hr">HR</SelectItem>
-              {/* Add more departments as needed */}
+              <SelectItem value="executive">Executive Office</SelectItem>
+              <SelectItem value="administration">Administration Department</SelectItem>
+              <SelectItem value="pld">Policy & Legislation Department</SelectItem>
+              <SelectItem value="gsd">Government Services Department</SelectItem>
+              <SelectItem value="did">Digital Innovation Department</SelectItem>
+              <SelectItem value="std">Strategy & Planning Department</SelectItem>
+              <SelectItem value="leg">Legal Affairs Department</SelectItem>
+              <SelectItem value="fin">Finance Department</SelectItem>
+              <SelectItem value="hrd">Human Resourse Department</SelectItem>
+              <SelectItem value="itd">Information Technology Department</SelectItem>
+              <SelectItem value="pmo">Project Management Office</SelectItem>
+              <SelectItem value="qcd">Quality Control Department</SelectItem>
+              <SelectItem value="ccd">Corporate Communications Department</SelectItem>
+              <SelectItem value="ird">International Relations Department</SelectItem>
             </SelectContent>
           </Select>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -416,9 +426,12 @@ export default function Component() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{text.allRoles}</SelectItem>
-              <SelectItem value="ceo">CEO</SelectItem>
-              <SelectItem value="manager">Manager</SelectItem>
-              <SelectItem value="designer">Designer</SelectItem>
+              <SelectItem value="superadmin">Super Admin</SelectItem>
+              <SelectItem value="systemadmin">System Admin</SelectItem>
+              <SelectItem value="departmenthead">Department Head</SelectItem>
+              <SelectItem value="seniorexpert">Senior Expert</SelectItem>
+              <SelectItem value="expert">Expert</SelectItem>
+              <SelectItem value="regularuser">Regular User</SelectItem>
               {/* Add more roles as needed */}
             </SelectContent>
           </Select>
@@ -446,12 +459,12 @@ export default function Component() {
       </div>
       <div className={`grid gap-4 ${view === 'grid' ? 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : ''}`}>
         {filteredEmployees.map((employee) => (
-          <Card key={employee.id} className="bg-slate-50 dark:bg-slate-900/50">
+          <Card key={employee.id} className="bg-slate-100 dark:bg-slate-900/50 border-2">
         <CardHeader className="relative">
           <Badge variant="secondary" className="absolute right-6 top-6">
             {employee.department}
           </Badge>
-          <div className="flex flex-col items-center space-y-3">
+          <div className="flex flex-col items-center space-y-4 py-3">
             <img
           alt={employee.name}
           className="rounded-full"
@@ -463,18 +476,18 @@ export default function Component() {
           }}
           width="100"
             />
-            <div className="space-y-1 text-center">
+            <div className="space-y-0 text-center">
           <h3 className="text-lg font-semibold">{employee.name}</h3>
           <p className="text-muted-foreground">{employee.role}</p>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-2">
           <div className="space-y-2">
             <div className="flex items-center text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">#{employee.employeeId}</span>
+          <span className="font-bold text-foreground">#{employee.employeeId}</span>
             </div>
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-1 text-sm">
           <Badge variant="secondary">{employee.position}</Badge>
           <span className="text-muted-foreground">·</span>
           <Badge variant="secondary">{employee.workType}</Badge>
@@ -492,8 +505,8 @@ export default function Component() {
             <div className="flex items-center justify-between gap-2">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="sm">
-            View details
+              <Button variant="ghost" size="sm" style={{ border: '1px solid', borderColor: 'gray.300' }}>
+            {text.viewDetails}
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -524,13 +537,13 @@ export default function Component() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon">
                         <MoreVertical className="h-4 w-4" />
-                        <span className="sr-only">More options</span>
+                        <span className="sr-only">{text.moreOptions}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onSelect={() => setEditingEmployee(employee)}>Edit</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setEditingEmployee(employee)}>{text.edit}</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => setEmployees(employees.filter(e => e.id !== employee.id))}>
-                        Delete
+                        {text.delete}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -544,7 +557,7 @@ export default function Component() {
         <Dialog open={!!editingEmployee} onOpenChange={() => setEditingEmployee(null)}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Edit Employee</DialogTitle>
+              <DialogTitle>{text.editEmployee}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <Input
@@ -592,7 +605,7 @@ export default function Component() {
                 onChange={(e) => setEditingEmployee({ ...editingEmployee, phone: e.target.value })}
               />
             </div>
-            <Button onClick={handleEditEmployee}>Save Changes</Button>
+            <Button onClick={handleEditEmployee}>{text.saveChanges}</Button>
           </DialogContent>
         </Dialog>
       )}
