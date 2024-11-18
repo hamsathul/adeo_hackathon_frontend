@@ -15,19 +15,48 @@ import autoTable from 'jspdf-autotable'
 import { translations } from '@/components/custom/translation'
 import { useLanguageStore } from '@/store/useLanguageStore'
 import { Layout } from '@/components/common/Layout';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import  {jwtDecode } from 'jwt-decode';
+import { useRouter } from "next/navigation";
+
+const server_url = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000/api/v1'
+
+
+interface User {
+  id: number;
+  username: string;
+  roles: Array<{ name: string }>;
+  department?: { name: string };
+  email: string;
+  is_active: boolean;
+}
 
 interface Employee {
-  id: string
-  name: string
-  role: string
-  department: string
-  email: string
-  phone: string
-  avatar: string
-  employeeId: string
-  workType: string
-  position: string
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+  email: string;
+  phone: string;
+  avatar: string;
+  employeeId: string;
+  workType: string;
+  position: string;
 }
+
+const mapUserToEmployee = (user: User) => ({
+  id: user.id.toString(),
+  name: user.username,
+  role: user.roles[0]?.name || 'N/A',
+  department: user.department?.name || 'N/A',
+  email: user.email,
+  phone: 'N/A', // Add if available in API
+  avatar: '/man.png', // Default avatar
+  employeeId: `EMP${user.id.toString().padStart(3, '0')}`,
+  workType: user.is_active ? 'Fulltime' : 'Inactive',
+  position: user.roles[0]?.name || 'N/A'
+})
 
 export default function Component() {
   const [view, setView] = useState<'grid' | 'list'>('grid')
@@ -39,34 +68,88 @@ export default function Component() {
   const [roleFilter, setRoleFilter] = useState('all')
   const [showAddEmployee, setShowAddEmployee] = useState(false)
   const [newEmployee, setNewEmployee] = useState<Partial<Employee>>({})
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
+  const router = useRouter();
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const { isArabic } = useLanguageStore();
   const text = isArabic ? translations.ar : translations.en;
 
+  // useEffect(() => {
+  //   // Simulating initial data load
+  //   setEmployees([
+  //     {
+  //       id: '1',
+  //       name: 'Ahmed Mohamed',
+  //       role: 'CEO',
+  //       department: 'Managerial',
+  //       email: 'a.mohamed@gmail.com',
+  //       phone: '+971 50 123 1234',
+  //       avatar: '/man.png',
+  //       employeeId: 'EMP01',
+  //       workType: 'Fulltime',
+  //       position: 'Executive',
+  //     },
+  //     // Add more initial employees here
+  //   ])
+  // }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      // console.log("Token:", token);
+      if (!token) {
+        toast.error("No authentication token found");
+        router.push('/login'); // Redirect to login page
+        return;
+      }
+
+      let decodedToken: { user_id: number };
+      try {
+        decodedToken = jwtDecode(token);
+      } catch (error) {
+        toast.error("Invalid token format");
+        router.push('/login'); // Redirect to login page
+        return;
+      }
+
+      if (!decodedToken.user_id) {
+        toast.error("User ID not found in token");
+        router.push('/login'); // Redirect to login page
+        return;
+      }
+
+      const { data } = await axios.get(`${server_url}/auth/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const mappedEmployees = data.map(mapUserToEmployee);
+      setEmployees(mappedEmployees);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          toast.error(`Error: ${error.response.data.message || 'Failed to fetch user data'}`);
+        } else if (error.request) {
+          toast.error("Server not responding. Please try again later.");
+        } else {
+          toast.error("Error setting up request");
+        }
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+      console.error("Error fetching users:", error);
+    }
+  }
+
   useEffect(() => {
-    // Simulating initial data load
-    setEmployees([
-      {
-        id: '1',
-        name: 'Ahmed Mohamed',
-        role: 'CEO',
-        department: 'Managerial',
-        email: 'a.mohamed@gmail.com',
-        phone: '+971 50 123 1234',
-        avatar: '/man.png',
-        employeeId: 'EMP01',
-        workType: 'Fulltime',
-        position: 'Executive',
-      },
-      // Add more initial employees here
-    ])
-  }, [])
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     const filtered = employees.filter((employee) => {
       const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase())
+                          employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesType = typeFilter === 'all' || employee.workType.toLowerCase() === typeFilter.toLowerCase()
       const matchesDepartment = departmentFilter === 'all' || employee.department.toLowerCase() === departmentFilter.toLowerCase()
       const matchesRole = roleFilter === 'all' || employee.role.toLowerCase() === roleFilter.toLowerCase()
@@ -75,6 +158,46 @@ export default function Component() {
     setFilteredEmployees(filtered)
   }, [employees, searchTerm, typeFilter, departmentFilter, roleFilter])
 
+  // Modified handleAddEmployee to work with API
+  const handleAddEmployee = async () => {
+    if (newEmployee.name && newEmployee.email) {
+      try {
+        // Add API call here when endpoint is available
+        // For now, just update local state
+        setEmployees([...employees, {
+          id: Date.now().toString(),
+          name: newEmployee.name || '',
+          role: newEmployee.role || 'N/A',
+          department: newEmployee.department || 'N/A',
+          email: newEmployee.email || '',
+          phone: newEmployee.phone || 'N/A',
+          avatar: newEmployee.avatar || '/man.png',
+          employeeId: newEmployee.employeeId || '',
+          workType: newEmployee.workType || 'Fulltime',
+          position: newEmployee.position || 'N/A'
+        }])
+        setNewEmployee({})
+        setShowAddEmployee(false)
+      } catch (error) {
+        console.error('Error adding employee:', error)
+        // Handle error appropriately
+      }
+    }
+  }
+
+  const handleEditEmployee = async () => {
+    if (editingEmployee) {
+      try {
+        // Add API call here when endpoint is available
+        // For now, just update local state
+        setEmployees(employees.map(emp => emp.id === editingEmployee.id ? editingEmployee : emp))
+        setEditingEmployee(null)
+      } catch (error) {
+        console.error('Error editing employee:', error)
+        // Handle error appropriately
+      }
+    }
+  }
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -139,21 +262,9 @@ export default function Component() {
       XLSX.writeFile(workbook, `employees.${format === 'excel' ? 'xlsx' : 'csv'}`)
     }
   }
+  
 
-  const handleAddEmployee = () => {
-    if (newEmployee.name && newEmployee.email) {
-      setEmployees([...employees, { ...newEmployee, id: Date.now().toString() } as Employee])
-      setNewEmployee({})
-      setShowAddEmployee(false)
-    }
-  }
 
-  const handleEditEmployee = () => {
-    if (editingEmployee) {
-      setEmployees(employees.map(emp => emp.id === editingEmployee.id ? editingEmployee : emp))
-      setEditingEmployee(null)
-    }
-  }
 
   return (
     <>
@@ -313,7 +424,7 @@ export default function Component() {
           </Select>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center rounded-md border">
+            <div className="flex items-center rounded-md border-l-zinc-950">
             <Button
               variant={view === 'grid' ? 'secondary' : 'ghost'}
               size="icon"
