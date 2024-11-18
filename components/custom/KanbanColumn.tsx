@@ -59,13 +59,13 @@ export function KanbanColumn({ status, items, onAdd, onEdit, onDelete, onAddRema
               {items.length} {items.length === 1 ? 'opinion' : 'opinions'}
             </p>
           </div>
-          <button
+          {/* <button
             onClick={() => setIsAddDialogOpen(true)}
             className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
             title="Add opinion"
           >
             <Plus className="w-4 h-4" />
-          </button>
+          </button> */}
         </div>
       </div>
       
