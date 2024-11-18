@@ -6,6 +6,8 @@ import { Status, Opinion, OpinionFormData, RemarkFormData } from '../types';
 import { KanbanOpinion } from './KanbanOpinion';
 import { TaskDialog } from './TaskDialog';
 import { cn } from '../utils';
+import { translations } from './translation';
+import { useLanguageStore } from '../../store/useLanguageStore';
 
 interface KanbanColumnProps {
   status: Status;
@@ -16,21 +18,24 @@ interface KanbanColumnProps {
   onAddRemark: (opinionId: string, remark: RemarkFormData) => void;
 }
 
-const statusConfig: Record<Status, { title: string; color: string }> = {
-  'unassigned': { title: 'UNASSIGNED', color: 'bg-gray-100 border-t-gray-300' },
-  'todo': { title: 'TO DO', color: 'bg-blue-100 border-t-blue-300' },
-  'in-progress': { title: 'IN PROGRESS', color: 'bg-teal-100 border-t-teal-300' },
-  'testing': { title: 'TESTING', color: 'bg-purple-100 border-t-purple-300' },
-  'review': { title: 'REVIEW', color: 'bg-yellow-100 border-t-yellow-300' },
-  'done': { title: 'DONE', color: 'bg-green-100 border-t-green-300' },
-  'on-hold': { title: 'ON HOLD', color: 'bg-orange-100 border-t-orange-300' },
-  'rejected': { title: 'REJECTED', color: 'bg-red-100 border-t-red-300' }
-};
 
 export function KanbanColumn({ status, items, onAdd, onEdit, onDelete, onAddRemark }: KanbanColumnProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const { setNodeRef } = useDroppable({ id: status });
+  const { isArabic } = useLanguageStore();
+  const text = isArabic ? translations.ar : translations.en;
 
+  const statusConfig: Record<Status, { title: string; color: string }> = {
+    'unassigned': { title: text.unassignedCard, color: 'bg-gray-100 border-t-gray-300' },
+    'todo': { title: text.todocard, color: 'bg-blue-100 border-t-blue-300' },
+    'in-progress': { title: text.progressCard, color: 'bg-teal-100 border-t-teal-300' },
+    'testing': { title: text.testingCard, color: 'bg-purple-100 border-t-purple-300' },
+    'review': { title: text.reviewCard, color: 'bg-yellow-100 border-t-yellow-300' },
+    'done': { title: text.completedCard, color: 'bg-green-100 border-t-green-300' },
+    'on-hold': { title: text.onholdCard, color: 'bg-orange-100 border-t-orange-300' },
+    'rejected': { title: text.rejectedCard, color: 'bg-red-100 border-t-red-300' }
+  };
+  
   const handleAddOpinion = (data: OpinionFormData) => {
     onAdd(status, data);
   };
