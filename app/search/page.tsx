@@ -162,11 +162,11 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 								{summarizedContent[index] && !minimizedSummaries[index] && (
 					<div className="mt-4 p-4 bg-white/50 rounded-lg space-y-4">
 						<div>
-						<h4 className="font-semibold mb-2">Summary</h4>
+						<h4 className="font-semibold mb-2">{text.summary}</h4>
 						<p className="text-sm">{summarizedContent[index].summary}</p>
 						</div>
 						<div>
-						<h4 className="font-semibold mb-2">Key Points</h4>
+						<h4 className="font-semibold mb-2">{text.keyPoints}</h4>
 						<ul className="list-disc list-inside text-sm">
 							{summarizedContent[index].key_points.map((point, i) => (
 							<li key={i}>{point}</li>
@@ -174,7 +174,7 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 						</ul>
 						</div>
 						<div>
-						<h4 className="font-semibold mb-2">Trends</h4>
+						<h4 className="font-semibold mb-2">{text.trends}</h4>
 						<ul className="list-disc list-inside text-sm">
 							{summarizedContent[index].trends.map((trend, i) => (
 							<li key={i}>{trend}</li>
