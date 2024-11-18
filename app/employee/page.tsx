@@ -12,12 +12,9 @@ import { Sparkles, Download, Grid2X2, Import, LayoutList, MoreVertical, Plus, Se
 import * as XLSX from 'xlsx'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import Sidebar from '../admin/_components/sidebar'
-import Header from '../admin/_components/header'
-import Chatbot from '@/components/custom/chatbot'
 import { translations } from '@/components/custom/translation'
 import { useLanguageStore } from '@/store/useLanguageStore'
-import SearchEngine from '@/components/custom/SearchEngine';
+import { Layout } from '@/components/common/Layout';
 
 interface Employee {
   id: string
@@ -43,17 +40,8 @@ export default function Component() {
   const [showAddEmployee, setShowAddEmployee] = useState(false)
   const [newEmployee, setNewEmployee] = useState<Partial<Employee>>({})
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [showChatbot, setShowChatbot] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const { isArabic } = useLanguageStore();
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchHovered, setSearchHovered] = useState(false);
   const text = isArabic ? translations.ar : translations.en;
-  
-  const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-      };
 
   useEffect(() => {
     // Simulating initial data load
@@ -133,10 +121,8 @@ export default function Component() {
 
   return (
     <>
-    <Header />
-    <div className="px-20 py-">
-        <header className="flex justify-end p-4"></header>
-    <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+    <Layout>
+    <header className="flex justify-end p-4"></header>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold tracking-tight">{text.employeeManagement}</h1>
         <div className="flex items-center gap-2">
@@ -491,114 +477,7 @@ export default function Component() {
           ))}
         </tbody>
       </table>
-{/* AI Assistant Button */}
-<div className="fixed bottom-4 right-4">
-  <div
-    className={`relative rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-4 cursor-pointer transition-all duration-500 ease-in-out ${
-      isHovered ? "scale-125 shadow-2xl" : "scale-100 shadow-lg"
-    }`}
-    onMouseEnter={() => setIsHovered(true)}
-    onMouseLeave={() => setIsHovered(false)}
-    onClick={() => setShowChatbot(true)}
-  >
-    {/* Animated Pulsating Circle */}
-    <div
-      className={`absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 blur-md opacity-70 ${
-        isHovered ? "animate-pulse" : ""
-      }`}
-    ></div>
-    {/* Sparkles Icon */}
-    <Sparkles
-      className="relative w-10 h-10 text-white z-10"
-      strokeWidth={1.1}
-    />
-
-    {/* Hover Text */}
-    {isHovered && (
-      <span className="absolute left-14 top-1/2 transform -translate-y-1/2 text-white text-sm font-semibold whitespace-nowrap z-20"></span>
-    )}
-  </div>
-</div>
-
-{/* Search Panel */}
-<div className="fixed bottom-24 right-4 mb-2">
-  <div
-    className={`absolute bottom-full right-0 mb-4 transition-all duration-300 ${
-      showSearch ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
-    }`}
-  >
-    <Card className="w-80 p-4 shadow-xl">
-      <div className="flex gap-2">
-        <Input placeholder="Search..." className="flex-1" />
-        <Button variant="ghost" size="icon">
-          <Search className="h-4 w-4" />
-        </Button>
-      </div>
-    </Card>
-  </div>
-
-  {/* Search Button */}
-  <div
-    className={`relative rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 p-4 cursor-pointer transition-all duration-500 ease-in-out ${
-      searchHovered ? "scale-125 shadow-2xl" : "scale-100 shadow-lg"
-    }`}
-    onMouseEnter={() => setSearchHovered(true)}
-    onMouseLeave={() => setSearchHovered(false)}
-    onClick={() => setShowSearch(!showSearch)}
-  >
-    {/* Animated Pulsating Circle */}
-    <div
-      className={`absolute inset-0 rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 blur-md opacity-70 ${
-        searchHovered ? "animate-pulse" : ""
-      }`}
-    />
-
-    {/* Search Icon with Sparkles */}
-    <div className="relative w-10 h-10 text-white z-10">
-      <Search className="w-full h-full" strokeWidth={1.1} />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className={`transition-opacity duration-300 ${
-            searchHovered ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <span className="absolute top-1 right-1 block w-1.5 h-1.5 bg-white rounded-full animate-twinkle" />
-          <span className="absolute top-3 right-3 block w-1 h-1 bg-white rounded-full animate-twinkle delay-100" />
-        </div>
-      </div>
-    </div>
-
-    {/* Hover Text */}
-    {searchHovered && (
-      <span className="absolute left-14 top-1/2 transform -translate-y-1/2 text-white text-sm font-semibold whitespace-nowrap z-20">
-      </span>
-    )}
-  </div>
-
-  <style jsx global>{`
-    @keyframes twinkle {
-      0%, 100% { opacity: 0; }
-      50% { opacity: 1; }
-    }
-    .animate-twinkle {
-      animation: twinkle 1.5s infinite ease-in-out;
-    }
-  `}</style>
-</div>
-
-{/* GlobalSearchDialog Slide-out */}
-{showSearch && (
-  <div
-    className="fixed top-0 right-0 h-full w-90 bg-white shadow-xl transition-transform duration-500 ease-in-out"
-    style={{ transform: showSearch ? "translateX(0)" : "translateX(100%)" }}
-  >
-    <SearchEngine isOpen={showSearch} onClose={() => setShowSearch(false)} />
-  </div>
-)}
-
-{/* Chatbot */}
-<Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />  
-    </div>
+    </Layout>
     </>
   )
 }
