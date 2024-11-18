@@ -34,7 +34,7 @@ export function DocumentAnalysis({ analysis, isLoading, error }: DocumentAnalysi
     );
   }
 
-  if (!analysis || !analysis.analysis_result) {
+  if (!analysis) {
     return (
       <div className="text-center p-8 text-gray-500">
         <Brain className="w-12 h-12 mx-auto mb-4 text-gray-400" />
@@ -43,7 +43,9 @@ export function DocumentAnalysis({ analysis, isLoading, error }: DocumentAnalysi
     );
   }
 
-  const { content_analysis, metadata } = analysis.analysis_result;
+  const { content_analysis } = analysis.analysis_result;
+  const processingTime = analysis.metadata?.processing_time;
+  const chunksProcessed = analysis.metadata?.chunks_processed;
 
   return (
     <div className="space-y-6">
@@ -141,10 +143,10 @@ export function DocumentAnalysis({ analysis, isLoading, error }: DocumentAnalysi
         </div>
       </div>
 
-      {analysis.metadata && (
+      {processingTime && chunksProcessed && (
         <div className="text-xs text-gray-500 flex items-center justify-between">
-          <span>Processed: {new Date(analysis.metadata.processing_time).toLocaleString()}</span>
-          <span>{analysis.metadata.chunks_processed} chunks analyzed</span>
+          <span>Processed: {new Date(processingTime).toLocaleString()}</span>
+          <span>{chunksProcessed} chunks analyzed</span>
         </div>
       )}
     </div>
