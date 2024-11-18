@@ -80,13 +80,22 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
 
       let file: File;
       
-      // Handle existing documents from public folder
-      if (documentUrl.startsWith('#')) {
-        // For demo purposes, create a mock file
-        const mockContent = new Blob(['Mock content for ' + fileName], { type: 'application/pdf' });
-        file = new File([mockContent], fileName, { type: 'application/pdf' });
+      // For existing documents
+      if (documentUrl === '#') {
+        const response = await fetch(`/${fileName}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch document: ${response.statusText}`);
+        }
+        const blob = await response.blob();
+        const fileType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 
+                        fileName.toLowerCase().endsWith('.xlsx') ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' :
+                        fileName.toLowerCase().endsWith('.xls') ? 'application/vnd.ms-excel' :
+                        fileName.toLowerCase().endsWith('.docx') ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
+                        fileName.toLowerCase().endsWith('.doc') ? 'application/msword' : 'application/octet-stream';
+        
+        file = new File([blob], fileName, { type: fileType });
       } else {
-        // Handle newly uploaded files
+        // For newly uploaded files
         const response = await fetch(documentUrl);
         if (!response.ok) {
           throw new Error('Failed to fetch document');
@@ -98,6 +107,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
       const result = await analyzeDocument(file);
       setDocumentAnalysis(result);
     } catch (error) {
+      console.error('Document analysis error:', error);
       setAnalysisError(error instanceof Error ? error.message : 'Failed to analyze document');
     } finally {
       setIsAnalyzing(false);
@@ -436,10 +446,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                           </div>
                         </div>
                         <button
-                          onClick={() => {
-                            setShowAiPanel(true);
-                            handleAnalyzeDocument(doc.url, doc.name);
-                          }}
+                          onClick={() => handleAnalyzeDocument('#', doc.name)}
                           className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
                         >
                           <Brain className="w-4 h-4 text-blue-600" />
@@ -468,10 +475,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                         </div>
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => {
-                              setShowAiPanel(true);
-                              handleAnalyzeDocument(doc.url, doc.name);
-                            }}
+                            onClick={() => handleAnalyzeDocument(doc.url, doc.name)}
                             className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
                           >
                             <Brain className="w-4 h-4 text-blue-600" />
