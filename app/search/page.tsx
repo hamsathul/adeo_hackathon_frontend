@@ -10,13 +10,13 @@ import axios from 'axios';
 
 // Define search types and their corresponding icons
 const searchTypes = [
-  { name: 'Search', icon: Search },
-  { name: 'Images', icon: Image },
-  { name: 'Places', icon: MapPin },
-  { name: 'Maps', icon: Map },
-  { name: 'News', icon: Newspaper },
-  { name: 'Scholar', icon: Book },
-  { name: 'Patents', icon: FileText },
+  { name: 'search', icon: Search },
+  { name: 'images', icon: Image },
+  { name: 'places', icon: MapPin },
+  { name: 'maps', icon: Map },
+  { name: 'news', icon: Newspaper },
+  { name: 'scholar', icon: Book },
+  { name: 'patents', icon: FileText },
 ];
 
 // Sample results for different search types
@@ -108,10 +108,43 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 
 								{/* Card Content */}
 								<div className="mb-6">
-									<h3 className="text-xl font-bold mb-3">{item.title}</h3>
-									<p className="text-gray-700 leading-relaxed">
-										{item.description}
-									</p>
+								{item.imageUrl && (
+									<a 
+									href={item.link} 
+									target="_blank" 
+									rel="noopener noreferrer"
+									className="block mb-4 hover:opacity-90 transition-opacity"
+									>
+									<img 
+										src={item.imageUrl} 
+										alt={item.title}
+										className="w-full h-48 object-cover rounded-lg"
+									/>
+									</a>
+								)}
+								<a 
+									href={item.link}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="block"
+								>
+									<h3 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors">
+									{item.title}
+									</h3>
+								</a>
+								<p className="text-gray-700 leading-relaxed">
+									{item.description}
+								</p>
+								{item.link && (
+									<a 
+									href={item.link}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 block truncate"
+									>
+									{item.link}
+									</a>
+								)}
 								</div>
 
 								{/* Tags */}
@@ -127,29 +160,46 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 								</div>
 
 								{summarizedContent[index] && !minimizedSummaries[index] && (
-  <div className="mt-4 p-4 bg-white/50 rounded-lg space-y-4">
-    <div>
-      <h4 className="font-semibold mb-2">{text.summary}</h4>
-      <p className="text-sm">{summarizedContent[index].summary}</p>
-    </div>
-    <div>
-      <h4 className="font-semibold mb-2">{text.keyPoints}</h4>
-      <ul className="list-disc list-inside text-sm">
-        {summarizedContent[index].key_points.map((point, i) => (
-          <li key={i}>{point}</li>
-        ))}
-      </ul>
-    </div>
-    <div>
-      <h4 className="font-semibold mb-2">{text.trends}</h4>
-      <ul className="list-disc list-inside text-sm">
-        {summarizedContent[index].trends.map((trend, i) => (
-          <li key={i}>{trend}</li>
-        ))}
-      </ul>
-    </div>
-  </div>
-)}
+					<div className="mt-4 p-4 bg-white/50 rounded-lg space-y-4">
+						<div>
+						<h4 className="font-semibold mb-2">{text.summary}</h4>
+						<p className="text-sm">{summarizedContent[index].summary}</p>
+						</div>
+						<div>
+						<h4 className="font-semibold mb-2">{text.keyPoints}</h4>
+						<ul className="list-disc list-inside text-sm">
+							{summarizedContent[index].key_points.map((point, i) => (
+							<li key={i}>{point}</li>
+							))}
+						</ul>
+						</div>
+						<div>
+						<h4 className="font-semibold mb-2">{text.trends}</h4>
+						<ul className="list-disc list-inside text-sm">
+							{summarizedContent[index].trends.map((trend, i) => (
+							<li key={i}>{trend}</li>
+							))}
+						</ul>
+						</div>
+						<div>
+						<h4 className="font-semibold mb-2">Sources</h4>
+						<ul className="list-disc list-inside text-sm">
+							{summarizedContent[index].sources.map((source, i) => (
+							<li key={i}>
+								<a 
+								href={source}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-blue-600 hover:text-blue-800 hover:underline"
+								>
+								{source}
+								</a>
+							</li>
+							))}
+						</ul>
+						</div>
+					</div>
+					)}
 
                 {/* Footer */}
                 <div className="flex justify-between items-center mt-4">
@@ -190,35 +240,70 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 // Function to transform sampleResults into StylishCards' expected format
 const transformResultsForCards = (results: any, type: string): Array<any> => {
 	const cards = [];
-   
-	switch(type) {
-	  case 'search':
-		// Knowledge Graph
-		if (results.knowledgeGraph) {
-		  cards.push({
-			date: new Date().toLocaleDateString('en-GB'),
-			title: results.knowledgeGraph.title,
-			description: results.knowledgeGraph.description,
-			tags: Object.entries(results.knowledgeGraph.attributes || {})
-			  .map(([key, value]) => `${key}: ${value}`),
-			bgColor: getBgColor(0),
-			category: 'Knowledge Graph'
-		  });
-		}
-   
+
+	if (type === 'search') {
 		// Organic Results 
 		if (results.organic) {
-		  results.organic.forEach((result: any, index: number) => {
-			cards.push({
-			  date: new Date().toLocaleDateString('en-GB'),  
-			  title: result.title,
-			  description: result.snippet,
-			  tags: result.sitelinks?.map((link: any) => link.title) || [],
-			  bgColor: getBgColor(index + 1),
-			  category: 'Search Results'
+			results.organic.forEach((result: any, index: number) => {
+				cards.push({
+					date: new Date().toLocaleDateString('en-GB'),  
+					title: result.title,
+					description: result.snippet,
+					link: result.link,
+					tags: result.sitelinks?.map((link: any) => link.title) || [],
+					bgColor: getBgColor(index + 1),
+					category: 'Search Results'
+				});
 			});
-		  });
 		}
+	} else if (type === 'news') {
+		if (Array.isArray(results.news)) {
+			results.news.forEach((newsItem: any, index: number) => {
+				cards.push({
+					date: newsItem.date || new Date().toLocaleDateString('en-GB'),
+					title: newsItem.title,
+					description: newsItem.description || newsItem.section,
+					link: newsItem.link,
+					imageUrl: newsItem.imageUrl,
+					tags: [newsItem.source || 'News'],
+					bgColor: getBgColor(index),
+					category: 'News'
+				});
+			});
+		}
+	}
+	
+			// Top Stories
+			if (results.topStories) {
+				results.topStories.forEach((story: any, index: number) => {
+				cards.push({
+					date: story.date,
+					title: story.title,
+					description: story.source,
+					link: story.link, // Add the link
+					imageUrl: story.imageUrl,
+					tags: [story.source],
+					bgColor: getBgColor(index),
+					category: 'Top Stories'
+				});
+				});
+			}
+
+			// News Results
+			if (results.news?.news) {
+				results.news.news.forEach((newsItem: any, index: number) => {
+				cards.push({
+					date: newsItem.date,
+					title: newsItem.title,
+					description: newsItem.source, // or you could use a snippet if available
+					link: newsItem.link,
+					imageUrl: newsItem.imageUrl,
+					tags: [newsItem.source],
+					bgColor: getBgColor(index),
+					category: 'News'
+				});
+				});
+			}
    
 		// Images
 		if (results.images) {
@@ -262,8 +347,8 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 		  });
 		}
    
-		break;
-	}
+
+	
    
 	return cards;
    };
@@ -314,19 +399,11 @@ const SearchEngine = () => {
       newFilters.delete(filter);
     } else {
       newFilters.add(filter);
-    }
-    setSelectedFilters(newFilters);
-  };
-
-  // Gather all relevant filters based on selected search types
-  const getRelevantFilters = () => {
-    const allFilters = new Set<string>();
-    selectedTypes.forEach(type => {
       // Assuming you have defined additionalFilters, else adjust accordingly
       // For demonstration, using sampleFilters or similar
       // Example:
       // additionalFilters[type]?.forEach(filter => allFilters.add(filter));
-    });
+    }
     return Array.from(allFilters);
   };
 
@@ -349,21 +426,13 @@ const SearchEngine = () => {
       bgColor: string;
       category: string;
     }
-
+	
     selectedTypes.forEach((type) => {
+
       if (results[type]) {
         transformedResults.push(...transformResultsForCards(results[type], type));
       }
     });
-
-    // Optionally, filter based on searchQuery here
-    if (searchQuery.trim() !== '') {
-      transformedResults = transformedResults.filter((item: TransformedResult) => 
-        item.title?.toLowerCase().includes(searchQuery?.toLowerCase()) ||
-        item.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.tags.some((tag: string) => tag?.toLowerCase().includes(searchQuery?.toLowerCase()))
-      );
-    }
 
     return transformedResults;
   };
