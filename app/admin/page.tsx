@@ -134,31 +134,38 @@ export default function Component() {
 
   const renderDashboard = () => {
     if (!isAuthenticated) return null;
-
-    // Check for admin roles
-    if (userRole.includes("Super Admin") || userRole.includes("System Admin")) {
-      return <KanbanBoard />;
-    }
-
-    // Check for staff roles
-    if (userRole.includes("Department Head") || 
+  
+    if (Array.isArray(userRole)) {
+      // Check for admin roles
+      if (userRole.includes("Super Admin") || userRole.includes("System Admin")) {
+        return <KanbanBoard />;
+      }
+  
+      // Check for staff roles
+      if (
+        userRole.includes("Department Head") || 
         userRole.includes("Senior Expert") || 
-        userRole.includes("Expert")) {
-      return <StaffDashboard />;
+        userRole.includes("Expert")
+      ) {
+        return <StaffDashboard />;
+      }
+  
+      // Default to user dashboard for Regular User and Viewer
+      if (userRole.includes("Regular User") || userRole.includes("Viewer")) {
+        return <UserDashboard />;
+      }
     }
-
-    // Default to user dashboard for Regular User and Viewer
-    if (userRole.includes("Regular User") || userRole.includes("Viewer")) {
-      return <UserDashboard />;
-    }
-
+  
+    // Log issue for debugging
+    console.warn("userRole is invalid or not defined:", userRole);
+  
     // Fallback case
     return <UserDashboard />;
   };
-
+  
   return (
     <Layout>
       {renderDashboard()}
     </Layout>
-  );
+  );  
 }

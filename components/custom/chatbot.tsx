@@ -15,6 +15,7 @@ interface Message {
   is_bot: boolean
   is_streaming?: boolean
 }
+import { Sparkles } from 'lucide-react'
 
 interface ChatbotProps {
   isOpen: boolean
@@ -267,57 +268,69 @@ const handleSendMessage = () => {
   return (
     isOpen && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div ref={chatbotRef} className="bg-gradient-to-b from-gray-100 to-white rounded-3xl w-full max-w-md h-[80vh] flex flex-col shadow-xl">
-		<div className="flex justify-between items-center p-6">
-            {/* <Button variant="ghost" size="icon">
-              <Menu className="w-6 h-6 text-gray-600" />
-            </Button> */}
+        <div
+          ref={chatbotRef}
+          className="bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 rounded-3xl w-full max-w-md h-[80vh] flex flex-col shadow-xl"
+        >
+          {/* Header */}
+          <div className="flex justify-between items-center p-0.5">
             <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-white" />
             </Button>
           </div>
+          {/* Chat messages */}
           <div className="flex-grow px-6 pb-6 overflow-auto">
-		  <div className="flex flex-col items-center mb-8">
-              <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-10 h-10 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-              </div>
-			  </div>
-			  <div className="space-y-4">
-  {messages.map((message) => (
-    <div 
-      key={message.id} 
-      className={`flex items-start space-x-3 ${message.is_bot ? '' : 'justify-end'}`}
-    >
-      {message.is_bot && <Avatar className="w-8 h-8 bg-gray-300" />}
-      <div 
-        className={`
-          ${message.is_bot ? 'bg-gray-200' : 'bg-teal-100'}
-          ${message.error ? 'border-red-500 border' : ''}
-          rounded-2xl p-3 max-w-[80%]
-        `}
-      >
-        <p className="text-sm text-gray-800">{message.content}</p>
-        <p className="text-xs text-gray-500 mt-1">
-          {message.timestamp}
-        </p>
-      </div>
-    </div>
-  ))}
-  <div ref={messagesEndRef} />
-</div>
+            <div className="flex flex-col items-center mb-8 mt-10">
+             <div className="w-16 h-16 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 rounded-full relative flex items-center justify-center">
+              {/* Halo Effect */}
+              <div className="absolute inset-0 rounded-full bg-gradient-radial from-white/20 via-white/10 to-transparent blur-lg animate-pulse"></div>              {/* Animated Pulsating Circle */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white-400 via-pink-200 to-blue-200 blur-lg opacity-70 animate-pulse"></div>
+              {/* Sparkles Icon */}
+              <Sparkles
+                className="relative w-10 h-10 text-white z-10"
+                strokeWidth={1.1}
+              />
+            </div>
           </div>
-          <div className="p-6">
-            {/* Input section */}
+            <div className="space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex items-start space-x-3 ${
+                    message.is_bot ? "" : "justify-end"
+                  }`}
+                >
+                  {message.is_bot && <Avatar className="w-8 h-8 bg-gray-300" />}
+                  <div
+                    className={`${
+                      message.is_bot
+                        ? "bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200"
+                        : "bg-gradient-to-r from-teal-100 via-green-100 to-yellow-100"
+                    } ${
+                      message.error ? "border-red-500 border" : ""
+                    } rounded-2xl p-3 max-w-[80%]`}
+                  >
+                    <p className="text-sm text-gray-800">{message.content}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {message.timestamp}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+  
+          {/* Input Section */}
+          <div className="p-6 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Ask me about anything"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="w-full p-4 pr-24 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                className="w-full p-4 pr-24 bg-white rounded-full text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex">
                 {inputMessage && (
@@ -328,11 +341,11 @@ const handleSendMessage = () => {
                     disabled={!isConnected}
                     className="mr-1"
                   >
-                    <Send className="w-5 h-5 text-teal-500" />
+                    <Send className="w-5 h-5 text-blue-500" />
                   </Button>
                 )}
                 <Button size="icon" variant="ghost">
-                  <Mic className="w-5 h-5 text-gray-500" />
+                  <Mic className="w-5 h-5 text-blue-500" />
                 </Button>
               </div>
             </div>
@@ -345,10 +358,7 @@ const handleSendMessage = () => {
         </div>
       </div>
     )
-  )
+  );  
 }
 
 export default Chatbot
-
-
-
