@@ -359,8 +359,16 @@ const SearchEngine = () => {
         </header>
         <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
         <main className="container mx-auto px-4 max-w-6xl">
+          {/* Logo Section */}
+          <div className="flex justify-center items-center py-4">
+            <img 
+              src="/samah-svg.svg" 
+              alt="Samah Logo" 
+              className="w-48 h-auto"
+            />
+          </div>
           {/* Search Section */}
-          <div className="text-center py-12">
+          <div className="text-center py-4">
             <h1 className="text-4xl font-bold mb-8">{text.searchEngine}</h1>
             <div className="relative max-w-2xl mx-auto">
               <input
