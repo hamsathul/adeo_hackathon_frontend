@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { X, FileText, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileIcon, Info } from 'lucide-react';
-import { Opinion, Remark } from '../types';
+import { X, FileText, User, Calendar, Tag, Flag, Pencil, MessageSquare, Info } from 'lucide-react';
+import { Opinion } from '../types';
 import { cn } from '../utils';
 
 interface OpinionDetailsDialogProps {
@@ -35,6 +35,13 @@ export function OpinionDetailsDialog({ isOpen, onClose, opinion, isAdmin = false
   const [activeTab, setActiveTab] = useState<Tab>('details');
 
   if (!isOpen) return null;
+
+  const renderDetailSection = (title: string, content: string) => (
+    <div>
+      <p className="text-gray-500 font-medium mb-1">{title}</p>
+      <p className="text-gray-900">{content}</p>
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -116,83 +123,82 @@ export function OpinionDetailsDialog({ isOpen, onClose, opinion, isAdmin = false
         
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'details' ? (
-            <div className="p-6">
-              <div className="grid grid-cols-2 gap-6 mb-8">
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-500 flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Submitted by
-                  </div>
-                  <div className="font-medium">{opinion.submitter.name}</div>
-                  <div className="text-sm text-gray-500">{opinion.submitter.email}</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-500 flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Submission Date
-                  </div>
-                  <div className="font-medium">March 15, 2024</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-500 flex items-center gap-2">
-                    <Tag className="w-4 h-4" />
-                    Department
-                  </div>
-                  <div className="font-medium">{opinion.department}</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-500">Assignment Status</div>
-                  <div className="font-medium">
-                    {opinion.assignee ? (
-                      <div className="flex items-center gap-2">
-                        <div className={cn(
-                          'w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium',
-                          opinion.assignee === 'BS' ? 'bg-blue-500' :
-                          opinion.assignee === 'YD' ? 'bg-yellow-500' :
-                          'bg-green-500'
-                        )}>
-                          {opinion.assignee}
-                        </div>
-                        <span>Assigned to {opinion.assignee}</span>
+            <div className="p-6 space-y-8">
+              <div>
+                <h3 className="font-medium mb-3 text-gray-900">Basic Information</h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-500 flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        Submitted by
                       </div>
-                    ) : (
-                      <span className="text-gray-500">Unassigned</span>
-                    )}
+                      <div className="font-medium">{opinion.submitter.name}</div>
+                      <div className="text-sm text-gray-500">{opinion.submitter.email}</div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-500 flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        Submission Date
+                      </div>
+                      <div className="font-medium">March 15, 2024</div>
+                    </div>
                   </div>
+                  <p><span className="text-gray-500 font-medium">Category:</span> {opinion.category}</p>
+                  {opinion.subCategory && (
+                    <p><span className="text-gray-500 font-medium">Sub-category:</span> {opinion.subCategory}</p>
+                  )}
+                  <p><span className="text-gray-500 font-medium">Priority:</span> {opinion.priority}</p>
                 </div>
               </div>
 
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold mb-3">Description</h3>
-                <div className="bg-gray-50 rounded-xl p-6">
-                  <p className="text-gray-600 whitespace-pre-wrap">
-                    {opinion.submitter.description}
-                  </p>
+              {opinion.details && (
+                <div>
+                  <h3 className="font-medium mb-3 text-gray-900">Opinion Details</h3>
+                  <div className="bg-gray-50 rounded-lg p-4 space-y-4 text-sm">
+                    {renderDetailSection('Request Statement', opinion.details.requestStatement)}
+                    {renderDetailSection('Challenges / Opportunities', opinion.details.challengesOpportunities)}
+                    {renderDetailSection('Subject Content', opinion.details.subjectContent)}
+                    {renderDetailSection('Alternative Options', opinion.details.alternativeOptions)}
+                    {renderDetailSection('Expected Impact', opinion.details.expectedImpact)}
+                    {renderDetailSection('Potential Risks and Mitigation', opinion.details.potentialRisks)}
+                    {renderDetailSection('Studies and Statistics', opinion.details.studiesStatistics)}
+                    {renderDetailSection('Legal and Financial Opinions', opinion.details.legalFinancialOpinions)}
+                    {renderDetailSection('Stakeholder Feedback', opinion.details.stakeholderFeedback)}
+                    {renderDetailSection('Work Plan', opinion.details.workPlan)}
+                    {renderDetailSection('Decision Draft', opinion.details.decisionDraft)}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
-                <h3 className="text-lg font-semibold mb-3">Attached Documents</h3>
-                <div className="grid gap-2">
-                  {opinion.submitter.documents.map((doc, index) => (
-                    <a
-                      key={index}
-                      href={doc.url}
-                      className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
-                    >
-                      <div className="p-2 bg-blue-100 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                        <FileText className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900 group-hover:text-blue-600">
-                          {doc.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          Added on March 15, 2024
-                        </div>
-                      </div>
-                    </a>
-                  ))}
+                <h3 className="font-medium mb-3 text-gray-900">Supporting Documents</h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  {opinion.submitter.documents.length > 0 ? (
+                    <div className="grid gap-2">
+                      {opinion.submitter.documents.map((doc, index) => (
+                        <a
+                          key={index}
+                          href={doc.url}
+                          className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
+                        >
+                          <div className="p-2 bg-blue-100 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                            <FileText className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900 group-hover:text-blue-600">
+                              {doc.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              Added on March 15, 2024
+                            </div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No documents attached</p>
+                  )}
                 </div>
               </div>
             </div>
