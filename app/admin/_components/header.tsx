@@ -20,16 +20,21 @@ return (
   <header className="bg-gray-300 text-gray-900 py-4 px-6">
     <div className="max-w-8xl mx-auto flex items-center justify-between relative">
       {/* Logo - Centered */}
-      <div className="absolute left-1/2 transform -translate-x-1/2">
+      <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center">
         <a href="/admin">
           <img 
-            src="/ADEO2.png" 
-            alt="Logo" 
-            className="inline-block w-34 h-12 cursor-pointer"
+        src="/ADEO2.png" 
+        alt="Logo" 
+        className="inline-block w-34 h-12 cursor-pointer"
           />
         </a>
+        <div className="border-r border-gray-400 h-8 mx-4" />
+        <img 
+          src="/samah.png" 
+          alt="Secondary Logo" 
+          className="w-34 h-12"
+        />
       </div>
-      {/* Navigation Buttons - Right-aligned */}
       <div className="flex items-center ml-auto space-x-2">
         <Button
           variant="ghost"

@@ -106,10 +106,17 @@ export function LoginPage() {
       </header>
 
       <main className="flex-1 flex items-center justify-center p-6">
-        <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-8">
-          <h1 className="text-2xl font-semibold text-center mb-8">
+        <div className="bg-opacity-30 bg-slate-400 backdrop-blur-lg  rounded-lg shadow-lg w-full max-w-md p-8">
+          {/* <h1 className="text-2xl font-semibold text-center mb-8">
             {isArabic ? 'الخدمات الرقمية لمكتب أبوظبي التنفيذي' : 'ADEO Digital Services'}
-          </h1>
+          </h1> */}
+          <Image
+            src="/samah.png"
+            alt="Abu Dhabi Executive Office Logo"
+            width={150}
+            height={150}
+            className="mx-auto mb-8 align-middle"
+          />
           
           {/* Display error message */}
           {error && <div className="mb-4 text-red-600 text-sm text-center">{error}</div>}

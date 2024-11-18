@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Flag, Tag, User, FileText, AlertTriangle, Info, Upload, Trash2 } from 'lucide-react';
+import { X, Flag, Tag, User, FileText, AlertTriangle, Info } from 'lucide-react';
 import { Department, OpinionFormData, Priority } from '../types';
 import { cn } from '../utils';
 
@@ -22,12 +22,6 @@ const priorityConfig = {
   low: { icon: Info, color: 'text-green-600 bg-green-50 border-green-100' },
 };
 
-interface UploadedFile {
-  name: string;
-  size: number;
-  type: string;
-}
-
 export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: TaskDialogProps) {
   const [formData, setFormData] = React.useState<OpinionFormData>(
     initialData || {
@@ -42,8 +36,6 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
       }
     }
   );
-  const [files, setFiles] = React.useState<UploadedFile[]>([]);
-  const [isDragging, setIsDragging] = React.useState(false);
 
   if (!isOpen) return null;
 
@@ -51,49 +43,6 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
     e.preventDefault();
     onSubmit(formData);
     onClose();
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    handleFiles(droppedFiles);
-  };
-
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = e.target.files ? Array.from(e.target.files) : [];
-    handleFiles(selectedFiles);
-  };
-
-  const handleFiles = (newFiles: File[]) => {
-    const processedFiles = newFiles.map(file => ({
-      name: file.name,
-      size: file.size,
-      type: file.type
-    }));
-    setFiles(prevFiles => [...prevFiles, ...processedFiles]);
-  };
-
-  const removeFile = (index: number) => {
-    setFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
-  };
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   return (
@@ -254,73 +203,6 @@ export function TaskDialog({ isOpen, onClose, onSubmit, initialData, title }: Ta
                 rows={2}
                 required
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Supporting Documents
-              </label>
-              <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                className={cn(
-                  'border-2 border-dashed rounded-lg p-4 transition-colors',
-                  isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300',
-                  'text-center'
-                )}
-              >
-                <input
-                  type="file"
-                  onChange={handleFileInput}
-                  multiple
-                  className="hidden"
-                  id="file-input"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx"
-                />
-                <label
-                  htmlFor="file-input"
-                  className="cursor-pointer inline-flex flex-col items-center"
-                >
-                  <Upload className="w-5 h-5 text-gray-400 mb-1" />
-                  <span className="text-sm text-gray-600">
-                    Drop files here or click to upload
-                  </span>
-                  <span className="text-xs text-gray-500 mt-0.5">
-                    PDF, DOC, DOCX, XLS, XLSX up to 10MB each
-                  </span>
-                </label>
-              </div>
-
-              {files.length > 0 && (
-                <div className="mt-2 space-y-2">
-                  {files.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-white rounded-lg">
-                          <FileText className="w-4 h-4 text-blue-600" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium">{file.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {formatFileSize(file.size)}
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeFile(index)}
-                        className="p-1 hover:bg-gray-200 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
