@@ -11,12 +11,17 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
+
+  const { isArabic } = useLanguageStore(); // Access current language state
+  const text = isArabic ? translations.ar : translations.en; // Select translations based on language
+
   const menuItems = [
-    { icon: <LayoutDashboard className="w-6 h-6" />, label: 'Dashboard', href: '/admin' },
-    { icon: <Users className="w-6 h-6" />, label: 'Users', href: '/employee' },
-    { icon: <Settings className="w-6 h-6" />, label: 'Settings', href: '/setting' },
+    { icon: <LayoutDashboard className="w-6 h-6" />, label: text.dashboard, href: '/admin' },
+    { icon: <Users className="w-6 h-6" />, label: text.users, href: '/employee' },
+    { icon: <Settings className="w-6 h-6" />, label: text.settings, href: '/setting' },
   ];
 
+  
   return (
     <>
       <div

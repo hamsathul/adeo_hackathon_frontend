@@ -3,6 +3,7 @@
 import * as React from "react";
 import { X } from 'lucide-react';
 import { useRouter } from "next/navigation";
+import axios from 'axios';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,23 +18,76 @@ import { useLanguageStore } from '@/store/useLanguageStore';
 import { translations } from '@/components/custom/translation';
 import { Layout } from "@/components/common/Layout";
 
+// Interface for User data
+interface User {
+  id: number;
+  email: string;
+  username: string;
+  department: {
+    name: string;
+  };
+}
+
 export default function Component() {
   const router = useRouter();
   const [imageUrl, setImageUrl] = React.useState("/placeholder.svg");
-  const [username, setUsername] = React.useState("ahmed");
+  const [username, setUsername] = React.useState("");
   const [profileName, setProfileName] = React.useState("");
   const [email, setEmail] = React.useState("");
+  const [aboutMe, setAboutMe] = React.useState("");
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = React.useState(false);
+  const [currentPassword, setCurrentPassword] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
   const { isArabic } = useLanguageStore();
   const text = isArabic ? translations.ar : translations.en;
 
-  // Fetch data from backend
+  // Fetch user data
   React.useEffect(() => {
-    setTimeout(() => {
-      setProfileName("Ahmed Al Hasd");
-      setEmail("ahmdhsd@ad.ae");
-    }, 1000);
+    const fetchUserData = async () => {
+      try {
+        // Assuming you have the token stored in localStorage
+        const token = localStorage.getItem('Token');
+        if (!token) {
+          toast.error("No authentication token found");
+          return;
+        }
+
+        // Get user ID from token (you'll need to implement token decoding)
+        const userId = decodeToken(token); 
+
+        // Fetch user data
+        const response = await axios.get(`/api/v1/auth/users/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const userData = response.data;
+        setUsername(userData.username);
+        setEmail(userData.email);
+        setProfileName(userData.department?.name || '');
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        toast.error("Failed to fetch user data");
+      }
+    };
+
+    fetchUserData();
   }, []);
+
+  // Token decoding function (you'll need to implement this based on your token structure)
+  const decodeToken = (token: string): number => {
+    // This is a placeholder. Replace with actual token decoding logic
+    // For example, using jwt-decode or your backend's token decoding method
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.userId;
+    } catch (error) {
+      toast.error("Invalid token");
+      throw error;
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,9 +101,60 @@ export default function Component() {
     setImageUrl("/placeholder.svg");
   };
 
-  const handleSaveChanges = () => {
-    // Show confirmation toast
-    toast.success("Your changes have been successfully saved.");
+  const handleSaveChanges = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const userId = decodeToken(token as string);
+
+      await axios.put(`/api/v1/auth/users/${userId}`, 
+        {
+          username,
+          aboutMe
+        }, 
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      toast.success("Your changes have been successfully saved.");
+    } catch (error) {
+      console.error("Error saving changes:", error);
+      toast.error("Failed to save changes");
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('authToken');
+      await axios.put('/api/v1/auth/change-password', 
+        {
+          current_password: currentPassword,
+          new_password: newPassword
+        }, 
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      toast.success("Password changed successfully");
+      setIsPasswordDialogOpen(false);
+      // Clear password fields
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      console.error("Error changing password:", error);
+      toast.error("Failed to change password");
+    }
   };
 
   return (
@@ -103,7 +208,11 @@ export default function Component() {
 
                 <div className="space-y-2">
                   <Label>{text.profileName}</Label>
-                  <Input className="border border-gray-500" value={profileName} readOnly />
+                  <Input 
+                    className="border border-gray-500" 
+                    value={profileName} 
+                    readOnly 
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -113,7 +222,7 @@ export default function Component() {
                     <Input
                       id="username"
                       className="border border-gray-500 pl-7"
-                      value={username} readOnly
+                      value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
                   </div>
@@ -123,7 +232,9 @@ export default function Component() {
                   <Label htmlFor="about">{text.aboutme}</Label>
                   <Textarea
                     id="about"
-                    defaultValue="Explain about yourself..."
+                    value={aboutMe}
+                    onChange={(e) => setAboutMe(e.target.value)}
+                    placeholder="Explain about yourself..."
                     className="pl-7 border border-gray-500"
                   />
                 </div>
@@ -138,7 +249,11 @@ export default function Component() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>{text.email}</Label>
-                  <Input className="border border-gray-500" value={email} readOnly />
+                  <Input 
+                    className="border border-gray-500" 
+                    value={email} 
+                    readOnly 
+                  />
                 </div>
               </div>
 
@@ -165,6 +280,8 @@ export default function Component() {
                         <Input
                           id="current-password"
                           type="password"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
                           className="col-span-3"
                         />
                       </div>
@@ -175,6 +292,8 @@ export default function Component() {
                         <Input
                           id="new-password"
                           type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
                           className="col-span-3"
                         />
                       </div>
@@ -185,12 +304,16 @@ export default function Component() {
                         <Input
                           id="confirm-password"
                           type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
                           className="col-span-3"
                         />
                       </div>
                     </div>
                     <div className="flex justify-end">
-                      <Button type="submit">{text.saveChanges}</Button>
+                      <Button type="submit" onClick={handleChangePassword}>
+                        {text.saveChanges}
+                      </Button>
                     </div>
                   </DialogContent>
                 </Dialog>
