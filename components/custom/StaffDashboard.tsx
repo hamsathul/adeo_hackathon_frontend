@@ -23,7 +23,7 @@ const initialOpinions: Opinion[] = [
       email: 'john@example.com',
       description: 'Proposal for improving city roads and bridges.',
       documents: [
-        { name: 'Proposal.pdf', url: '#' },
+        { name: '42ArabicADEO.pdf', url: '#' },
         { name: 'Budget.xlsx', url: '#' }
       ]
     },
