@@ -62,7 +62,7 @@ export function LoginPage() {
         },
       })
 
-      const token = response.data.token
+      const token = response.data.access_token
       localStorage.setItem('token', token) // Store token in localStorage
       router.push('/admin') // Redirect to admin page
     } catch (error) {

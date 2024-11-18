@@ -7,8 +7,8 @@ interface LanguageState {
   toggleLanguage: () => void
 }
 
-export const useLanguageStore = create<LanguageState>()(
-  persist(
+export const useLanguageStore = create(
+  persist<LanguageState>(
     (set) => ({
       isArabic: false,
       toggleLanguage: () => set((state) => ({ isArabic: !state.isArabic })),

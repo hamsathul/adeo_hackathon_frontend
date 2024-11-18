@@ -4,7 +4,7 @@ export const translations = {
     en: {
       ai: "AI Assistant",
       opinionManagement: "Opinion Management",
-      opinionsGovernment: "Opinions / Government",
+      opinionsGovernment: "Opinions / Government and Opinion Management",
       filter: "Filter",
       searchOpinion: "Search Opinions...",
       unassignedCard: "Unassigned", 
@@ -79,7 +79,7 @@ export const translations = {
     ar: {
       ai: "AI Assistant",
       opinionManagement: "إدارة الآراء",
-      opinionsGovernment: "الآراء / الحكومة",
+      opinionsGovernment: "الآراء / الحكومة وإدارة الرأي",
       filter: "تصفية",
       searchOpinion: "البحث عن الآراء...",
       unassignedCard: "غير معين",

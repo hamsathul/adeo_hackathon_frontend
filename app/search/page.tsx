@@ -375,7 +375,7 @@ const SearchEngine = () => {
               </button>
             </div>
           </div>
-  
+
           {/* Search Types */}
           <div className="mb-8">
             <div className="flex flex-wrap justify-center gap-2 mb-4">

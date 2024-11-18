@@ -12,23 +12,11 @@
   }
 }
 
-@font-face {
-  font-family: 'Uber Move';
-  src: url('https://cdn.jsdelivr.net/gh/ubermanu/uber-move/fonts/UberMoveMedium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-}
 
-@font-face {
-  font-family: 'Uber Move';
-  src: url('https://cdn.jsdelivr.net/gh/ubermanu/uber-move/fonts/UberMoveBold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-}
 
 @layer base {
   html {
-    font-family: 'Uber Move', system-ui, sans-serif;
+    font-family:  system-ui, sans-serif;
   }
 }
 
@@ -50,4 +38,46 @@
 
 .animate-pulse {
   animation: pulse 2s infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.6; }
+}
+
+.animate-flicker {
+  animation: flicker 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse360 {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse360 {
+  animation: pulse360 2s infinite ease-in-out;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-out {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
 }
