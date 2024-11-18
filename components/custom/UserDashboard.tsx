@@ -7,6 +7,8 @@ import { OpinionSubmissionDialog } from './OpinionSubmissionDialog';
 import { OpinionDetailsDialog } from './OpinionDetailsDialog';
 import { Opinion } from '../types';
 import { cn } from '../utils';
+import { translations } from './translation'
+import { useLanguageStore } from '@/store/useLanguageStore';
 
 const priorityConfig = {
   'urgent': { color: 'text-red-600 bg-red-50' },
@@ -21,6 +23,8 @@ export function UserDashboard() {
   const [editingOpinion, setEditingOpinion] = useState<Opinion | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [myOpinions, setMyOpinions] = useState<Opinion[]>([]);
+  const { isArabic } = useLanguageStore();
+  const text = isArabic ? translations.ar : translations.en
 
   const handleSubmitOpinion = (opinionData: Opinion) => {
     if (editingOpinion) {
@@ -62,8 +66,8 @@ export function UserDashboard() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Submit Opinion</h1>
-        <p className="text-gray-500">Submit your opinions and track their status</p>
+        <h1 className="text-3xl font-bold tracking-tight mb-2">{text.submitOpinion}</h1>
+        <p className="text-gray-500">{text.submitMessage}</p>
       </div>
 
       <div className="flex items-center justify-between gap-4 mb-8">
@@ -71,7 +75,7 @@ export function UserDashboard() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Search your submissions..."
+            placeholder={text.searchSubmission}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5 bg-white"
@@ -85,7 +89,7 @@ export function UserDashboard() {
           className="flex items-center gap-2 px-4 py-2.5 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors"
         >
           <Plus className="w-5 h-5" />
-          New Opinion
+          {text.newOpinion}
         </button>
       </div>
 
@@ -95,14 +99,14 @@ export function UserDashboard() {
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <FileText className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No opinions submitted yet</h3>
-            <p className="text-gray-500 mb-4">Start by submitting your first opinion</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{text.noOpinion}</h3>
+            <p className="text-gray-500 mb-4">{text.noOpinion2}</p>
             <button
               onClick={() => setIsSubmissionDialogOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Submit Opinion
+              {text.submitOpinion}
             </button>
           </div>
         ) : (

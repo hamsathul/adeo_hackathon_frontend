@@ -5,6 +5,8 @@ import { OpinionFormSection } from './OpinionFormSection';
 import { OpinionReviewSection } from './OpinionReviewSection';
 import { cn } from '../utils';
 import { CATEGORY_SUBCATEGORIES } from '../utils';
+import { translations } from './translation';
+import { useLanguageStore } from '@/store/useLanguageStore';
 
 type Step = 'basic' | 'details' | 'documents' | 'review';
 
@@ -61,7 +63,9 @@ export function OpinionSubmissionDialog({
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [details, setDetails] = useState<OpinionDetails>(initialData?.details || initialDetails);
-
+  const { isArabic } = useLanguageStore();
+  const text = isArabic ? translations.ar : translations.en;
+  
   // Reset form when dialog is opened/closed
   useEffect(() => {
     if (!isOpen) {
@@ -207,7 +211,7 @@ export function OpinionSubmissionDialog({
       case 'basic':
         return (
           <div className="p-6 space-y-6">
-            <OpinionFormSection title="Opinion Title" required>
+            <OpinionFormSection title={text.opinionTitle} required>
               <input
                 type="text"
                 value={title}
@@ -218,7 +222,7 @@ export function OpinionSubmissionDialog({
               />
             </OpinionFormSection>
 
-            <OpinionFormSection title="Category" required>
+            <OpinionFormSection title={text.category} required>
               <select
                 value={category}
                 onChange={(e) => {
@@ -251,9 +255,9 @@ export function OpinionSubmissionDialog({
               </OpinionFormSection>
             )}
 
-            <OpinionFormSection title="Priority Level" required>
+            <OpinionFormSection title={text.priorityLevel} required>
               <div className="grid grid-cols-4 gap-2">
-                {['urgent', 'high', 'medium', 'low'].map((p) => (
+                {[text.urgent, text.high, text.medium, text.low].map((p) => (
                   <button
                     key={p}
                     type="button"
@@ -271,7 +275,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <div className="grid grid-cols-2 gap-6">
-              <OpinionFormSection title="Your Name" required>
+              <OpinionFormSection title={text.yourName} required>
                 <input
                   type="text"
                   value={submitterName}
@@ -282,7 +286,7 @@ export function OpinionSubmissionDialog({
                 />
               </OpinionFormSection>
 
-              <OpinionFormSection title="Email Address" required>
+              <OpinionFormSection title={text.emailAddress} required>
                 <input
                   type="email"
                   value={submitterEmail}
@@ -300,7 +304,7 @@ export function OpinionSubmissionDialog({
         return (
           <div className="p-6 space-y-6">
             <OpinionFormSection 
-              title="Request Statement" 
+              title={text.requestStatement} 
               description="Clearly mention what is required from the committee"
               required
             >
@@ -314,7 +318,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Challenges / Opportunities"
+              title={text.challengesOpportunities}
               description="Mention the reasons for submitting the request"
               required
             >
@@ -328,7 +332,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Subject Content"
+              title={text.subjectContent}
               description="Provide details on the requested topic"
               required
             >
@@ -342,7 +346,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Alternative Options"
+              title={text.alternativeOptions}
               description="Mention other solutions and alternatives considered"
               required
             >
@@ -356,7 +360,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Expected Impact"
+              title={text.expectedImpact}
               description="Describe the feasibility of implementation"
               required
             >
@@ -370,7 +374,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Potential Risks and Mitigation"
+              title={text.potentialRisks}
               description="List the potential risks and possible consequences"
               required
             >
@@ -384,7 +388,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Studies and Statistics"
+              title={text.studiesStatistics}
               description="Incorporate insights from relevant studies"
               required
             >
@@ -398,7 +402,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Legal and Financial Opinions"
+              title={text.legalFinancialOpinions}
               description="Include approved legal and financial opinions"
               required
             >
@@ -412,7 +416,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Stakeholder Feedback"
+              title={text.stakeholderFeedback}
               description="Insert feedback from stakeholders"
               required
             >
@@ -426,7 +430,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Work Plan"
+              title={text.workPlan}
               description="Detail the required stages for implementation"
               required
             >
@@ -440,7 +444,7 @@ export function OpinionSubmissionDialog({
             </OpinionFormSection>
 
             <OpinionFormSection 
-              title="Decision Draft"
+              title={text.decisionDraft}
               description="Include the proposed draft text of the decision"
               required
             >
@@ -458,7 +462,7 @@ export function OpinionSubmissionDialog({
       case 'documents':
         return (
           <div className="p-6">
-            <OpinionFormSection title="Supporting Documents">
+            <OpinionFormSection title={text.supportingDocuments}>
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -483,10 +487,10 @@ export function OpinionSubmissionDialog({
                 >
                   <Upload className="w-5 h-5 text-gray-400 mb-1" />
                   <span className="text-sm text-gray-600">
-                    Drop files here or click to upload
+                    {text.dropMessage}
                   </span>
                   <span className="text-xs text-gray-500 mt-0.5">
-                    PDF, DOC, DOCX, XLS, XLSX up to 10MB each
+                    {text.dropMessage2}
                   </span>
                 </label>
               </div>
@@ -551,7 +555,7 @@ export function OpinionSubmissionDialog({
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <h2 className="text-xl font-semibold">
-              {isEditing ? 'Edit Opinion' : 'Submit New Opinion'}
+              {isEditing ? text.editOpinion : text.submitNewOpinion}
             </h2>
           </div>
           <button
@@ -605,7 +609,7 @@ export function OpinionSubmissionDialog({
                 step === 'basic' && "invisible"
               )}
             >
-              Previous
+              {text.previous}
             </button>
             <div className="flex items-center gap-2">
               <button
@@ -613,7 +617,7 @@ export function OpinionSubmissionDialog({
                 onClick={onClose}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Cancel
+                {text.cancel}
               </button>
               <button
                 type="submit"
@@ -625,7 +629,7 @@ export function OpinionSubmissionDialog({
                     : "bg-gray-300 cursor-not-allowed"
                 )}
               >
-                {step === 'review' ? (isEditing ? 'Save Changes' : 'Submit Opinion') : 'Next'}
+                {step === 'review' ? (isEditing ? text.saveChanges : text.submitOpinion) : text.next}
               </button>
             </div>
           </div>
