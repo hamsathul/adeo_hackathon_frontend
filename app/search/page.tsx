@@ -11,7 +11,7 @@ import axios from 'axios';
 // Define search types and their corresponding icons
 const searchTypes = [
   { name: 'search', icon: Search },
-  { name: 'smages', icon: Image },
+  { name: 'images', icon: Image },
   { name: 'places', icon: MapPin },
   { name: 'maps', icon: Map },
   { name: 'news', icon: Newspaper },
