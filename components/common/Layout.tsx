@@ -66,23 +66,7 @@ export function Layout({ children }: LayoutProps) {
   </div>
 </div>
 
-{/* Search Panel */}
 <div className="fixed bottom-24 right-4 mb-2">
-  <div
-    className={`absolute bottom-full right-0 mb-4 transition-all duration-300 ${
-      showSearch ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
-    }`}
-  >
-    <Card className="w-80 p-4 shadow-xl">
-      <div className="flex gap-2">
-        <Input placeholder="Search..." className="flex-1" />
-        <Button variant="ghost" size="icon">
-          <Search className="h-4 w-4" />
-        </Button>
-      </div>
-    </Card>
-  </div>
-
   {/* Search Button */}
   <div
     className={`relative rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 p-4 cursor-pointer transition-all duration-500 ease-in-out ${

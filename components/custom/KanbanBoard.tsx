@@ -25,8 +25,8 @@ const initialOpinions: Opinion[] = [
       email: 'john@example.com',
       description: 'Proposal for improving city roads and bridges.',
       documents: [
-        { name: 'Proposal.pdf', url: '#' },
-        { name: 'Budget.xlsx', url: '#' }
+        { name: '42ArabicADEO.pdf', url: '#' },
+        { name: '42CaseStudy.pdf', url: '#' }
       ]
     },
     remarks: []
@@ -56,7 +56,6 @@ const columns: Status[] = ['unassigned', 'todo', 'in-progress', 'testing', 'revi
 
 export function KanbanBoard() {
   const [isClient, setIsClient] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isArabic } = useLanguageStore();
   const text = isArabic ? translations.ar : translations.en;
   const [opinions, setOpinions] = useState<Opinion[]>(initialOpinions);

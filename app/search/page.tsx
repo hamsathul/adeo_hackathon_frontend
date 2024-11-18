@@ -1,15 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Bot, Search, Image, MapPin, Map, Newspaper, Book, FileText, X, Bookmark, ChevronUp, ChevronDown, Minimize2, Maximize2 } from 'lucide-react';
-import Header from '@/app/admin/_components/header';
-import Sidebar from '@/app/admin/_components/sidebar';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Bot, Search, Image, MapPin, Map, Newspaper, Book, FileText, X, Bookmark, Minimize2, Maximize2 } from 'lucide-react'; 
 import { Button } from '@/components/ui/button';
-import { DialogTitle } from '@radix-ui/react-dialog';
-import Chatbot from '@/components/custom/chatbot';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { translations } from '@/components/custom/translation';
+import { Layout } from '@/components/common/Layout';
 import axios from 'axios';
 
 // Define search types and their corresponding icons
@@ -284,16 +280,10 @@ const SearchEngine = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTypes, setSelectedTypes] = useState<Set<keyof typeof sampleResults>>(new Set(['search']));
   const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set());
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [showChatbot, setShowChatbot] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const { isArabic } = useLanguageStore();
   const [searchResults, setSearchResults] = useState<Array<any>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const text = isArabic ? translations.ar : translations.en;
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   const searchAPI = async (query: string, options: string[]) => {
 	try {
@@ -386,17 +376,8 @@ const SearchEngine = () => {
 	  };
 
     return (
-      <div className="min-h-screen bg-white text-gray-900">
-        <Header />
-        <header className="flex justify-end p-4">
-          <button 
-            onClick={toggleSidebar}
-            className="p-2 rounded-full hover:bg-gray-200"
-          >
-            {/* You can add an icon here, e.g., Menu icon */}
-          </button>
-        </header>
-        <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+      <Layout>
+        <div className="min-h-screen bg-white text-gray-900">
         <main className="container mx-auto px-4 max-w-6xl">
           {/* Logo Section */}
           <div className="flex justify-center items-center py-4">
@@ -499,6 +480,7 @@ const SearchEngine = () => {
           </div>
         </main>
       </div>
+      </Layout>
     );
   };
   
