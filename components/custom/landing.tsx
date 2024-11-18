@@ -74,7 +74,7 @@ export function LandingPage() {
             <Button 
               variant="default"
               size="lg"
-              className="bg-black text-white hover:bg-gray-900 group"
+              className="bg-transparent text-white backdrop-blur-xl group rounded-full"
               onClick={() => window.open('https://www.mediaoffice.abudhabi/en/topic/abu-dhabi-executive-office-adeo/', '_blank')}
             >
               {isArabic ? 'اقرأ المزيد' : 'READ MORE'}
