@@ -98,6 +98,7 @@ export function KanbanBoard() {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -162,6 +163,9 @@ export function KanbanBoard() {
       assignee: data.assignee,
       department: data.department,
       priority: data.priority,
+      category: data.category,
+      subCategory: data.subCategory,
+      details: data.details,
       submitter: {
         name: data.submitter.name,
         email: data.submitter.email,
@@ -182,6 +186,9 @@ export function KanbanBoard() {
             assignee: data.assignee,
             department: data.department,
             priority: data.priority,
+            category: data.category,
+            subCategory: data.subCategory,
+            details: data.details,
             submitter: {
               ...opinion.submitter,
               name: data.submitter.name,
@@ -228,69 +235,70 @@ export function KanbanBoard() {
 
   return (
     <>
-    <div className="min-h-screen bg-[#f8f9fa]">
-  <div className="px-20">
-    <header className="flex justify-end"></header>
-    <div className="container mx-auto px-4 py-2">
-      <div className="mb-8">
-        <div className=""><div>
-            <div className="text-sm text-gray-500 mb-1 tracking-wide">{text.opinionsGovernment}</div>
-            <h1 className="text-3xl font-bold tracking-tight mt-2">{text.opinionManagement}</h1>
-          </div>
-          <div className="flex items-center gap-4">
-          <div className="relative flex-1 max-w-xl mt-2">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-            type="text"
-            placeholder={text.searchOpinion}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5 bg-white"
-            />
-          </div>
-          <button
-            onClick={() => setIsFilterDialogOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-white transition-colors bg-transparent"
-            >
-            <Filter className="w-5 h-5" />
-            {text.filter}
-            {(filters.assignee || filters.department) && (
-              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-            )}
-          </button>
-        </div>
-        </div>
-        </div>
+      <div className="min-h-screen bg-[#f8f9fa]">
+        <div className="px-20">
+          <header className="flex justify-end"></header>
+          <div className="container mx-auto px-4 py-2">
+            <div className="mb-8">
+              <div className="">
+                <div>
+                  <div className="text-sm text-gray-500 mb-1 tracking-wide">{text.opinionsGovernment}</div>
+                  <h1 className="text-3xl font-bold tracking-tight mt-2">{text.opinionManagement}</h1>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="relative flex-1 max-w-xl mt-2">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      placeholder={text.searchOpinion}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/5 bg-white"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setIsFilterDialogOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-white transition-colors bg-transparent"
+                  >
+                    <Filter className="w-5 h-5" />
+                    {text.filter}
+                    {(filters.assignee || filters.department) && (
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
 
-        <FilterDialog
-        isOpen={isFilterDialogOpen}
-        onClose={() => setIsFilterDialogOpen(false)}
-        filters={filters}
-        onApplyFilters={setFilters}
-        /> 
-       <FilterDialog
-        isOpen={isFilterDialogOpen}
-        onClose={() => setIsFilterDialogOpen(false)}
-        filters={filters}
-        onApplyFilters={setFilters}
-        />
-        {isClient ? (
-          <KanbanBoardDnd 
-            columns={columns}
-            filteredOpinions={filteredOpinions}
-            handleDragStart={handleDragStart}
-            handleDragEnd={handleDragEnd}
-            handleAddOpinion={handleAddOpinion}
-            handleEditOpinion={handleEditOpinion}
-            handleDeleteOpinion={handleDeleteOpinion}
-            handleAddRemark={handleAddRemark}
-            activeOpinion={activeOpinion}
-          />
-        ) : (
-          <div>Loading...</div>
-        )}
-    </div>
-        <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />  
+            <FilterDialog
+              isOpen={isFilterDialogOpen}
+              onClose={() => setIsFilterDialogOpen(false)}
+              filters={filters}
+              onApplyFilters={setFilters}
+            />
+            <FilterDialog
+              isOpen={isFilterDialogOpen}
+              onClose={() => setIsFilterDialogOpen(false)}
+              filters={filters}
+              onApplyFilters={setFilters}
+            />
+            {isClient ? (
+              <KanbanBoardDnd 
+                columns={columns}
+                filteredOpinions={filteredOpinions}
+                handleDragStart={handleDragStart}
+                handleDragEnd={handleDragEnd}
+                handleAddOpinion={handleAddOpinion}
+                handleEditOpinion={handleEditOpinion}
+                handleDeleteOpinion={handleDeleteOpinion}
+                handleAddRemark={handleAddRemark}
+                activeOpinion={activeOpinion}
+              />
+            ) : (
+              <div>Loading...</div>
+            )}
+          </div>
+          <Chatbot isOpen={showChatbot} onClose={() => setShowChatbot(false)} />  
         </div>
       </div>
     </>
