@@ -94,10 +94,46 @@ export default function Component() {
   const handleExport = (format: 'pdf' | 'excel' | 'csv') => {
     if (format === 'pdf') {
       const doc = new jsPDF()
-      autoTable(doc, { html: '#employeeTable' })
+      
+      // Add first logo
+      const logo1 = new Image()
+      logo1.src = '/samah.png'
+      doc.addImage(logo1, 'PNG', 10, 10, 30, 30)
+      
+      // Add separator line
+      doc.setDrawColor(200, 200, 200) // Light gray color
+      doc.line(45, 10, 45, 40) // Vertical line between logos
+      
+      // Add second logo
+      const logo2 = new Image()
+      logo2.src = '/ADEO.png'
+      doc.addImage(logo2, 'PNG', 50, 10, 30, 30)
+      
+      // Add some space after logos
+      doc.setFontSize(12)
+      doc.text('Employee List', 10, 50)
+      
+      // Add table with offset for logos
+      autoTable(doc, { 
+        html: '#employeeTable',
+        startY: 60
+      })
+      
       doc.save('employees.pdf')
     } else if (format === 'excel' || format === 'csv') {
-      const worksheet = XLSX.utils.json_to_sheet(employees)
+      // For Excel/CSV, add both logos in separate cells
+      const logoData = [{
+        'Logo 1': 'Samah Logo: /samah.png',
+        'Logo 2': 'ADEO Logo: /ADEO.png'
+      }]
+      const worksheet = XLSX.utils.json_to_sheet(logoData)
+      
+      // Add empty row after logos
+      XLSX.utils.sheet_add_json(worksheet, [{}], { origin: -1 })
+      
+      // Add employee data
+      XLSX.utils.sheet_add_json(worksheet, employees, { origin: -1 })
+      
       const workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Employees')
       XLSX.writeFile(workbook, `employees.${format === 'excel' ? 'xlsx' : 'csv'}`)

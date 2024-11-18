@@ -31,15 +31,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         }`}
       >
         <div className="py-6 px-4">
-          <div className="flex items-center justify-between">
-            <h2 className={`text-lg font-bold ${!isOpen && 'hidden'}`}>Samah</h2>
+            <div className="flex items-center justify-between">
+            <img 
+              src="/samah-white.png" 
+              alt="Samah Logo"
+              className={`h-16 ${!isOpen && 'hidden'}`}
+            />
             <button
               className="text-gray-400 hover:text-white focus:outline-none flex items-center justify-center w-8 h-8"
               onClick={onToggle}
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
-          </div>
+            </div>
           <nav className="mt-6">
             {menuItems.map((item, index) => (
               <a
