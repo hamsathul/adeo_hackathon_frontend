@@ -10,13 +10,13 @@ import axios from 'axios';
 
 // Define search types and their corresponding icons
 const searchTypes = [
-  { name: 'Search', icon: Search },
-  { name: 'Images', icon: Image },
-  { name: 'Places', icon: MapPin },
-  { name: 'Maps', icon: Map },
-  { name: 'News', icon: Newspaper },
-  { name: 'Scholar', icon: Book },
-  { name: 'Patents', icon: FileText },
+  { name: 'search', icon: Search },
+  { name: 'smages', icon: Image },
+  { name: 'places', icon: MapPin },
+  { name: 'maps', icon: Map },
+  { name: 'news', icon: Newspaper },
+  { name: 'scholar', icon: Book },
+  { name: 'patents', icon: FileText },
 ];
 
 // Sample results for different search types
@@ -354,7 +354,7 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
    };
 
 const getBgColor = (index: number): string => {
-	const colors = ['bg-[#d5dbdb]', 'bg-[#d5f5e3]', 'bg-[#fadfd9]'];
+	const colors = ['bg-[#d5dbdb]', 'bg-[#f2d7d5]', 'bg-[#fadfd9]'];
 	return colors[index % colors.length];
 };
 
