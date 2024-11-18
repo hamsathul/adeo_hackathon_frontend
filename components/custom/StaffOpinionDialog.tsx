@@ -43,6 +43,25 @@ interface UploadedFile {
   saved?: boolean;
 }
 
+const DetailSection = ({ title, content, description }: { title: string; content: string; description?: string }) => (
+  <div className="mb-6">
+    <div className="flex items-start justify-between mb-2">
+      <h4 className="text-sm font-medium text-gray-900">{title}</h4>
+      {description && (
+        <div className="group relative">
+          <Info className="w-4 h-4 text-gray-400 cursor-help" />
+          <div className="absolute right-0 w-64 p-2 bg-white rounded-lg shadow-lg border border-gray-100 text-xs text-gray-600 hidden group-hover:block z-10">
+            {description}
+          </div>
+        </div>
+      )}
+    </div>
+    <div className="bg-gray-50 rounded-lg p-4">
+      <p className="text-gray-700 whitespace-pre-wrap">{content}</p>
+    </div>
+  </div>
+);
+
 export function StaffOpinionDialog({
   isOpen,
   onClose,
@@ -137,7 +156,7 @@ export function StaffOpinionDialog({
   const removeFile = (index: number) => {
     setUploadedFiles(prev => {
       const newFiles = [...prev];
-      URL.revokeObjectURL(newFiles[index].url); // Clean up the URL
+      URL.revokeObjectURL(newFiles[index].url);
       newFiles.splice(index, 1);
       return newFiles;
     });
@@ -166,7 +185,7 @@ export function StaffOpinionDialog({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className={cn(
         "bg-white rounded-xl max-h-[90vh] flex transition-all duration-300",
-        showAiPanel ? "w-[90vw]" : "w-[600px]"
+        showAiPanel ? "w-[90vw]" : "w-[800px]"
       )}>
         <div className="flex-1 flex flex-col max-h-[90vh]">
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
@@ -297,16 +316,66 @@ export function StaffOpinionDialog({
                 </div>
 
                 <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-3">Description</h3>
-                  <div className="bg-gray-50 rounded-xl p-6">
-                    <p className="text-gray-600 whitespace-pre-wrap">
-                      {opinion.submitter.description}
-                    </p>
-                  </div>
+                  <h3 className="text-lg font-semibold mb-4">Opinion Details</h3>
+                  <DetailSection
+                    title="Request Statement"
+                    content={opinion.details.requestStatement}
+                    description="Clearly mention what is required from the committee"
+                  />
+                  <DetailSection
+                    title="Challenges / Opportunities"
+                    content={opinion.details.challengesOpportunities}
+                    description="Mention the reasons for submitting the request"
+                  />
+                  <DetailSection
+                    title="Subject Content"
+                    content={opinion.details.subjectContent}
+                    description="Provide details on the requested topic"
+                  />
+                  <DetailSection
+                    title="Alternative Options"
+                    content={opinion.details.alternativeOptions}
+                    description="Compare alternatives with the proposed solution"
+                  />
+                  <DetailSection
+                    title="Expected Impact"
+                    content={opinion.details.expectedImpact}
+                    description="Describe implementation feasibility and impacts"
+                  />
+                  <DetailSection
+                    title="Potential Risks and Mitigation"
+                    content={opinion.details.potentialRisks}
+                    description="List risks and recommended solutions"
+                  />
+                  <DetailSection
+                    title="Studies and Statistics"
+                    content={opinion.details.studiesStatistics}
+                    description="Include relevant studies and statistics"
+                  />
+                  <DetailSection
+                    title="Legal and Financial Opinions"
+                    content={opinion.details.legalFinancialOpinions}
+                    description="Include approved legal and financial opinions"
+                  />
+                  <DetailSection
+                    title="Stakeholder Feedback"
+                    content={opinion.details.stakeholderFeedback}
+                    description="Include feedback from relevant stakeholders"
+                  />
+                  <DetailSection
+                    title="Work Plan"
+                    content={opinion.details.workPlan}
+                    description="Detail implementation stages and timeline"
+                  />
+                  <DetailSection
+                    title="Decision Draft"
+                    content={opinion.details.decisionDraft}
+                    description="Proposed draft text of the decision"
+                  />
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">Documents</h3>
+                  <h3 className="text-lg font-semibold mb-4">Supporting Documents</h3>
                   <div
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
