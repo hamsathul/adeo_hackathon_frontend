@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Flag, ChevronRight, FileText } from 'lucide-react';
-import { Opinion, Department } from '../types';
+import { Opinion, Department, Priority } from '../types';
 import { StaffOpinionDialog } from './StaffOpinionDialog';
 import { cn } from '../utils';
 
@@ -13,21 +13,46 @@ interface StaffOpinionCardProps {
 }
 
 const priorityConfig = {
-  'urgent': { color: 'text-red-600 bg-red-50' },
-  'high': { color: 'text-orange-600 bg-orange-50' },
-  'medium': { color: 'text-yellow-600 bg-yellow-50' },
-  'low': { color: 'text-green-600 bg-green-50' },
-};
+  urgent: { color: 'text-red-600', bgColor: 'bg-red-50' },
+  high: { color: 'text-orange-600', bgColor: 'bg-orange-50' },
+  medium: { color: 'text-yellow-600', bgColor: 'bg-yellow-50' },
+  low: { color: 'text-green-600', bgColor: 'bg-green-50' }
+} as const;
 
 const statusColors: Record<string, string> = {
-  'unassigned': 'bg-gray-100 text-gray-700',
-  'todo': 'bg-gray-100 text-gray-700',
-  'in-progress': 'bg-blue-100 text-blue-700',
-  'testing': 'bg-purple-100 text-purple-700',
-  'review': 'bg-yellow-100 text-yellow-700',
-  'done': 'bg-green-100 text-green-700',
-  'on-hold': 'bg-orange-100 text-orange-700',
-  'rejected': 'bg-red-100 text-red-700',
+  'unassigned': 'bg-gray-100 text-gray-600',
+  'todo': 'bg-gray-100 text-gray-600',
+  'assigned_to_department': 'bg-blue-100 text-blue-700',
+  'assigned_to_expert': 'bg-indigo-100 text-indigo-700',
+  'in-progress': 'bg-sky-100 text-sky-700',
+  'expert_opinion_submitted': 'bg-emerald-100 text-emerald-700',
+  'head_review_pending': 'bg-amber-100 text-amber-700',
+  'head_approved': 'bg-green-100 text-green-700',
+  'in_review': 'bg-yellow-100 text-yellow-700',
+  'pending_other_department': 'bg-purple-100 text-purple-700',
+  'additional_info_requested': 'bg-orange-100 text-orange-700',
+  'completed': 'bg-teal-100 text-teal-700',
+  'rejected': 'bg-red-100 text-red-700'
+};
+
+// Type guard to check if a string is a valid Priority
+const isPriority = (value: string): value is Priority => {
+  return ['urgent', 'high', 'medium', 'low'].includes(value);
+};
+
+// Get priority styles with type safety
+const getPriorityStyles = (priority: string) => {
+  if (isPriority(priority)) {
+    return {
+      color: priorityConfig[priority].color,
+      bgColor: priorityConfig[priority].bgColor
+    };
+  }
+  // Fallback to medium priority if invalid
+  return {
+    color: priorityConfig.medium.color,
+    bgColor: priorityConfig.medium.bgColor
+  };
 };
 
 export function StaffOpinionCard({
@@ -38,6 +63,7 @@ export function StaffOpinionCard({
   onCloseOpinion
 }: StaffOpinionCardProps) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const priorityStyles = getPriorityStyles(opinion.priority);
 
   return (
     <>
@@ -49,7 +75,8 @@ export function StaffOpinionCard({
             </span>
             <div className={cn(
               'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium',
-              priorityConfig[opinion.priority].color
+              priorityStyles.color,
+              priorityStyles.bgColor
             )}>
               <Flag className="w-3 h-3" />
               {opinion.priority.charAt(0).toUpperCase() + opinion.priority.slice(1)}
@@ -65,7 +92,7 @@ export function StaffOpinionCard({
               'px-2 py-0.5 rounded-full text-xs font-medium',
               statusColors[opinion.status]
             )}>
-              {opinion.status.replace('-', ' ').toUpperCase()}
+              {opinion.status.replace(/_/g, ' ').toUpperCase()}
             </span>
           </div>
           <button

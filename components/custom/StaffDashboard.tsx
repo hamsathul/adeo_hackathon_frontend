@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Search, Filter, Flag, ChevronRight, Users, MessageSquare } from 'lucide-react';
-import { Opinion, TaskFilters, Department } from '../types';
+import { Opinion, TaskFilters, Department, Status } from '../types';
 import { StaffOpinionCard } from './StaffOpinionCard';
 import { StaffFilterDialog } from './StaffFilterDialog';
 import { GlobalSearchButton } from './GlobalSearchButton';
@@ -53,7 +53,7 @@ export function StaffDashboard() {
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
   const { isArabic } = useLanguageStore();
-  const text = isArabic ? translations.ar : translations.en;  
+  const text = isArabic ? translations.ar : translations.en;
 
   const handleAssignDepartment = (opinionId: string, department: Department) => {
     setOpinions(opinions.map(opinion =>
@@ -82,7 +82,7 @@ export function StaffDashboard() {
 
   const handleCloseOpinion = (opinionId: string) => {
     setOpinions(opinions.map(opinion =>
-      opinion.id === opinionId ? { ...opinion, status: 'done' } : opinion
+      opinion.id === opinionId ? { ...opinion, status: 'completed' as Status } : opinion
     ));
   };
 
@@ -96,22 +96,21 @@ export function StaffDashboard() {
   });
 
   return (
-    <>
-    {/* <div className="min-h-screen bg-[#f8f9fa]"> */}
-      {/* <div className="container mx-auto px-6 py-8"> */}
+    <div className="min-h-screen bg-[#f8f9fa]">
+      <div className="container mx-auto px-6 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-            <h1 className="text-3xl font-bold tracking-tight">{text.myAssignedOpinions}</h1>
-            <p className="text-gray-500 mt-2">{text.assignedOpinionsMessage}</p>
+              <h1 className="text-3xl font-bold tracking-tight">{text.myAssignedOpinions}</h1>
+              <p className="text-gray-500 mt-2">{text.assignedOpinionsMessage}</p>
             </div>
             <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg">
-              <Users className="w-5 h-5" />
-              <a href="/employee" className="font-medium">
-              {text.staffPortal}
-            </a>
-            </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg">
+                <Users className="w-5 h-5" />
+                <a href="/employee" className="font-medium">
+                  {text.staffPortal}
+                </a>
+              </div>
             </div>
           </div>
 
@@ -174,6 +173,7 @@ export function StaffDashboard() {
           isOpen={isGlobalSearchOpen}
           onClose={() => setIsGlobalSearchOpen(false)}
         />
-    </>
+      </div>
+    </div>
   );
 }

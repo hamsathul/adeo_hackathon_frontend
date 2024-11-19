@@ -100,11 +100,24 @@ export function UserDashboard() {
     return `opinion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   };
 
-  const getPriorityStyles = (priority: Priority) => {
+  const getPriorityStyles = (priority: string) => {
+    // Type guard to ensure priority is valid
+    if (isPriority(priority)) {
+      return {
+        color: priorityConfig[priority].color,
+        bgColor: priorityConfig[priority].bgColor
+      };
+    }
+    // Fallback to medium priority if invalid
     return {
-      color: priorityConfig[priority].color,
-      bgColor: priorityConfig[priority].bgColor
+      color: priorityConfig.medium.color,
+      bgColor: priorityConfig.medium.bgColor
     };
+  };
+
+  // Type guard function to check if a string is a valid Priority
+  const isPriority = (value: string): value is Priority => {
+    return ['urgent', 'high', 'medium', 'low'].includes(value);
   };
 
   const handleSubmitOpinion = (opinionData: Opinion) => {
