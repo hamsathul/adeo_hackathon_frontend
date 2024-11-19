@@ -162,7 +162,43 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 					{/* Summary Content */}
 					{summarizedContent[index] && !minimizedSummaries[index] && (
 					  <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4">
-						{/* ... (summary content remains the same) ... */}
+						<div>
+						<h4 className="font-semibold mb-2">{text.summary}</h4>
+						<p className="text-sm">{summarizedContent[index].summary}</p>
+						</div>
+						<div>
+						<h4 className="font-semibold mb-2">{text.keyPoints}</h4>
+						<ul className="list-disc list-inside text-sm">
+							{summarizedContent[index].key_points.map((point, i) => (
+							<li key={i}>{point}</li>
+							))}
+						</ul>
+						</div>
+						<div>
+						<h4 className="font-semibold mb-2">{text.trends}</h4>
+						<ul className="list-disc list-inside text-sm">
+							{summarizedContent[index].trends.map((trend, i) => (
+							<li key={i}>{trend}</li>
+							))}
+						</ul>
+						</div>
+						<div>
+						<h4 className="font-semibold mb-2">Sources</h4>
+						<ul className="list-disc list-inside text-sm">
+							{summarizedContent[index].sources.map((source, i) => (
+							<li key={i}>
+								<a 
+								href={source}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-blue-600 hover:text-blue-800 hover:underline"
+								>
+								{source}
+								</a>
+							</li>
+							))}
+						</ul>
+						</div>
 					  </div>
 					)}
 	
