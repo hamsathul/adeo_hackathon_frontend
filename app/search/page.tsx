@@ -85,7 +85,7 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 	  }, {});
 	
 
-	  return (
+	return (
 		<div className="space-y-8">
 		  {Object.entries(groupedItems).map(([category, categoryItems]) => (
 			<div key={category} className="mb-8">
@@ -201,60 +201,62 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 						</div>
 					  </div>
 					)}
-	
-					{/* Footer */}
-					<div className="flex justify-between items-center mt-4">
-					  <Button
-						onClick={() => handleSummarize(index, item.description)}
-						variant="outline"
-						size="sm"
-						className="flex items-center gap-2"
-						disabled={isLoading[index]}
-					  >
-						{isLoading[index] ? (
-						  <span className="animate-spin">⌛</span>
-						) : (
-						  <Bot className="w-4 h-4" />
-						)}
-						{text.summarize}
-					  </Button>
-					  
-					  {summarizedContent[index] && (
-						<Button
-						  onClick={() => toggleMinimize(index)}
-						  variant="ghost"
-						  size="sm"
-						>
-						  {minimizedSummaries[index] ? <Maximize2 /> : <Minimize2 />}
-						</Button>
-					  )}
-					</div>
-				  </div>
-				))}
-			  </div>
-			</div>
-		  ))}
-		</div>
-	  );
-	};
+
+                {/* Footer */}
+                <div className="flex justify-between items-center mt-4">
+                  <Button
+                    onClick={() => handleSummarize(index, item.description)}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                    disabled={isLoading[index]}
+                  >
+                    {isLoading[index] ? (
+                      <span className="animate-spin">⌛</span>
+                    ) : (
+                      <Bot className="w-4 h-4" />
+                    )}
+                    {text.summarize}
+                  </Button>
+                  
+                  {summarizedContent[index] && (
+                    <Button
+                      onClick={() => toggleMinimize(index)}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      {minimizedSummaries[index] ? <Maximize2 /> : <Minimize2 />}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 // Function to transform sampleResults into StylishCards' expected format
 const transformResultsForCards = (results: any, type: string): Array<any> => {
 	const cards = [];
-  
+
 	if (type === 'search') {
-	  if (results.organic) {
-		results.organic.forEach((result: any, index: number) => {
-		  cards.push({
-			date: new Date().toLocaleDateString('en-GB'),  
-			title: result.title,
-			description: result.snippet,
-			link: result.link,
-			tags: result.sitelinks?.map((link: any) => link.title) || [],
-			category: 'Search Results'
-		  });
-		});
-	  }
+		// Organic Results 
+		if (results.organic) {
+			results.organic.forEach((result: any, index: number) => {
+				cards.push({
+					date: new Date().toLocaleDateString('en-GB'),  
+					title: result.title,
+					description: result.snippet,
+					link: result.link,
+					tags: result.sitelinks?.map((link: any) => link.title) || [],
+					bgColor: getBgColor(index + 1),
+					category: 'Search Results'
+				});
+			});
+		}
 	} else if (type === 'news') {
 		if (Array.isArray(results.news)) {
 			results.news.forEach((newsItem: any, index: number) => {
@@ -265,6 +267,7 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 					link: newsItem.link,
 					imageUrl: newsItem.imageUrl,
 					tags: [newsItem.source || 'News'],
+					bgColor: getBgColor(index),
 					category: 'News'
 				});
 			});
@@ -281,6 +284,7 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 					link: story.link, // Add the link
 					imageUrl: story.imageUrl,
 					tags: [story.source],
+					bgColor: getBgColor(index),
 					category: 'Top Stories'
 				});
 				});
@@ -296,6 +300,7 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 					link: newsItem.link,
 					imageUrl: newsItem.imageUrl,
 					tags: [newsItem.source],
+					bgColor: getBgColor(index),
 					category: 'News'
 				});
 				});
@@ -309,6 +314,7 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 			  title: image.title,
 			  description: `Image from ${image.link}`,
 			  tags: ['Image'],
+			  bgColor: getBgColor(index),
 			  category: 'Images'
 			});
 		  });
@@ -322,6 +328,7 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 			  title: item.question,
 			  description: item.snippet,
 			  tags: ['FAQ'],
+			  bgColor: getBgColor(index),
 			  category: 'People Also Ask'
 			});
 		  });
@@ -335,6 +342,7 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 			  title: search.query,
 			  description: `Related search query`,
 			  tags: ['Related'],
+			  bgColor: getBgColor(index),
 			  category: 'Related Searches'
 			});
 		  });
@@ -346,10 +354,10 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
 	return cards;
    };
 
-// const getBgColor = (index: number): string => {
-// 	const colors = ['bg-[#FDFDFD]', 'bg-[#F4E7D3]', 'bg-[#AEE12]'];
-// 	return colors[index % colors.length];
-// };
+const getBgColor = (index: number): string => {
+	const colors = ['bg-[#d5dbdb]', 'bg-[#f2d7d5]', 'bg-[#fadfd9]'];
+	return colors[index % colors.length];
+};
 
 const server_url = process.env.NEXT_PUBLIC_BACKEND_URL;
 
