@@ -15,19 +15,48 @@ import autoTable from 'jspdf-autotable'
 import { translations } from '@/components/custom/translation'
 import { useLanguageStore } from '@/store/useLanguageStore'
 import { Layout } from '@/components/common/Layout';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import  {jwtDecode } from 'jwt-decode';
+import { useRouter } from "next/navigation";
+
+const server_url = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8000/api/v1'
+
+
+interface User {
+  id: number;
+  username: string;
+  roles: Array<{ name: string }>;
+  department?: { name: string };
+  email: string;
+  is_active: boolean;
+}
 
 interface Employee {
-  id: string
-  name: string
-  role: string
-  department: string
-  email: string
-  phone: string
-  avatar: string
-  employeeId: string
-  workType: string
-  position: string
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+  email: string;
+  phone: string;
+  avatar: string;
+  employeeId: string;
+  workType: string;
+  position: string;
 }
+
+const mapUserToEmployee = (user: User) => ({
+  id: user.id.toString(),
+  name: user.username,
+  role: user.roles[0]?.name || 'N/A',
+  department: user.department?.name || 'N/A',
+  email: user.email,
+  phone: 'N/A', // Add if available in API
+  avatar: '/man.png', // Default avatar
+  employeeId: `EMP${user.id.toString().padStart(3, '0')}`,
+  workType: user.is_active ? 'Fulltime' : 'Inactive',
+  position: user.roles[0]?.name || 'N/A'
+})
 
 export default function Component() {
   const [view, setView] = useState<'grid' | 'list'>('grid')
@@ -39,34 +68,88 @@ export default function Component() {
   const [roleFilter, setRoleFilter] = useState('all')
   const [showAddEmployee, setShowAddEmployee] = useState(false)
   const [newEmployee, setNewEmployee] = useState<Partial<Employee>>({})
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null)
+  const router = useRouter();
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const { isArabic } = useLanguageStore();
   const text = isArabic ? translations.ar : translations.en;
 
+  // useEffect(() => {
+  //   // Simulating initial data load
+  //   setEmployees([
+  //     {
+  //       id: '1',
+  //       name: 'Ahmed Mohamed',
+  //       role: 'CEO',
+  //       department: 'Managerial',
+  //       email: 'a.mohamed@gmail.com',
+  //       phone: '+971 50 123 1234',
+  //       avatar: '/man.png',
+  //       employeeId: 'EMP01',
+  //       workType: 'Fulltime',
+  //       position: 'Executive',
+  //     },
+  //     // Add more initial employees here
+  //   ])
+  // }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      // console.log("Token:", token);
+      if (!token) {
+        toast.error("No authentication token found");
+        router.push('/login'); // Redirect to login page
+        return;
+      }
+
+      let decodedToken: { user_id: number };
+      try {
+        decodedToken = jwtDecode(token);
+      } catch (error) {
+        toast.error("Invalid token format");
+        router.push('/login'); // Redirect to login page
+        return;
+      }
+
+      if (!decodedToken.user_id) {
+        toast.error("User ID not found in token");
+        router.push('/login'); // Redirect to login page
+        return;
+      }
+
+      const { data } = await axios.get(`${server_url}/auth/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const mappedEmployees = data.map(mapUserToEmployee);
+      setEmployees(mappedEmployees);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          toast.error(`Error: ${error.response.data.message || 'Failed to fetch user data'}`);
+        } else if (error.request) {
+          toast.error("Server not responding. Please try again later.");
+        } else {
+          toast.error("Error setting up request");
+        }
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+      console.error("Error fetching users:", error);
+    }
+  }
+
   useEffect(() => {
-    // Simulating initial data load
-    setEmployees([
-      {
-        id: '1',
-        name: 'Ahmed Mohamed',
-        role: 'CEO',
-        department: 'Managerial',
-        email: 'a.mohamed@gmail.com',
-        phone: '+971 50 123 1234',
-        avatar: '/ADEO.svg',
-        employeeId: 'EMP01',
-        workType: 'Fulltime',
-        position: 'Executive',
-      },
-      // Add more initial employees here
-    ])
-  }, [])
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     const filtered = employees.filter((employee) => {
       const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase())
+                          employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesType = typeFilter === 'all' || employee.workType.toLowerCase() === typeFilter.toLowerCase()
       const matchesDepartment = departmentFilter === 'all' || employee.department.toLowerCase() === departmentFilter.toLowerCase()
       const matchesRole = roleFilter === 'all' || employee.role.toLowerCase() === roleFilter.toLowerCase()
@@ -75,6 +158,46 @@ export default function Component() {
     setFilteredEmployees(filtered)
   }, [employees, searchTerm, typeFilter, departmentFilter, roleFilter])
 
+  // Modified handleAddEmployee to work with API
+  const handleAddEmployee = async () => {
+    if (newEmployee.name && newEmployee.email) {
+      try {
+        // Add API call here when endpoint is available
+        // For now, just update local state
+        setEmployees([...employees, {
+          id: Date.now().toString(),
+          name: newEmployee.name || '',
+          role: newEmployee.role || 'N/A',
+          department: newEmployee.department || 'N/A',
+          email: newEmployee.email || '',
+          phone: newEmployee.phone || 'N/A',
+          avatar: newEmployee.avatar || '/man.png',
+          employeeId: newEmployee.employeeId || '',
+          workType: newEmployee.workType || 'Fulltime',
+          position: newEmployee.position || 'N/A'
+        }])
+        setNewEmployee({})
+        setShowAddEmployee(false)
+      } catch (error) {
+        console.error('Error adding employee:', error)
+        // Handle error appropriately
+      }
+    }
+  }
+
+  const handleEditEmployee = async () => {
+    if (editingEmployee) {
+      try {
+        // Add API call here when endpoint is available
+        // For now, just update local state
+        setEmployees(employees.map(emp => emp.id === editingEmployee.id ? editingEmployee : emp))
+        setEditingEmployee(null)
+      } catch (error) {
+        console.error('Error editing employee:', error)
+        // Handle error appropriately
+      }
+    }
+  }
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -94,30 +217,54 @@ export default function Component() {
   const handleExport = (format: 'pdf' | 'excel' | 'csv') => {
     if (format === 'pdf') {
       const doc = new jsPDF()
-      autoTable(doc, { html: '#employeeTable' })
+      
+      // Add first logo
+      const logo1 = new Image()
+      logo1.src = '/samah.png'
+      doc.addImage(logo1, 'PNG', 10, 10, 30, 30)
+      
+      // Add separator line
+      doc.setDrawColor(200, 200, 200) // Light gray color
+      doc.line(45, 10, 45, 40) // Vertical line between logos
+      
+      // Add second logo
+      const logo2 = new Image()
+      logo2.src = '/ADEO.png'
+      doc.addImage(logo2, 'PNG', 50, 10, 30, 30)
+      
+      // Add some space after logos
+      doc.setFontSize(12)
+      doc.text('Employee List', 10, 50)
+      
+      // Add table with offset for logos
+      autoTable(doc, { 
+        html: '#employeeTable',
+        startY: 60
+      })
+      
       doc.save('employees.pdf')
     } else if (format === 'excel' || format === 'csv') {
-      const worksheet = XLSX.utils.json_to_sheet(employees)
+      // For Excel/CSV, add both logos in separate cells
+      const logoData = [{
+        'Logo 1': 'Samah Logo: /samah.png',
+        'Logo 2': 'ADEO Logo: /ADEO.png'
+      }]
+      const worksheet = XLSX.utils.json_to_sheet(logoData)
+      
+      // Add empty row after logos
+      XLSX.utils.sheet_add_json(worksheet, [{}], { origin: -1 })
+      
+      // Add employee data
+      XLSX.utils.sheet_add_json(worksheet, employees, { origin: -1 })
+      
       const workbook = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Employees')
       XLSX.writeFile(workbook, `employees.${format === 'excel' ? 'xlsx' : 'csv'}`)
     }
   }
+  
 
-  const handleAddEmployee = () => {
-    if (newEmployee.name && newEmployee.email) {
-      setEmployees([...employees, { ...newEmployee, id: Date.now().toString() } as Employee])
-      setNewEmployee({})
-      setShowAddEmployee(false)
-    }
-  }
 
-  const handleEditEmployee = () => {
-    if (editingEmployee) {
-      setEmployees(employees.map(emp => emp.id === editingEmployee.id ? editingEmployee : emp))
-      setEditingEmployee(null)
-    }
-  }
 
   return (
     <>
@@ -257,10 +404,20 @@ export default function Component() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{text.allDepartments}</SelectItem>
-              <SelectItem value="managerial">Managerial</SelectItem>
-              <SelectItem value="it">IT</SelectItem>
-              <SelectItem value="hr">HR</SelectItem>
-              {/* Add more departments as needed */}
+              <SelectItem value="executive">Executive Office</SelectItem>
+              <SelectItem value="administration">Administration Department</SelectItem>
+              <SelectItem value="pld">Policy & Legislation Department</SelectItem>
+              <SelectItem value="gsd">Government Services Department</SelectItem>
+              <SelectItem value="did">Digital Innovation Department</SelectItem>
+              <SelectItem value="std">Strategy & Planning Department</SelectItem>
+              <SelectItem value="leg">Legal Affairs Department</SelectItem>
+              <SelectItem value="fin">Finance Department</SelectItem>
+              <SelectItem value="hrd">Human Resourse Department</SelectItem>
+              <SelectItem value="itd">Information Technology Department</SelectItem>
+              <SelectItem value="pmo">Project Management Office</SelectItem>
+              <SelectItem value="qcd">Quality Control Department</SelectItem>
+              <SelectItem value="ccd">Corporate Communications Department</SelectItem>
+              <SelectItem value="ird">International Relations Department</SelectItem>
             </SelectContent>
           </Select>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -269,15 +426,18 @@ export default function Component() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{text.allRoles}</SelectItem>
-              <SelectItem value="ceo">CEO</SelectItem>
-              <SelectItem value="manager">Manager</SelectItem>
-              <SelectItem value="designer">Designer</SelectItem>
+              <SelectItem value="superadmin">Super Admin</SelectItem>
+              <SelectItem value="systemadmin">System Admin</SelectItem>
+              <SelectItem value="departmenthead">Department Head</SelectItem>
+              <SelectItem value="seniorexpert">Senior Expert</SelectItem>
+              <SelectItem value="expert">Expert</SelectItem>
+              <SelectItem value="regularuser">Regular User</SelectItem>
               {/* Add more roles as needed */}
             </SelectContent>
           </Select>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center rounded-md border">
+            <div className="flex items-center rounded-md border-l-zinc-950">
             <Button
               variant={view === 'grid' ? 'secondary' : 'ghost'}
               size="icon"
@@ -299,92 +459,91 @@ export default function Component() {
       </div>
       <div className={`grid gap-4 ${view === 'grid' ? 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : ''}`}>
         {filteredEmployees.map((employee) => (
-          <Card key={employee.id}>
-            <CardHeader className="relative">
-              <Badge variant="secondary" className="absolute right-6 top-6">
-                {employee.department}
-              </Badge>
-              <div className="flex flex-col items-center space-y-3">
-                <img
-                  alt={employee.name}
-                  className="rounded-full"
-                  height="100"
-                  src={employee.avatar}
-                  style={{
-                    aspectRatio: "100/100",
-                    objectFit: "cover",
-                  }}
-                  width="100"
-                />
-                <div className="space-y-1 text-center">
-                  <h3 className="text-lg font-semibold">{employee.name}</h3>
-                  <p className="text-muted-foreground">{employee.role}</p>
-                </div>
+          <Card key={employee.id} className="bg-slate-100 dark:bg-slate-900/50 border-2">
+        <CardHeader className="relative">
+          <Badge variant="secondary" className="absolute right-6 top-6">
+            {employee.department}
+          </Badge>
+          <div className="flex flex-col items-center space-y-4 py-3">
+            <img
+          alt={employee.name}
+          className="rounded-full"
+          height="100"
+          src={employee.avatar}
+          style={{
+            aspectRatio: "100/100",
+            objectFit: "cover",
+          }}
+          width="100"
+            />
+            <div className="space-y-0 text-center">
+          <h3 className="text-lg font-semibold">{employee.name}</h3>
+          <p className="text-muted-foreground">{employee.role}</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="space-y-2">
+            <div className="flex items-center text-sm text-muted-foreground">
+          <span className="font-bold text-foreground">#{employee.employeeId}</span>
+            </div>
+            <div className="flex items-center gap-1 text-sm">
+          <Badge variant="secondary">{employee.position}</Badge>
+          <span className="text-muted-foreground">·</span>
+          <Badge variant="secondary">{employee.workType}</Badge>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="text-sm">
+          <a className="text-blue-600 hover:underline" href={`mailto:${employee.email}`}>
+            {employee.email}
+          </a>
+            </div>
+            <div className="text-sm text-muted-foreground">{employee.phone}</div>
+          </div>
+          <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="sm" style={{ border: '1px solid', borderColor: 'gray.300' }}>
+            {text.viewDetails}
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+            <DialogTitle>{employee.name}</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+            <img
+              alt={employee.name}
+              className="rounded-full mx-auto"
+              height="150"
+              src={employee.avatar}
+              style={{
+                aspectRatio: "150/150",
+                objectFit: "cover",
+              }}
+              width="150"
+            />
+            <p><strong>Employee ID:</strong> {employee.employeeId}</p>
+            <p><strong>Position:</strong> {employee.position}</p>
+            <p><strong>Department:</strong> {employee.department}</p>
+            <p><strong>Email:</strong> {employee.email}</p>
+            <p><strong>Phone:</strong> {employee.phone}</p>
+            <p><strong>Work Type:</strong> {employee.workType}</p>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <span className="font-medium text-foreground">#{employee.employeeId}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Badge variant="secondary">{employee.position}</Badge>
-                  <span className="text-muted-foreground">·</span>
-                  <Badge variant="secondary">{employee.workType}</Badge>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-sm">
-                  <a className="text-blue-600 hover:underline" href={`mailto:${employee.email}`}>
-                    {employee.email}
-                  </a>
-                </div>
-                <div className="text-sm text-muted-foreground">{employee.phone}</div>
-              </div>
-              <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center justify-between gap-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        View details
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>{employee.name}</DialogTitle>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <img
-                          alt={employee.name}
-                          className="rounded-full mx-auto"
-                          height="150"
-                          src={employee.avatar}
-                          style={{
-                            aspectRatio: "150/150",
-                            objectFit: "cover",
-                          }}
-                          width="150"
-                        />
-                        <p><strong>Employee ID:</strong> {employee.employeeId}</p>
-                        <p><strong>Position:</strong> {employee.position}</p>
-                        <p><strong>Department:</strong> {employee.department}</p>
-                        <p><strong>Email:</strong> {employee.email}</p>
-                        <p><strong>Phone:</strong> {employee.phone}</p>
-                        <p><strong>Work Type:</strong> {employee.workType}</p>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+            </DialogContent>
+          </Dialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon">
                         <MoreVertical className="h-4 w-4" />
-                        <span className="sr-only">More options</span>
+                        <span className="sr-only">{text.moreOptions}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onSelect={() => setEditingEmployee(employee)}>Edit</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setEditingEmployee(employee)}>{text.edit}</DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => setEmployees(employees.filter(e => e.id !== employee.id))}>
-                        Delete
+                        {text.delete}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -398,7 +557,7 @@ export default function Component() {
         <Dialog open={!!editingEmployee} onOpenChange={() => setEditingEmployee(null)}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Edit Employee</DialogTitle>
+              <DialogTitle>{text.editEmployee}</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <Input
@@ -446,7 +605,7 @@ export default function Component() {
                 onChange={(e) => setEditingEmployee({ ...editingEmployee, phone: e.target.value })}
               />
             </div>
-            <Button onClick={handleEditEmployee}>Save Changes</Button>
+            <Button onClick={handleEditEmployee}>{text.saveChanges}</Button>
           </DialogContent>
         </Dialog>
       )}

@@ -85,88 +85,89 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 	  }, {});
 	
 
-	  return (
+	return (
 		<div className="space-y-8">
 		  {Object.entries(groupedItems).map(([category, categoryItems]) => (
 			<div key={category} className="mb-8">
 			  <h2 className="text-2xl font-semibold mb-4 capitalize">{category}</h2>
 			  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{categoryItems.map((item, index) => (
-							<div 
-								key={index} 
-								className={`rounded-3xl ${item.bgColor} p-6 relative transition-all duration-300 hover:shadow-lg`}
-							>
-								{/* Card Header */}
-								<div className="flex justify-between items-start mb-6">
-									<div className="bg-white text-sm font-medium px-4 py-2 rounded-full">
-										{item.date}
-									</div>
-									<button className="p-2 hover:bg-white/50 rounded-full transition-colors">
-										<Bookmark className="w-5 h-5" />
-									</button>
-								</div>
-
-								{/* Card Content */}
-								<div className="mb-6">
-								{item.imageUrl && (
-									<a 
-									href={item.link} 
-									target="_blank" 
-									rel="noopener noreferrer"
-									className="block mb-4 hover:opacity-90 transition-opacity"
-									>
-									<img 
-										src={item.imageUrl} 
-										alt={item.title}
-										className="w-full h-48 object-cover rounded-lg"
-									/>
-									</a>
-								)}
-								<a 
-									href={item.link}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="block"
-								>
-									<h3 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors">
-									{item.title}
-									</h3>
-								</a>
-								<p className="text-gray-700 leading-relaxed">
-									{item.description}
-								</p>
-								{item.link && (
-									<a 
-									href={item.link}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 block truncate"
-									>
-									{item.link}
-									</a>
-								)}
-								</div>
-
-								{/* Tags */}
-								<div className="flex flex-wrap gap-2 mb-6">
-									{item.tags.map((tag: string, tagIndex: number) => (
-										<span 
-											key={tagIndex}
-											className="bg-white px-3 py-1 rounded-full text-sm"
-										>
-											{tag}
-										</span>
-									))}
-								</div>
-
-								{summarizedContent[index] && !minimizedSummaries[index] && (
-					<div className="mt-4 p-4 bg-white/50 rounded-lg space-y-4">
+				  <div 
+					key={index} 
+					className="bg-white rounded-3xl p-6 relative transition-all duration-300 border border-blue-200 shadow-[0_4px_20px_rgba(142,159,255,0.15)] hover:shadow-[0_4px_25px_rgba(142,159,255,0.55)]"
+				  >
+					{/* Card Header */}
+					<div className="flex justify-between items-start mb-6">
+					  <div className="bg-gray-50 text-sm font-medium px-4 py-2 rounded-full">
+						{item.date}
+					  </div>
+					  <button className="p-2 hover:bg-gray-50 rounded-full transition-colors">
+						<Bookmark className="w-5 h-5" />
+					  </button>
+					</div>
+	
+					{/* Card Content */}
+					<div className="mb-6">
+					  {item.imageUrl && (
+						<a 
+						  href={item.link} 
+						  target="_blank" 
+						  rel="noopener noreferrer"
+						  className="block mb-4 hover:opacity-90 transition-opacity"
+						>
+						  <img 
+							src={item.imageUrl} 
+							alt={item.title}
+							className="w-full h-48 object-cover rounded-lg"
+						  />
+						</a>
+					  )}
+					  <a 
+						href={item.link}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="block"
+					  >
+						<h3 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors">
+						  {item.title}
+						</h3>
+					  </a>
+					  <p className="text-gray-700 leading-relaxed">
+						{item.description}
+					  </p>
+					  {item.link && (
+						<a 
+						  href={item.link}
+						  target="_blank"
+						  rel="noopener noreferrer"
+						  className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 block truncate"
+						>
+						  {item.link}
+						</a>
+					  )}
+					</div>
+	
+					{/* Tags */}
+					<div className="flex flex-wrap gap-2 mb-6">
+					  {item.tags.map((tag: string, tagIndex: number) => (
+						<span 
+						  key={tagIndex}
+						  className="bg-gray-50 px-3 py-1 rounded-full text-sm"
+						>
+						  {tag}
+						</span>
+					  ))}
+					</div>
+	
+					{/* Summary Content */}
+					{summarizedContent[index] && !minimizedSummaries[index] && (
+					  <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4">
 						<div>
-						<h4 className="font-semibold mb-2">Summary</h4>
+						<h4 className="font-semibold mb-2">{text.summary}</h4>
 						<p className="text-sm">{summarizedContent[index].summary}</p>
 						</div>
 						<div>
-						<h4 className="font-semibold mb-2">Key Points</h4>
+						<h4 className="font-semibold mb-2">{text.keyPoints}</h4>
 						<ul className="list-disc list-inside text-sm">
 							{summarizedContent[index].key_points.map((point, i) => (
 							<li key={i}>{point}</li>
@@ -174,7 +175,7 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 						</ul>
 						</div>
 						<div>
-						<h4 className="font-semibold mb-2">Trends</h4>
+						<h4 className="font-semibold mb-2">{text.trends}</h4>
 						<ul className="list-disc list-inside text-sm">
 							{summarizedContent[index].trends.map((trend, i) => (
 							<li key={i}>{trend}</li>
@@ -198,7 +199,7 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 							))}
 						</ul>
 						</div>
-					</div>
+					  </div>
 					)}
 
                 {/* Footer */}
@@ -354,7 +355,7 @@ const transformResultsForCards = (results: any, type: string): Array<any> => {
    };
 
 const getBgColor = (index: number): string => {
-	const colors = ['bg-[#F0F7FF]', 'bg-[#FFF0F3]', 'bg-[#F3F0FF]'];
+	const colors = ['bg-[#d5dbdb]', 'bg-[#f2d7d5]', 'bg-[#fadfd9]'];
 	return colors[index % colors.length];
 };
 
@@ -444,95 +445,94 @@ const SearchEngine = () => {
 		setIsLoading(false);
 	  };
 
-    return (
-      <Layout>
-        <div className="min-h-screen bg-white text-gray-900">
-        <main className="container mx-auto px-4 max-w-6xl">
-          {/* Logo Section */}
-          <div className="flex justify-center items-center py-4">
-            <img 
-              src="/samah-svg.svg" 
-              alt="Samah Logo" 
-              className="w-48 h-auto"
+  return (
+    <Layout>
+      <div className="min-h-screen bg-white text-gray-900">
+      <main className="container mx-auto px-4 max-w-6xl">
+        {/* Logo Section */}
+        <div className="flex justify-center items-center py-4">
+          <img 
+            src="/samah-svg.svg" 
+            alt="Samah Logo" 
+            className="w-48 h-auto"
+          />
+        </div>
+        {/* Search Section */}
+        <div className="text-center py-4">
+
+          <div className="relative max-w-2xl mx-auto">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+      onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              placeholder="Search anything..."
+              className="w-full px-4 py-3 rounded-full border focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <button className="absolute right-3 top-1/2 -translate-y-1/2"
+      onClick={handleSearch}
+      >
+              <Search className="text-gray-500" />
+            </button>
           </div>
-          {/* Search Section */}
-          <div className="text-center py-4">
+        </div>
 
-            <div className="relative max-w-2xl mx-auto">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-				onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Search anything..."
-                className="w-full px-4 py-3 rounded-full border focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2"
-			  onClick={handleSearch}
-			  >
-                <Search className="text-gray-500" />
+        {/* Search Types */}
+        <div className="mb-8">
+          <div className="flex flex-wrap justify-center gap-2 mb-4">
+            {searchTypes.map(({ name, icon: Icon }) => (
+              <button
+                key={name}
+                onClick={() => toggleSearchType(name as keyof typeof sampleResults)}
+                className={`flex items-center px-4 py-2 rounded-full ${
+                  selectedTypes.has(name as keyof typeof sampleResults)
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700'
+                } hover:opacity-90`}
+              >
+                <Icon size={16} className="mr-2" />
+                {name}
               </button>
-            </div>
+            ))}
           </div>
+        </div>
 
-          {/* Search Types */}
-          <div className="mb-8">
-            <div className="flex flex-wrap justify-center gap-2 mb-4">
-              {searchTypes.map(({ name, icon: Icon }) => (
+        {/* Selected Filters Display */}
+        {selectedFilters.size > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {Array.from(selectedFilters).map((filter) => (
+              <div
+                key={filter}
+                className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+              >
+                {filter}
                 <button
-                  key={name}
-                  onClick={() => toggleSearchType(name as keyof typeof sampleResults)}
-                  className={`flex items-center px-4 py-2 rounded-full ${
-                    selectedTypes.has(name as keyof typeof sampleResults)
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 text-gray-700'
-                  } hover:opacity-90`}
+                  onClick={() => toggleFilter(filter)}
+                  className="ml-2 hover:text-blue-600"
                 >
-                  <Icon size={16} className="mr-2" />
-                  {name}
+                  <X size={14} />
                 </button>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-  
-          {/* Selected Filters Display */}
-          {selectedFilters.size > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
-              {Array.from(selectedFilters).map((filter) => (
-                <div
-                  key={filter}
-                  className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
-                >
-                  {filter}
-                  <button
-                    onClick={() => toggleFilter(filter)}
-                    className="ml-2 hover:text-blue-600"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-  
-  {/* // Results Area */}
-			<div className="flex-1">
-			{isLoading ? (
-				<p className="text-center text-gray-500">Loading...</p>
-				) : searchResults.length > 0 ? (
-				<StylishCards items={searchResults} />
-				) : searchQuery ? (
-				<p className="text-center text-gray-500">{text.noresult}</p>
-				) : (
-				<p className="text-center text-gray-500">{text.enterSearch}</p>
-				)}
-			
-            </div>
-        </main>
-      </div>
-      </Layout>
-    );
-  };
-  
-  export default SearchEngine;
+        )}
+
+{/* // Results Area */}
+    <div className="flex-1">
+    {isLoading ? (
+      <p className="text-center text-gray-500">Loading...</p>
+      ) : searchResults.length > 0 ? (
+      <StylishCards items={searchResults} />
+      ) : searchQuery ? (
+      <p className="text-center text-gray-500">{text.noresult}</p>
+      ) : (
+      <p className="text-center text-gray-500">{text.enterSearch}</p>
+      )}
+        </div>
+      </main>
+    </div>
+    </Layout>
+  );
+};
+
+export default SearchEngine;

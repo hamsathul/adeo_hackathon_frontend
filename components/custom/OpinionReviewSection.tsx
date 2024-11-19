@@ -25,8 +25,8 @@ export function OpinionReviewSection({
   return (
     <div className="space-y-8">
       <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-blue-700">
-        Please review your opinion details before submitting. Make sure all information is accurate.
-      </div>
+      Please review your opinion details before submitting. Make sure all information is accurate.
+        </div>
 
       <div>
         <h3 className="font-medium mb-3 text-gray-900">Basic Information</h3>

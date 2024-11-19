@@ -161,9 +161,9 @@ export function LoginPage() {
             </div>
 
             <div className="text-right">
-              <Link href="/" className="text-sm text-blue-600 hover:text-blue-500">
+                <Link href="/" className="text-sm text-blue-600 hover:text-blue-500">
                 {isArabic ? 'واجهت مشكلة في تسجيل الدخول؟' : 'Having trouble signing in?'}
-              </Link>
+                </Link>
             </div>
 
             <button
@@ -179,7 +179,7 @@ export function LoginPage() {
 
       <footer className="py-6 text-center text-sm text-gray-600">
         <p>{isArabic ? '© مكتب أبوظبي التنفيذي. جميع الحقوق محفوظة.' : '© Abu Dhabi Executive Office. All rights reserved.'}</p>
-        <Link href="https://www.abudhabi.gov.ae" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500">
+        <Link href="https://www.abudhabi.gov.ae/en/terms-of-use" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500">
           {isArabic ? 'الشروط والأحكام' : 'Terms and Conditions'}
         </Link>
       </footer>

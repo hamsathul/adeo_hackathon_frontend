@@ -6,7 +6,6 @@ import { io, Socket } from 'socket.io-client'
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation'
 
-
 interface Message {
   error?: any
   id: string
@@ -104,59 +103,74 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
               socketInstance.disconnect();
             }
           });
+          socketInstance.on('message_received', (data) => {
+            console.log('Message received:', data);
 
-		  socketInstance.on('message_received', (data) => {
-			console.log('Message received:', data)
-			
-			if (data.type === 'user_message') {
-			  // Update the temporary message with server data
-			  setMessages(prev => prev.map(msg => 
-				msg.id.startsWith('temp-') ? {
-				  ...msg,
-				  id: data.message.id,
-				  timestamp: formatTimestamp(data.message.timestamp)
-				} : msg
-			  ));
-			} 
-			else if (data.type === 'ai_message_chunk') {
-			  setMessages(prev => {
-				const existingMessageIndex = prev.findIndex(m => m.id === data.message.id);
-				if (existingMessageIndex >= 0) {
-				  const updatedMessages = [...prev];
-				  updatedMessages[existingMessageIndex] = {
-					...updatedMessages[existingMessageIndex],
-					content: updatedMessages[existingMessageIndex].content + data.message.content,
-					is_streaming: true,
-					timestamp: formatTimestamp(data.message.timestamp)
-				  };
-				  return updatedMessages;
-				} else {
-				  return [...prev, {
-					id: data.message.id,
-					content: data.message.content,
-					timestamp: formatTimestamp(data.message.timestamp),
-					is_bot: true,
-					is_streaming: true
-				  }];
-				}
-			  });
-			}
-			else if (data.type === 'ai_message_complete') {
-			  setMessages(prev => {
-				const updatedMessages = prev.map(message => 
-				  message.id === data.message.id 
-					? { 
-						...message, 
-						content: data.message.content, 
-						is_streaming: false,
-						timestamp: formatTimestamp(data.message.timestamp)
-					  }
-					: message
-				);
-				return updatedMessages;
-			  });
-			}
-		  });
+            const formatDubaiTimestamp = (timestamp: string) => {
+              try {
+                const date = new Date(timestamp);
+                const options: Intl.DateTimeFormatOptions = {
+                  timeZone: 'Asia/Dubai',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                };
+                return date.toLocaleTimeString([], options);
+              } catch (error) {
+                console.error('Error formatting timestamp:', error);
+                return '';
+              }
+            };
+
+            if (data.type === 'user_message') {
+              // Update the temporary message with server data
+              setMessages(prev => prev.map(msg =>
+                msg.id.startsWith('temp-') ? {
+                  ...msg,
+                  id: data.message.id,
+                  timestamp: formatDubaiTimestamp(data.message.timestamp)
+                } : msg
+              ));
+            } 
+            else if (data.type === 'ai_message_chunk') {
+              setMessages(prev => {
+                const existingMessageIndex = prev.findIndex(m => m.id === data.message.id);
+                if (existingMessageIndex >= 0) {
+                  const updatedMessages = [...prev];
+                  updatedMessages[existingMessageIndex] = {
+                    ...updatedMessages[existingMessageIndex],
+                    content: updatedMessages[existingMessageIndex].content + data.message.content,
+                    is_streaming: true,
+                    timestamp: formatDubaiTimestamp(data.message.timestamp)
+                  };
+                  return updatedMessages;
+                } else {
+                  return [...prev, {
+                    id: data.message.id,
+                    content: data.message.content,
+                    timestamp: formatDubaiTimestamp(data.message.timestamp),
+                    is_bot: true,
+                    is_streaming: true
+                  }];
+                }
+              });
+            }
+            else if (data.type === 'ai_message_complete') {
+              setMessages(prev => {
+                const updatedMessages = prev.map(message =>
+                  message.id === data.message.id
+                    ? {
+                      ...message,
+                      content: data.message.content,
+                      is_streaming: false,
+                      timestamp: formatDubaiTimestamp(data.message.timestamp)
+                    }
+                    : message
+                );
+                return updatedMessages;
+              });
+            }
+          });
 		  
 		  // Add error handling for failed messages
 		  socketInstance.on('error', (error) => {
@@ -274,7 +288,7 @@ const handleSendMessage = () => {
         >
           {/* Header */}
           <div className="flex justify-between items-center p-0.5">
-            <Button variant="ghost" size="icon" onClick={onClose}>
+            <Button className="rounded-full p-2 bg-blur hover:bg-blur-20 transition duration-300" variant="ghost" size="icon" onClick={onClose}>
               <X className="w-5 h-5 text-white" />
             </Button>
           </div>
@@ -322,7 +336,7 @@ const handleSendMessage = () => {
           </div>
   
           {/* Input Section */}
-          <div className="p-6 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+          <div className=" rounded-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
             <div className="relative">
               <input
                 type="text"

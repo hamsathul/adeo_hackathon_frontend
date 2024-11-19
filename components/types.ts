@@ -51,7 +51,6 @@ export interface Opinion {
   remarks: Remark[];
 }
 
-
 export interface OpinionFormData {
   title: string;
   assignee: string;
