@@ -6,7 +6,6 @@ import { io, Socket } from 'socket.io-client'
 import { jwtDecode } from 'jwt-decode';
 import { useRouter } from 'next/navigation'
 
-
 interface Message {
   error?: any
   id: string
