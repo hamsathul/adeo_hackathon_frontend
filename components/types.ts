@@ -1,4 +1,4 @@
-export type Status = 'unassigned' | 'todo' | 'in-progress' | 'testing' | 'review' | 'done' | 'on-hold' | 'rejected';
+
 export type Department = 'Engineering' | 'Design' | 'Marketing' | 'Product' | 'Sales';
 export type Priority = 'low' | 'medium' | 'high' | 'urgent';
 
@@ -12,6 +12,30 @@ export interface Remark {
   content: string;
   author: string;
   timestamp: string;
+}
+
+export type Status = 
+  | 'unassigned'
+  | 'assigned_to_department'
+  | 'assigned_to_expert'
+  | 'expert_opinion_submitted' 
+  | 'head_review_pending'
+  | 'head_approved'
+  | 'in_review'
+  | 'pending_other_department'
+  | 'additional_info_requested'
+  | 'completed'
+  | 'rejected';
+
+export interface WorkflowStatus {
+  name: Status;
+  description: string;
+  created_at: string;
+}
+
+export interface WorkflowStatusResponse {
+  total: number;
+  items: WorkflowStatus[];
 }
 
 export interface OpinionDetails {
@@ -29,42 +53,68 @@ export interface OpinionDetails {
 }
 
 export interface Opinion {
-  id: string;
-  title: string;
-  status: Status;
-  assignee?: string;
-  opinionId: string;
-  department: Department;
-  priority: Priority;
-  category: Category;
-  subCategory?: SubCategory;
-  details: OpinionDetails;
-  submitter: {
-    name: string;
-    email: string;
-    description: string;
-    documents: Array<{
-      name: string;
-      url: string;
-    }>;
-  };
-  remarks: Remark[];
-}
+	id: string;
+	title: string;
+	status: Status;
+	opinionId: string;
+	assignee?: string;
+	department: string;
+	priority: string;
+	category: string;
+	subCategory: string;
+	details: {
+	  requestStatement: string;
+	  challengesOpportunities: string;
+	  subjectContent: string;
+	  alternativeOptions: string;
+	  expectedImpact: string;
+	  potentialRisks: string;
+	  studiesStatistics: string;
+	  legalFinancialOpinions: string;
+	  stakeholderFeedback: string;
+	  workPlan: string;
+	  decisionDraft: string;
+	};
+	submitter: {
+	  name: string;
+	  email: string;
+	  description: string;
+	  documents: Array<{ name: string; url: string; }>;
+	};
+	remarks: Array<{
+	  id: string;
+	  content: string;
+	  author: string;
+	  timestamp: string;
+	}>;
+  }
 
-export interface OpinionFormData {
-  title: string;
-  assignee: string;
-  department: Department;
-  priority: Priority;
-  category: Category;
-  subCategory?: SubCategory;
-  details: OpinionDetails;
-  submitter: {
-    name: string;
-    email: string;
-    description: string;
-  };
-}
+  export interface OpinionFormData {
+	title: string;
+	assignee?: string;
+	department: string;
+	priority: string;
+	category: string;
+	subCategory: string;
+	details: {
+	  requestStatement: string;
+	  challengesOpportunities: string;
+	  subjectContent: string;
+	  alternativeOptions: string;
+	  expectedImpact: string;
+	  potentialRisks: string;
+	  studiesStatistics: string;
+	  legalFinancialOpinions: string;
+	  stakeholderFeedback: string;
+	  workPlan: string;
+	  decisionDraft: string;
+	};
+	submitter: {
+	  name: string;
+	  email: string;
+	  description: string;
+	};
+  }
 
 export interface RemarkFormData {
   content: string;

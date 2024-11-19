@@ -1,19 +1,13 @@
 'use client';
 
 import React from 'react';
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-import { Opinion, Status } from '../types';
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { Opinion, Status, WorkflowStatus } from '../types';
 import { KanbanColumn } from './KanbanColumn';
 import { KanbanOpinion } from './KanbanOpinion';
 
 interface KanbanBoardDndProps {
-  columns: Status[];
+  workflowStatuses: WorkflowStatus[];
   filteredOpinions: Opinion[];
   handleDragStart: any;
   handleDragEnd: any;
@@ -25,7 +19,7 @@ interface KanbanBoardDndProps {
 }
 
 export function KanbanBoardDnd({
-  columns,
+  workflowStatuses,
   filteredOpinions,
   handleDragStart,
   handleDragEnd,
@@ -43,6 +37,14 @@ export function KanbanBoardDnd({
     })
   );
 
+    // Sort workflow statuses to put 'unassigned' first
+	const sortedStatuses = [...workflowStatuses].sort((a, b) => {
+		if (a.name === 'unassigned') return -1;
+		if (b.name === 'unassigned') return 1;
+		return 0;
+	  });
+	
+
   return (
     <DndContext
       sensors={sensors}
@@ -50,11 +52,12 @@ export function KanbanBoardDnd({
       onDragEnd={handleDragEnd}
     >
       <div className="kanban-grid grid gap-4 overflow-x-auto pb-4">
-        {columns.map((columnStatus) => (
+	  {sortedStatuses.map((status) => (
           <KanbanColumn
-            key={columnStatus}
-            status={columnStatus}
-            items={filteredOpinions.filter((opinion) => opinion.status === columnStatus)}
+            key={status.name}
+            status={status.name}
+            statusDescription={status.description}
+            items={filteredOpinions.filter((opinion) => opinion.status === status.name)}
             onAdd={handleAddOpinion}
             onEdit={handleEditOpinion}
             onDelete={handleDeleteOpinion}
