@@ -5,6 +5,7 @@ import { OpinionFormSection } from './OpinionFormSection';
 import { OpinionReviewSection } from './OpinionReviewSection';
 import { cn } from '../utils';
 import { CATEGORY_SUBCATEGORIES } from '../utils';
+import axios from 'axios';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { translations } from '@/components/custom/translation';
 
@@ -24,6 +25,41 @@ interface UploadedFile {
   size: number;
   type: string;
 }
+
+interface OpinionRequestResponse {
+	id: number;
+	reference_number: string;
+	title: string;
+	description: string;
+	department_id: number;
+	category_id: number;
+	sub_category_id: number;
+	priority: string;
+	requester_id: number;
+	current_status_id: number;
+	request_statement: string;
+	challenges_opportunities: string;
+	subject_content: string;
+	alternative_options: string;
+	expected_impact: string;
+	potential_risks: string;
+	studies_statistics: string;
+	legal_financial_opinions: string;
+	stakeholder_feedback: string;
+	work_plan: string;
+	decision_draft: string;
+	due_date: string;
+	version: number;
+	created_at: string;
+	updated_at: string;
+	is_deleted: boolean;
+	deleted_at: string | null;
+	deleted_by: number | null;
+  }
+
+  interface CategoryStructure {
+	[key: string]: string[];
+  }
 
 const STEPS = [
   { id: 'basic', title: 'Basic Information' },
@@ -48,6 +84,24 @@ const initialDetails: OpinionDetails = {
   decisionDraft: ''
 };
 
+const fetchCategories = async (): Promise<CategoryStructure> => {
+	try {
+	  const response = await axios.get(
+		'http://localhost:8000/api/v1/opinions/categories/structured',
+		{
+		  headers: {
+			'Authorization': `Bearer ${localStorage.getItem('token')}`, // Assuming you store the token in localStorage
+			'accept': 'application/json'
+		  }
+		}
+	  );
+	  return response.data;
+	} catch (error) {
+	  console.error('Error fetching categories:', error);
+	  return {};
+	}
+  };
+
 export function OpinionSubmissionDialog({ 
   isOpen, 
   onClose, 
@@ -65,6 +119,9 @@ export function OpinionSubmissionDialog({
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [details, setDetails] = useState<OpinionDetails>(initialData?.details || initialDetails);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [categories, setCategories] = useState<CategoryStructure>({});
   const { isArabic } = useLanguageStore();
   const text = isArabic ? translations.ar : translations.en;
 
@@ -84,46 +141,101 @@ export function OpinionSubmissionDialog({
     }
   }, [isOpen, initialData]);
 
+  useEffect(() => {
+    if (isOpen) {
+      fetchCategories().then(setCategories);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (step !== 'review') {
-      nextStep();
-      return;
+        nextStep();
+        return;
     }
-    
-    const documentUrls = files.map(file => ({
-      name: file.name,
-      url: URL.createObjectURL(file.file)
-    }));
 
-    const existingDocuments = initialData?.submitter.documents || [];
-    const allDocuments = [...existingDocuments, ...documentUrls];
-    
-    const opinionData: Opinion = {
-      id: initialData?.id || Math.random().toString(36).substr(2, 9),
-      opinionId: initialData?.opinionId || `GOV-${Math.floor(Math.random() * 1000)}`,
-      title,
-      status: initialData?.status || 'unassigned',
-      department: 'Engineering',
-      category,
-      subCategory,
-      priority,
-      details,
-      submitter: {
-        name: submitterName,
-        email: submitterEmail,
-        description: details.requestStatement,
-        documents: allDocuments
-      },
-      remarks: initialData?.remarks || []
-    };
+    try {
+        const requestData = {
+            title,
+            description: details.requestStatement,
+            priority: priority.toLowerCase(),
+            department_id: 1,
+            category_id: 1,
+            sub_category_id: 1,
+            due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            request_statement: details.requestStatement,
+            challenges_opportunities: details.challengesOpportunities,
+            subject_content: details.subjectContent,
+            alternative_options: details.alternativeOptions,
+            expected_impact: details.expectedImpact,
+            potential_risks: details.potentialRisks,
+            studies_statistics: details.studiesStatistics,
+            legal_financial_opinions: details.legalFinancialOpinions,
+            stakeholder_feedback: details.stakeholderFeedback,
+            work_plan: details.workPlan,
+            decision_draft: details.decisionDraft,
+        };
 
-    onSubmit(opinionData);
-    onClose();
-  };
+
+		const formData = new FormData();
+		formData.append('request_data', JSON.stringify(requestData));
+
+		// Append files as file1, file2, file3
+		files.slice(0, 3).forEach((uploadedFile, index) => {
+			formData.append(`file${index + 1}`, uploadedFile.file);
+		});
+		
+
+		const response = await axios.post(
+			'http://localhost:8000/api/v1/opinions/requests/',
+			formData,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}
+		);
+		
+
+        if (response.data) {
+            const documentUrls = files.map((file) => ({
+                name: file.name,
+                url: URL.createObjectURL(file.file),
+            }));
+
+            const opinionData: Opinion = {
+                id: response.data.id.toString(),
+                opinionId: response.data.reference_number,
+                title: response.data.title,
+                status: 'unassigned',
+                department: 'Engineering',
+                category,
+                subCategory,
+                priority,
+                details,
+                submitter: {
+                    name: submitterName,
+                    email: submitterEmail,
+                    description: response.data.description,
+                    documents: documentUrls,
+                },
+                remarks: [],
+            };
+
+            onSubmit(opinionData);
+            onClose();
+        }
+    } catch (error) {
+        console.error('Error submitting opinion request:', error);
+        alert('Failed to submit opinion request. Please try again.');
+    }
+};
+
 
   const nextStep = () => {
     const currentIndex = STEPS.findIndex(s => s.id === step);
@@ -191,7 +303,7 @@ export function OpinionSubmissionDialog({
         return !!(
           title &&
           category &&
-          (!CATEGORY_SUBCATEGORIES[category].length || subCategory) &&
+		  (!categories[category]?.length || subCategory) &&	
           priority &&
           submitterName &&
           submitterEmail
@@ -227,29 +339,30 @@ export function OpinionSubmissionDialog({
               <select
                 value={category}
                 onChange={(e) => {
-                  const newCategory = e.target.value as Category;
+                  const newCategory = e.target.value;
                   setCategory(newCategory);
                   setSubCategory(undefined);
                 }}
                 className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
                 required
               >
-                {Object.keys(CATEGORY_SUBCATEGORIES).map((cat) => (
+                <option value="">Select category</option>
+                {Object.keys(categories).map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
             </OpinionFormSection>
 
-            {CATEGORY_SUBCATEGORIES[category].length > 0 && (
-              <OpinionFormSection title={text.subCategory} required>
+            {categories[category]?.length > 0 && (
+              <OpinionFormSection title="Sub-category" required>
                 <select
                   value={subCategory || ''}
-                  onChange={(e) => setSubCategory(e.target.value as SubCategory)}
+                  onChange={(e) => setSubCategory(e.target.value)}
                   className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-white"
                   required
                 >
                   <option value="">Select sub-category</option>
-                  {CATEGORY_SUBCATEGORIES[category].map((subCat) => (
+                  {categories[category].map((subCat) => (
                     <option key={subCat} value={subCat}>{subCat}</option>
                   ))}
                 </select>
@@ -620,18 +733,22 @@ export function OpinionSubmissionDialog({
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                disabled={!isStepValid(step)}
-                className={cn(
-                  "px-4 py-2 text-white rounded-lg transition-colors",
-                  isStepValid(step)
-                    ? "bg-blue-600 hover:bg-blue-700"
-                    : "bg-gray-300 cursor-not-allowed"
-                )}
-              >
-                {step === 'review' ? (isEditing ? 'Save Changes' : 'Submit Opinion') : 'Next'}
-              </button>
+			  <button
+				type="submit"
+				disabled={!isStepValid(step) || isSubmitting}
+				className={cn(
+					"px-4 py-2 text-white rounded-lg transition-colors",
+					isStepValid(step) && !isSubmitting
+					? "bg-blue-600 hover:bg-blue-700"
+					: "bg-gray-300 cursor-not-allowed"
+				)}
+				>
+				{isSubmitting 
+					? 'Submitting...' 
+					: (step === 'review' 
+					? (isEditing ? 'Save Changes' : 'Submit Opinion') 
+					: 'Next')}
+				</button>
             </div>
           </div>
         </form>
