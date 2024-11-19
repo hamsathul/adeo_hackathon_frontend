@@ -74,8 +74,8 @@ const initialOpinions: Opinion[] = [
       email: 'sarah@example.com',
       description: 'Updates to environmental protection policies.',
       documents: [
-        { name: 'PolicyDraft.pdf', url: '#' },
-        { name: 'Research.pdf', url: '#' }
+        { name: 'ADGazette.pdf', url: '#' },
+        { name: 'DXBGazette.pdf', url: '#' }
       ]
     },
     remarks: []
