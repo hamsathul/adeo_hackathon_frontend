@@ -92,75 +92,76 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 			  <h2 className="text-2xl font-semibold mb-4 capitalize">{category}</h2>
 			  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 				{categoryItems.map((item, index) => (
-							<div 
-								key={index} 
-								className={`rounded-3xl ${item.bgColor} p-6 relative transition-all duration-300 hover:shadow-lg`}
-							>
-								{/* Card Header */}
-								<div className="flex justify-between items-start mb-6">
-									<div className="bg-white text-sm font-medium px-4 py-2 rounded-full">
-										{item.date}
-									</div>
-									<button className="p-2 hover:bg-white/50 rounded-full transition-colors">
-										<Bookmark className="w-5 h-5" />
-									</button>
-								</div>
-
-								{/* Card Content */}
-								<div className="mb-6">
-								{item.imageUrl && (
-									<a 
-									href={item.link} 
-									target="_blank" 
-									rel="noopener noreferrer"
-									className="block mb-4 hover:opacity-90 transition-opacity"
-									>
-									<img 
-										src={item.imageUrl} 
-										alt={item.title}
-										className="w-full h-48 object-cover rounded-lg"
-									/>
-									</a>
-								)}
-								<a 
-									href={item.link}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="block"
-								>
-									<h3 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors">
-									{item.title}
-									</h3>
-								</a>
-								<p className="text-gray-700 leading-relaxed">
-									{item.description}
-								</p>
-								{item.link && (
-									<a 
-									href={item.link}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 block truncate"
-									>
-									{item.link}
-									</a>
-								)}
-								</div>
-
-								{/* Tags */}
-								<div className="flex flex-wrap gap-2 mb-6">
-									{item.tags.map((tag: string, tagIndex: number) => (
-										<span 
-											key={tagIndex}
-											className="bg-white px-3 py-1 rounded-full text-sm"
-										>
-											{tag}
-										</span>
-									))}
-								</div>
-
-								{summarizedContent[index] && !minimizedSummaries[index] && (
-					<div className="mt-4 p-4 bg-white/50 rounded-lg space-y-4">
+				  <div 
+					key={index} 
+					className="bg-white rounded-3xl p-6 relative transition-all duration-300 border border-blue-200 shadow-[0_4px_20px_rgba(142,159,255,0.15)] hover:shadow-[0_4px_25px_rgba(142,159,255,0.55)]"
+				  >
+					{/* Card Header */}
+					<div className="flex justify-between items-start mb-6">
+					  <div className="bg-gray-50 text-sm font-medium px-4 py-2 rounded-full">
+						{item.date}
+					  </div>
+					  <button className="p-2 hover:bg-gray-50 rounded-full transition-colors">
+						<Bookmark className="w-5 h-5" />
+					  </button>
+					</div>
+	
+					{/* Card Content */}
+					<div className="mb-6">
+					  {item.imageUrl && (
+						<a 
+						  href={item.link} 
+						  target="_blank" 
+						  rel="noopener noreferrer"
+						  className="block mb-4 hover:opacity-90 transition-opacity"
+						>
+						  <img 
+							src={item.imageUrl} 
+							alt={item.title}
+							className="w-full h-48 object-cover rounded-lg"
+						  />
+						</a>
+					  )}
+					  <a 
+						href={item.link}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="block"
+					  >
+						<h3 className="text-xl font-bold mb-3 hover:text-blue-600 transition-colors">
+						  {item.title}
+						</h3>
+					  </a>
+					  <p className="text-gray-700 leading-relaxed">
+						{item.description}
+					  </p>
+					  {item.link && (
+						<a 
+						  href={item.link}
+						  target="_blank"
+						  rel="noopener noreferrer"
+						  className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-2 block truncate"
+						>
+						  {item.link}
+						</a>
+					  )}
+					</div>
+	
+					{/* Tags */}
+					<div className="flex flex-wrap gap-2 mb-6">
+					  {item.tags.map((tag: string, tagIndex: number) => (
+						<span 
+						  key={tagIndex}
+						  className="bg-gray-50 px-3 py-1 rounded-full text-sm"
+						>
+						  {tag}
+						</span>
+					  ))}
+					</div>
+	
+					{/* Summary Content */}
+					{summarizedContent[index] && !minimizedSummaries[index] && (
+					  <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4">
 						<div>
 						<h4 className="font-semibold mb-2">{text.summary}</h4>
 						<p className="text-sm">{summarizedContent[index].summary}</p>
@@ -198,7 +199,7 @@ const StylishCards = ({ items }: { items: Array<any> }) => {
 							))}
 						</ul>
 						</div>
-					</div>
+					  </div>
 					)}
 
                 {/* Footer */}
