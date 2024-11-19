@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Brain, Send } from 'lucide-react';
+import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Save, Brain, Send, Upload } from 'lucide-react';
 import { Opinion, RemarkFormData } from '../types';
 import { DocumentAnalysis } from './DocumentAnalysis';
 import { analyzeDocument, DocumentAnalysisResponse } from '../services/documentAnalysis';
 import { DetailSection } from './DetailSection';
-import { DocumentUpload } from './DocumentUpload';
+// import { DocumentUpload } from './DocumentUpload';
 import { cn } from '../utils';
 import { translations } from './translation';
 import { useLanguageStore } from '@/store/useLanguageStore';
