@@ -159,11 +159,14 @@ export function LoginPage() {
                 />
               </div>
             </div>
-
             <div className="text-right">
-                <Link href="/" className="text-sm text-blue-600 hover:text-blue-500">
+              <button
+                type="button"
+                onClick={() => alert(isArabic ? 'يرجى الاتصال بدعم تكنولوجيا المعلومات' : 'Kindly contact IT support')}
+                className="text-sm text-blue-600 hover:text-blue-500"
+              >
                 {isArabic ? 'واجهت مشكلة في تسجيل الدخول؟' : 'Having trouble signing in?'}
-                </Link>
+              </button>
             </div>
 
             <button

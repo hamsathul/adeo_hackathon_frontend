@@ -43,9 +43,10 @@ interface Employee {
   employeeId: string;
   workType: string;
   position: string;
+  password: string; // Add password property
 }
 
-const mapUserToEmployee = (user: User) => ({
+const mapUserToEmployee = (user: User): Employee => ({
   id: user.id.toString(),
   name: user.username,
   role: user.roles[0]?.name || 'N/A',
@@ -55,7 +56,8 @@ const mapUserToEmployee = (user: User) => ({
   avatar: '/man.png', // Default avatar
   employeeId: `EMP${user.id.toString().padStart(3, '0')}`,
   workType: user.is_active ? 'Fulltime' : 'Inactive',
-  position: user.roles[0]?.name || 'N/A'
+  position: user.roles[0]?.name || 'N/A',
+  password: '' // Default password, update as needed
 })
 
 export default function Component() {
@@ -128,7 +130,11 @@ export default function Component() {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          toast.error(`Error: ${error.response.data.message || 'Failed to fetch user data'}`);
+            if (error.response.status === 403) {
+            alert("You don't have the permission to access this page");
+          } else {
+            toast.error(`Error: ${error.response.data.message || 'Failed to fetch user data'}`);
+          }
         } else if (error.request) {
           toast.error("Server not responding. Please try again later.");
         } else {
@@ -160,28 +166,49 @@ export default function Component() {
 
   // Modified handleAddEmployee to work with API
   const handleAddEmployee = async () => {
-    if (newEmployee.name && newEmployee.email) {
+    if (
+      newEmployee.name && 
+      newEmployee.email && 
+      newEmployee.password // Add password check
+    ) {
       try {
-        // Add API call here when endpoint is available
-        // For now, just update local state
-        setEmployees([...employees, {
-          id: Date.now().toString(),
-          name: newEmployee.name || '',
-          role: newEmployee.role || 'N/A',
-          department: newEmployee.department || 'N/A',
-          email: newEmployee.email || '',
-          phone: newEmployee.phone || 'N/A',
-          avatar: newEmployee.avatar || '/man.png',
-          employeeId: newEmployee.employeeId || '',
-          workType: newEmployee.workType || 'Fulltime',
-          position: newEmployee.position || 'N/A'
-        }])
-        setNewEmployee({})
-        setShowAddEmployee(false)
+        const token = localStorage.getItem('token');
+        if (!token) {
+          toast.error("No authentication token found");
+          router.push('/login');
+          return;
+        }
+
+        const { data } = await axios.post(`${server_url}/auth/users`, {
+          email: newEmployee.email,
+          username: newEmployee.name,
+          password: newEmployee.password        }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const newEmp = mapUserToEmployee(data);
+        setEmployees([...employees, newEmp]);
+        setNewEmployee({});
+        setShowAddEmployee(false);
+        toast.success('Employee added successfully');
       } catch (error) {
-        console.error('Error adding employee:', error)
-        // Handle error appropriately
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            toast.error(`Error: ${error.response.data.message || 'Failed to add employee'}`);
+          } else if (error.request) {
+            toast.error("Server not responding. Please try again later.");
+          } else {
+            toast.error("Error setting up request");
+          }
+        } else {
+          toast.error("An unexpected error occurred");
+        }
+        console.error('Error adding employee:', error);
       }
+    } else {
+      toast.error("Please fill in all required fields including password");
     }
   }
 
@@ -300,79 +327,91 @@ export default function Component() {
             </DropdownMenuContent>
           </DropdownMenu>
           <Dialog open={showAddEmployee} onOpenChange={setShowAddEmployee}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                {text.addEmployee}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{text.addNewEmployee}</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <Input
-                  placeholder={text.name}
-                  value={newEmployee.name || ''}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
-                />
-                <Input
-                  placeholder={text.email}
-                  type="email"
-                  value={newEmployee.email || ''}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
-                />
-                <Input
-                  placeholder={text.position}
-                  value={newEmployee.position || ''}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, position: e.target.value })}
-                />
-                <Input
-                  placeholder={text.employeeID}
-                  value={newEmployee.employeeId || ''}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, employeeId: e.target.value })}
-                />
-                <Select
-                  value={newEmployee.workType || ''}
-                  onValueChange={(value) => setNewEmployee({ ...newEmployee, workType: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={text.workType} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Fulltime">Full Time</SelectItem>
-                    <SelectItem value="Parttime">Part Time</SelectItem>
-                    <SelectItem value="Contract">Contract</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Input
-                  placeholder={text.department}
-                  value={newEmployee.department || ''}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })}
-                />
-                <Input
-                  placeholder={text.phone}
-                  value={newEmployee.phone || ''}
-                  onChange={(e) => setNewEmployee({ ...newEmployee, phone: e.target.value })}
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) {
-                      const reader = new FileReader()
-                      reader.onloadend = () => {
-                        setNewEmployee({ ...newEmployee, avatar: reader.result as string })
-                      }
-                      reader.readAsDataURL(file)
-                    }
-                  }}
-                />
-              </div>
-              <Button onClick={handleAddEmployee}>{text.addEmployee}</Button>
-            </DialogContent>
-          </Dialog>
+      <DialogTrigger asChild>
+        <Button size="sm">
+          <Plus className="h-4 w-4 mr-2" />
+          {text.addEmployee}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{text.addNewEmployee}</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <Input
+            placeholder={text.name}
+            value={newEmployee.name || ''}
+            onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
+            required
+          />
+          <Input
+            placeholder={text.email}
+            type="email"
+            value={newEmployee.email || ''}
+            onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
+            required
+          />
+          <Input
+            placeholder="Password"
+            type="password"
+            value={newEmployee.password || ''}
+            onChange={(e) => setNewEmployee({ ...newEmployee, password: e.target.value })}
+            required
+          />
+          <Input
+            placeholder={text.position}
+            value={newEmployee.position || ''}
+            onChange={(e) => setNewEmployee({ ...newEmployee, position: e.target.value })}
+            required
+          />
+          <Input
+            placeholder={text.employeeID}
+            value={newEmployee.employeeId || ''}
+            onChange={(e) => setNewEmployee({ ...newEmployee, employeeId: e.target.value })}
+            required
+          />
+          <Select
+            value={newEmployee.workType || ''}
+            onValueChange={(value) => setNewEmployee({ ...newEmployee, workType: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={text.workType} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Fulltime">Full Time</SelectItem>
+              <SelectItem value="Parttime">Part Time</SelectItem>
+              <SelectItem value="Contract">Contract</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input
+            placeholder={text.department}
+            value={newEmployee.department || ''}
+            onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })}
+            required
+          />
+          <Input
+            placeholder={text.phone}
+            value={newEmployee.phone || ''}
+            onChange={(e) => setNewEmployee({ ...newEmployee, phone: e.target.value })}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (file) {
+                const reader = new FileReader()
+                reader.onloadend = () => {
+                  setNewEmployee({ ...newEmployee, avatar: reader.result as string })
+                }
+                reader.readAsDataURL(file)
+              }
+            }}
+          />
+        </div>
+        <Button onClick={handleAddEmployee}>{text.addEmployee}</Button>
+      </DialogContent>
+    </Dialog>
         </div>
       </div>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">

@@ -1,6 +1,6 @@
 
 export type Department = 'Engineering' | 'Design' | 'Marketing' | 'Product' | 'Sales';
-export type Priority = 'low' | 'medium' | 'high' | 'urgent';
+export type Priority = 'urgent' | 'high' | 'medium' | 'low';
 
 export interface TaskFilters {
   assignee?: string;
@@ -32,6 +32,8 @@ export type Status =
   | 'pending_other_department'
   | 'additional_info_requested'
   | 'completed'
+  | 'todo'
+  | 'in-progress'
   | 'rejected';
 
   export interface Opinion {

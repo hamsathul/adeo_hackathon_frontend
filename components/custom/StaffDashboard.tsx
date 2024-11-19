@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Search, Filter, Flag, ChevronRight, Users, MessageSquare } from 'lucide-react';
-import { Opinion, TaskFilters, Department } from '../types';
+import { Opinion, TaskFilters, Department, Status } from '../types';
 import { StaffOpinionCard } from './StaffOpinionCard';
 import { StaffFilterDialog } from './StaffFilterDialog';
 import { GlobalSearchButton } from './GlobalSearchButton';
@@ -52,8 +52,9 @@ export function StaffDashboard() {
   const [filters, setFilters] = useState<TaskFilters>({});
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
+  const [showUnauthorizedMessage, setShowUnauthorizedMessage] = useState(false);
   const { isArabic } = useLanguageStore();
-  const text = isArabic ? translations.ar : translations.en;  
+  const text = isArabic ? translations.ar : translations.en;
 
   const handleAssignDepartment = (opinionId: string, department: Department) => {
     setOpinions(opinions.map(opinion =>
@@ -82,8 +83,17 @@ export function StaffDashboard() {
 
   const handleCloseOpinion = (opinionId: string) => {
     setOpinions(opinions.map(opinion =>
-      opinion.id === opinionId ? { ...opinion, status: 'done' } : opinion
+      opinion.id === opinionId ? { ...opinion, status: 'completed' as Status } : opinion
     ));
+  };
+
+  const handleStaffPortalClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowUnauthorizedMessage(true);
+    // Hide the message after 3 seconds
+    setTimeout(() => {
+      setShowUnauthorizedMessage(false);
+    }, 3000);
   };
 
   const filteredOpinions = opinions.filter(opinion => {
@@ -96,22 +106,29 @@ export function StaffDashboard() {
   });
 
   return (
-    <>
-    {/* <div className="min-h-screen bg-[#f8f9fa]"> */}
-      {/* <div className="container mx-auto px-6 py-8"> */}
+    <div className="min-h-screen bg-[#f8f9fa]">
+      <div className="container mx-auto px-6 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-            <h1 className="text-3xl font-bold tracking-tight">{text.myAssignedOpinions}</h1>
-            <p className="text-gray-500 mt-2">{text.assignedOpinionsMessage}</p>
+              <h1 className="text-3xl font-bold tracking-tight">{text.myAssignedOpinions}</h1>
+              <p className="text-gray-500 mt-2">{text.assignedOpinionsMessage}</p>
             </div>
             <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg">
-              <Users className="w-5 h-5" />
-              <a href="/employee" className="font-medium">
-              {text.staffPortal}
-            </a>
-            </div>
+              <div className="relative">
+                <button
+                  onClick={handleStaffPortalClick}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors"
+                >
+                  <Users className="w-5 h-5" />
+                  <span className="font-medium">{text.staffPortal}</span>
+                </button>
+                {showUnauthorizedMessage && (
+                  <div className="absolute top-full mt-2 right-0 bg-red-50 text-red-600 px-4 py-2 rounded-lg shadow-lg whitespace-nowrap z-50">
+                    Unauthorized access. Please contact administrator.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -174,6 +191,7 @@ export function StaffDashboard() {
           isOpen={isGlobalSearchOpen}
           onClose={() => setIsGlobalSearchOpen(false)}
         />
-    </>
+      </div>
+    </div>
   );
 }

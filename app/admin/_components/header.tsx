@@ -11,11 +11,11 @@ export default function Header() {
   const text = isArabic ? translations.ar : translations.en
   const router = useRouter()
 
-const handleLogout = () => {
-	localStorage.removeItem('token')
-	router.push('/login')
-}
-
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    router.push('/login')
+  }
+  
 return (
   <header className="bg-gray-300 text-gray-900 py-4 px-6">
     <div className="max-w-8xl mx-auto flex items-center justify-between relative">
@@ -29,11 +29,13 @@ return (
           />
         </a>
         <div className="border-r border-gray-400 h-8 mx-4" />
+        <a href="/admin">
         <img 
           src="/samah.png" 
           alt="Secondary Logo" 
           className="w-34 h-12"
         />
+        </a>  
       </div>
       <div className="flex items-center ml-auto space-x-2">
         <Button
