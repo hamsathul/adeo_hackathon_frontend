@@ -4,24 +4,21 @@ export interface DocumentAnalysisResponse {
   document_id: string;
   status: string;
   analysis_result: {
-    document_ids: string[];
-    content_analysis: {
-      document_metadata: {
-        document_type: string;
-        classification: string;
-        language: string;
-        formality_level: string;
-      };
-      executive_summary: {
-        main_purpose: string;
-        target_audience: string[];
-        brief_overview: string;
-      };
-      key_components: {
-        main_topics: string[];
-        critical_points: string[];
-        key_stakeholders: string[];
-      };
+    document_metadata: {
+      document_type: string;
+      classification: string;
+      language: string;
+      formality_level: string;
+    };
+    executive_summary: {
+      main_purpose: string;
+      target_audience: string[];
+      brief_overview: string;
+    };
+    key_components: {
+      main_topics: string[];
+      critical_points: string[];
+      key_stakeholders: string[];
     };
     processing_metadata: {
       total_chunks: number;
