@@ -143,7 +143,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
             <div>
-			// In the header section, update the status display:
+
 <div className="flex items-center gap-2 mb-1">
   <span className="text-sm font-medium text-blue-600">{opinion.reference_number}</span>
   <span className="text-sm text-gray-500">•</span>
