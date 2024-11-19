@@ -104,59 +104,74 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
               socketInstance.disconnect();
             }
           });
+          socketInstance.on('message_received', (data) => {
+            console.log('Message received:', data);
 
-		  socketInstance.on('message_received', (data) => {
-			console.log('Message received:', data)
-			
-			if (data.type === 'user_message') {
-			  // Update the temporary message with server data
-			  setMessages(prev => prev.map(msg => 
-				msg.id.startsWith('temp-') ? {
-				  ...msg,
-				  id: data.message.id,
-				  timestamp: formatTimestamp(data.message.timestamp)
-				} : msg
-			  ));
-			} 
-			else if (data.type === 'ai_message_chunk') {
-			  setMessages(prev => {
-				const existingMessageIndex = prev.findIndex(m => m.id === data.message.id);
-				if (existingMessageIndex >= 0) {
-				  const updatedMessages = [...prev];
-				  updatedMessages[existingMessageIndex] = {
-					...updatedMessages[existingMessageIndex],
-					content: updatedMessages[existingMessageIndex].content + data.message.content,
-					is_streaming: true,
-					timestamp: formatTimestamp(data.message.timestamp)
-				  };
-				  return updatedMessages;
-				} else {
-				  return [...prev, {
-					id: data.message.id,
-					content: data.message.content,
-					timestamp: formatTimestamp(data.message.timestamp),
-					is_bot: true,
-					is_streaming: true
-				  }];
-				}
-			  });
-			}
-			else if (data.type === 'ai_message_complete') {
-			  setMessages(prev => {
-				const updatedMessages = prev.map(message => 
-				  message.id === data.message.id 
-					? { 
-						...message, 
-						content: data.message.content, 
-						is_streaming: false,
-						timestamp: formatTimestamp(data.message.timestamp)
-					  }
-					: message
-				);
-				return updatedMessages;
-			  });
-			}
-		  });
+            const formatDubaiTimestamp = (timestamp: string) => {
+              try {
+                const date = new Date(timestamp);
+                const options: Intl.DateTimeFormatOptions = {
+                  timeZone: 'Asia/Dubai',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                };
+                return date.toLocaleTimeString([], options);
+              } catch (error) {
+                console.error('Error formatting timestamp:', error);
+                return '';
+              }
+            };
+
+            if (data.type === 'user_message') {
+              // Update the temporary message with server data
+              setMessages(prev => prev.map(msg =>
+                msg.id.startsWith('temp-') ? {
+                  ...msg,
+                  id: data.message.id,
+                  timestamp: formatDubaiTimestamp(data.message.timestamp)
+                } : msg
+              ));
+            } 
+            else if (data.type === 'ai_message_chunk') {
+              setMessages(prev => {
+                const existingMessageIndex = prev.findIndex(m => m.id === data.message.id);
+                if (existingMessageIndex >= 0) {
+                  const updatedMessages = [...prev];
+                  updatedMessages[existingMessageIndex] = {
+                    ...updatedMessages[existingMessageIndex],
+                    content: updatedMessages[existingMessageIndex].content + data.message.content,
+                    is_streaming: true,
+                    timestamp: formatDubaiTimestamp(data.message.timestamp)
+                  };
+                  return updatedMessages;
+                } else {
+                  return [...prev, {
+                    id: data.message.id,
+                    content: data.message.content,
+                    timestamp: formatDubaiTimestamp(data.message.timestamp),
+                    is_bot: true,
+                    is_streaming: true
+                  }];
+                }
+              });
+            }
+            else if (data.type === 'ai_message_complete') {
+              setMessages(prev => {
+                const updatedMessages = prev.map(message =>
+                  message.id === data.message.id
+                    ? {
+                      ...message,
+                      content: data.message.content,
+                      is_streaming: false,
+                      timestamp: formatDubaiTimestamp(data.message.timestamp)
+                    }
+                    : message
+                );
+                return updatedMessages;
+              });
+            }
+          });
 		  
 		  // Add error handling for failed messages
 		  socketInstance.on('error', (error) => {
