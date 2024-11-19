@@ -36,19 +36,26 @@ export interface DocumentAnalysisResponse {
   };
 }
 
-export async function analyzeDocument(file: File): Promise<DocumentAnalysisResponse> {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const response = await axios.post<DocumentAnalysisResponse>(
-    'http://localhost:8000/api/v1/documentprocessor/analyze-document',
-    formData,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }
-  );
-
-  return response.data;
-}
+export async function analyzeDocument(documentId: number): Promise<DocumentAnalysisResponse> {
+	const API_BASE_URL = 'http://localhost:8000';
+	const token = localStorage.getItem('token');
+  
+	try {
+	  const response = await axios.post<DocumentAnalysisResponse>(
+		`${API_BASE_URL}/api/v1/documentprocessor/analyze-document/existing/${documentId}`,
+		null,
+		{
+		  headers: {
+			'Authorization': `Bearer ${token}`,
+		  },
+		}
+	  );
+	  return response.data;
+	} catch (error) {
+	  if (axios.isAxiosError(error)) {
+		console.error('Document analysis error:', error.response?.data);
+		throw new Error(error.response?.data?.detail || 'Failed to analyze document');
+	  }
+	  throw error;
+	}
+  }
