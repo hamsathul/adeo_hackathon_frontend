@@ -29,11 +29,13 @@ return (
           />
         </a>
         <div className="border-r border-gray-400 h-8 mx-4" />
+        <a href="/admin">
         <img 
           src="/samah.png" 
           alt="Secondary Logo" 
           className="w-34 h-12"
         />
+        </a>  
       </div>
       <div className="flex items-center ml-auto space-x-2">
         <Button
