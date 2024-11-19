@@ -23,15 +23,62 @@ const statusColors: Record<Status, string> = {
   'rejected': 'bg-red-100 text-red-700'
 };
 
+const sampleOpinion: Opinion = {
+  id: '1',
+  title: 'Urban Development Initiative',
+  status: 'in-progress',
+  opinionId: 'GOV-42',
+  department: 'Engineering',
+  priority: 'high',
+  category: 'Infrastructure, Land and Assets',
+  subCategory: 'Land and Assets',
+  details: {
+    requestStatement: 'Proposal for comprehensive urban development project focusing on sustainable infrastructure and community spaces.',
+    challengesOpportunities: 'Growing population needs, aging infrastructure, opportunity for sustainable development.',
+    subjectContent: 'Development of mixed-use spaces, green infrastructure, and smart city integration.',
+    alternativeOptions: 'Traditional development vs. smart city approach, phased implementation vs. complete overhaul.',
+    expectedImpact: 'Improved quality of life, increased property values, reduced environmental impact.',
+    potentialRisks: 'Budget overruns, construction delays, community displacement concerns.',
+    studiesStatistics: 'Population growth projections, environmental impact assessments, traffic studies.',
+    legalFinancialOpinions: 'Zoning compliance review, budget allocation analysis, ROI projections.',
+    stakeholderFeedback: 'Community surveys, business owner consultations, environmental group inputs.',
+    workPlan: 'Three-phase implementation over 36 months with quarterly milestones.',
+    decisionDraft: 'Approve Phase 1 of urban development initiative with allocated budget of $50M.'
+  },
+  submitter: {
+    name: 'Sarah Johnson',
+    email: 'sarah.johnson@example.com',
+    description: 'Comprehensive urban development proposal for downtown district.',
+    documents: [
+      { name: 'UrbanPlanningProposal.pdf', url: '#' },
+      { name: 'FinancialProjections.xlsx', url: '#' },
+      { name: 'EnvironmentalImpact.pdf', url: '#' }
+    ]
+  },
+  remarks: [
+    {
+      id: '1',
+      content: 'Environmental impact assessment looks promising. Suggested minor adjustments to green space allocation.',
+      author: 'Environmental Review Team',
+      timestamp: '2024-03-15 14:30'
+    },
+    {
+      id: '2',
+      content: 'Financial projections have been validated. ROI timeline seems realistic.',
+      author: 'Financial Department',
+      timestamp: '2024-03-16 09:15'
+    }
+  ]
+};
+
 export function UserDashboard() {
   const [isSubmissionDialogOpen, setIsSubmissionDialogOpen] = useState(false);
   const [selectedOpinion, setSelectedOpinion] = useState<Opinion | null>(null);
   const [editingOpinion, setEditingOpinion] = useState<Opinion | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [myOpinions, setMyOpinions] = useState<Opinion[]>([]);
+  const [myOpinions, setMyOpinions] = useState<Opinion[]>([sampleOpinion]);
 
   const handleSubmitOpinion = (opinionData: Opinion) => {
-    // Ensure priority is a valid value
     if (!priorityConfig[opinionData.priority]) {
       console.error('Invalid priority value:', opinionData.priority);
       return;
@@ -112,67 +159,50 @@ export function UserDashboard() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredOpinions.length === 0 ? (
-            <div className="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No opinions submitted yet</h3>
-              <p className="text-gray-500 mb-4">Start by submitting your first opinion</p>
-              <button
-                onClick={() => setIsSubmissionDialogOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Submit Opinion
-              </button>
-            </div>
-          ) : (
-            filteredOpinions.map((opinion) => (
-              <div
-                key={opinion.id}
-                className="bg-white rounded-xl border border-gray-200 hover:border-blue-200 transition-all duration-200 hover:shadow-sm"
-              >
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-gray-500">
-                      {opinion.opinionId}
-                    </span>
-                    {priorityConfig[opinion.priority] && (
-                      <div className={cn(
-                        'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium',
-                        priorityConfig[opinion.priority].color,
-                        priorityConfig[opinion.priority].bgColor
-                      )}>
-                        <Flag className="w-3 h-3" />
-                        {opinion.priority.charAt(0).toUpperCase() + opinion.priority.slice(1)}
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{opinion.title}</h3>
-                  <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-                    <div className="flex items-center gap-1">
-                      <FileText className="w-4 h-4" />
-                      {opinion.submitter.documents.length} files
-                    </div>
-                    <span className={cn(
-                      'px-2 py-0.5 rounded-full text-xs font-medium',
-                      statusColors[opinion.status]
+          {filteredOpinions.map((opinion) => (
+            <div
+              key={opinion.id}
+              className="bg-white rounded-xl border border-gray-200 hover:border-blue-200 transition-all duration-200 hover:shadow-sm"
+            >
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-gray-500">
+                    {opinion.opinionId}
+                  </span>
+                  {priorityConfig[opinion.priority] && (
+                    <div className={cn(
+                      'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium',
+                      priorityConfig[opinion.priority].color,
+                      priorityConfig[opinion.priority].bgColor
                     )}>
-                      {opinion.status.replace('-', ' ').toUpperCase()}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setSelectedOpinion(opinion)}
-                    className="w-full flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    View Details
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                      <Flag className="w-3 h-3" />
+                      {opinion.priority.charAt(0).toUpperCase() + opinion.priority.slice(1)}
+                    </div>
+                  )}
                 </div>
+                <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{opinion.title}</h3>
+                <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center gap-1">
+                    <FileText className="w-4 h-4" />
+                    {opinion.submitter.documents.length} files
+                  </div>
+                  <span className={cn(
+                    'px-2 py-0.5 rounded-full text-xs font-medium',
+                    statusColors[opinion.status]
+                  )}>
+                    {opinion.status.replace('-', ' ').toUpperCase()}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setSelectedOpinion(opinion)}
+                  className="w-full flex items-center justify-center gap-1 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                >
+                  View Details
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
-            ))
-          )}
+            </div>
+          ))}
         </div>
 
         <OpinionSubmissionDialog
