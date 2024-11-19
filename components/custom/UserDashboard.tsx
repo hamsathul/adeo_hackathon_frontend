@@ -87,7 +87,7 @@ export function UserDashboard() {
   };
 
   const handleSubmitOpinion = (opinionData: Opinion) => {
-    if (!priorityConfig[opinionData.priority]) {
+    if (!priorityConfig[opinionData.priority as Priority]) {
       console.error('Invalid priority value:', opinionData.priority);
       return;
     }
@@ -184,11 +184,11 @@ export function UserDashboard() {
                   <span className="text-sm font-medium text-gray-500">
                     {opinion.opinionId}
                   </span>
-                  {priorityConfig[opinion.priority] && (
+                  {priorityConfig[opinion.priority as Priority] && (
                     <div className={cn(
                       'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium',
-                      priorityConfig[opinion.priority].color,
-                      priorityConfig[opinion.priority].bgColor
+                      priorityConfig[opinion.priority as Priority].color,
+                      priorityConfig[opinion.priority as Priority].bgColor
                     )}>
                       <Flag className="w-3 h-3" />
                       {opinion.priority.charAt(0).toUpperCase() + opinion.priority.slice(1)}
