@@ -52,6 +52,7 @@ export function StaffDashboard() {
   const [filters, setFilters] = useState<TaskFilters>({});
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
+  const [showUnauthorizedMessage, setShowUnauthorizedMessage] = useState(false);
   const { isArabic } = useLanguageStore();
   const text = isArabic ? translations.ar : translations.en;
 
@@ -86,6 +87,15 @@ export function StaffDashboard() {
     ));
   };
 
+  const handleStaffPortalClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowUnauthorizedMessage(true);
+    // Hide the message after 3 seconds
+    setTimeout(() => {
+      setShowUnauthorizedMessage(false);
+    }, 3000);
+  };
+
   const filteredOpinions = opinions.filter(opinion => {
     const matchesSearch = opinion.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          opinion.opinionId.toLowerCase().includes(searchQuery.toLowerCase());
@@ -105,11 +115,19 @@ export function StaffDashboard() {
               <p className="text-gray-500 mt-2">{text.assignedOpinionsMessage}</p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg">
-                <Users className="w-5 h-5" />
-                <a href="/employee" className="font-medium">
-                  {text.staffPortal}
-                </a>
+              <div className="relative">
+                <button
+                  onClick={handleStaffPortalClick}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors"
+                >
+                  <Users className="w-5 h-5" />
+                  <span className="font-medium">{text.staffPortal}</span>
+                </button>
+                {showUnauthorizedMessage && (
+                  <div className="absolute top-full mt-2 right-0 bg-red-50 text-red-600 px-4 py-2 rounded-lg shadow-lg whitespace-nowrap z-50">
+                    Unauthorized access. Please contact administrator.
+                  </div>
+                )}
               </div>
             </div>
           </div>
