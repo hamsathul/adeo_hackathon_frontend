@@ -74,15 +74,15 @@ export function KanbanColumn({
               {items.length} {items.length === 1 ? text.opinion : text.opinions}
             </p>
           </div>
-          {status === 'unassigned' && (
-            <button
-              onClick={() => setIsAddDialogOpen(true)}
-              className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-              title={text.addOpinion}
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          )}
+          {/* {status === 'unassigned' && (
+            // <button
+            //   onClick={() => setIsAddDialogOpen(true)}
+            //   className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+            //   title={text.addOpinion}
+            // >
+            //   <Plus className="w-4 h-4" />
+            // </button>
+          )} */}
         </div>
       </div>
 
