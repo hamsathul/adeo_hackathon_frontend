@@ -110,51 +110,36 @@ export function KanbanBoard() {
     setActiveOpinion(opinion || null);
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-	const { active, over } = event;
-	
-	if (!over) return;
-  
-	const activeOpinionId = Number(active.id);
-	const overColumnId = over.id.toString();
-  
-	const activeOpinion = opinions.find((t) => t.id === activeOpinionId);
-	
-	if (!activeOpinion) return;
-  
-	if (workflowStatuses.some(status => status.name === overColumnId)) {
-	  try {
-		// Update status in backend
-		await axios.patch(
-		  `http://localhost:8000/api/v1/opinions/requests/${activeOpinionId}/status`,
-		  { status: overColumnId },
-		  {
-			headers: {
-			  Authorization: `Bearer ${localStorage.getItem('token')}`
+const handleDragEnd = (event: DragEndEvent) => {
+const { active, over } = event;
+
+if (!over) return;
+
+const activeOpinionId = Number(active.id);
+const overColumnId = over.id.toString();
+
+const activeOpinion = opinions.find((t) => t.id === activeOpinionId);
+
+if (!activeOpinion) return;
+
+if (workflowStatuses.some(status => status.name === overColumnId)) {
+	// Update local state
+	setOpinions(opinions.map((t) => {
+		if (t.id === activeOpinionId) {
+		return { 
+			...t, 
+			current_status: {
+			...t.current_status,
+			name: overColumnId as Status
 			}
-		  }
-		);
-  
-		// Update local state
-		setOpinions(opinions.map((t) => {
-		  if (t.id === activeOpinionId) {
-			return { 
-			  ...t, 
-			  current_status: {
-				...t.current_status,
-				name: overColumnId as Status
-			  }
-			};
-		  }
-		  return t;
-		}));
-	  } catch (error) {
-		console.error('Failed to update opinion status:', error);
-	  }
-	}
-	
-	setActiveOpinion(null);
-  };
+		};
+		}
+		return t;
+	}));
+}
+
+setActiveOpinion(null);
+};
   const handleAddOpinion = (status: Status, data: OpinionFormData) => {
     const newOpinion: Opinion = {
       id: Math.random().toString(36).substr(2, 9),
