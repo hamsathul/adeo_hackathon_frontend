@@ -130,7 +130,11 @@ export default function Component() {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response) {
-          toast.error(`Error: ${error.response.data.message || 'Failed to fetch user data'}`);
+            if (error.response.status === 403) {
+            alert("You don't have the permission to access this page");
+          } else {
+            toast.error(`Error: ${error.response.data.message || 'Failed to fetch user data'}`);
+          }
         } else if (error.request) {
           toast.error("Server not responding. Please try again later.");
         } else {
