@@ -1,60 +1,54 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8000/api/v1';
+// services/documentAnalysis.ts
 
 export interface DocumentAnalysisResponse {
-  document_id: string;
-  status: string;
-  analysis_result: {
-    document_ids: string[];
-    content_analysis: {
-      document_metadata: {
-        document_type: string;
-        classification: string;
-        language: string;
-        formality_level: string;
-      };
-      executive_summary: {
-        main_purpose: string;
-        target_audience: string[];
-        brief_overview: string;
-      };
-      key_components: {
-        main_topics: string[];
-        critical_points: string[];
-        key_stakeholders: string[];
-      };
-      // Add other types as needed
-    };
-    processing_metadata: {
-      total_chunks: number;
-      timestamp: string;
-      analysis_version: string;
-    };
-  };
-  metadata: {
-    filename: string;
-    content_type: string;
-    text_length: number;
-    processing_time: string;
-    chunks_processed: number;
-    similar_docs_found: number;
-  };
-}
-
-export async function analyzeDocument(file: File): Promise<DocumentAnalysisResponse> {
-  const formData = new FormData();
-  formData.append('file', file);
-
-  const response = await axios.post<DocumentAnalysisResponse>(
-    `${API_URL}/documentprocessor/analyze-document`,
-    formData,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }
-  );
-
-  return response.data;
-}
+	document_id: string;
+	status: string;
+	analysis_result?: {
+	  document_type?: string;
+	  main_purpose?: string;
+	  key_points?: string[];
+	  requirements?: string[];
+	  important_dates_deadlines?: string[];
+	  sections_analysis?: Array<{
+		section_name: string;
+		key_content: string;
+	  }>;
+	  summary?: string;
+	  audience?: string;
+	  action_items?: string[];
+	};
+	metadata: {
+	  filename: string;
+	  content_type: string;
+	  text_length: number;
+	  processing_time: string;
+	  chunks_processed: number;
+	  similar_docs_found: number;
+	};
+  }
+  
+  export async function analyzeDocument(documentId: number): Promise<DocumentAnalysisResponse> {
+	const API_BASE_URL = 'http://localhost:8000';
+	const token = localStorage.getItem('token');
+  
+	try {
+	  const response = await axios.post<DocumentAnalysisResponse>(
+		`${API_BASE_URL}/api/v1/documentprocessor/analyze-document/existing/${documentId}`,
+		{},
+		{
+		  headers: {
+			'Authorization': `Bearer ${token}`,
+		  },
+		}
+	  );
+	  return response.data;
+	} catch (error) {
+	  if (axios.isAxiosError(error)) {
+		const errorMessage = error.response?.data?.detail || 'Failed to analyze document';
+		console.error('Document analysis error:', error.response?.data);
+		throw new Error(errorMessage);
+	  }
+	  throw error;
+	}
+  }

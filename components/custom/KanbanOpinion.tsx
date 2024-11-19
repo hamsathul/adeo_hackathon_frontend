@@ -14,12 +14,6 @@ interface KanbanOpinionProps {
   onAddRemark: (opinionId: string, remark: RemarkFormData) => void;
 }
 
-const assigneeColors: Record<string, string> = {
-  'BS': 'bg-blue-500',
-  'YD': 'bg-yellow-500',
-  'FK': 'bg-green-500',
-};
-
 const priorityConfig: Record<string, { color: string; bgColor: string }> = {
   'urgent': { color: 'text-red-700', bgColor: 'bg-red-50' },
   'high': { color: 'text-orange-700', bgColor: 'bg-orange-50' },
@@ -49,12 +43,12 @@ export function KanbanOpinion({ opinion, onEdit, onDelete, onAddRemark }: Kanban
   };
 
   const handleEdit = (data: OpinionFormData) => {
-    onEdit(opinion.id, data);
+    onEdit(opinion.id.toString(), data);
   };
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this opinion?')) {
-      onDelete(opinion.id);
+      onDelete(opinion.id.toString());
     }
   };
 
@@ -76,7 +70,7 @@ export function KanbanOpinion({ opinion, onEdit, onDelete, onAddRemark }: Kanban
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-gray-500">
-                {opinion.opinionId}
+                {opinion.reference_number}
               </span>
               <div className={cn(
                 'flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium',
@@ -88,18 +82,15 @@ export function KanbanOpinion({ opinion, onEdit, onDelete, onAddRemark }: Kanban
               </div>
             </div>
             <div className="flex items-center gap-1.5">
-              {opinion.submitter.documents.length > 0 && (
+              {opinion.documents.length > 0 && (
                 <div className="flex items-center gap-1 text-xs text-gray-500">
                   <FileText className="w-3 h-3" />
-                  {opinion.submitter.documents.length}
+                  {opinion.documents.length}
                 </div>
               )}
-              {opinion.assignee && (
-                <div className={cn(
-                  'w-6 h-6 rounded-full text-white flex items-center justify-center text-xs font-medium',
-                  assigneeColors[opinion.assignee]
-                )}>
-                  {opinion.assignee}
+              {opinion.requester && (
+                <div className="flex items-center gap-1 text-xs text-gray-500">
+                  {opinion.requester.username}
                 </div>
               )}
               <div className="relative">
@@ -150,11 +141,11 @@ export function KanbanOpinion({ opinion, onEdit, onDelete, onAddRemark }: Kanban
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1">
                 <Tag className="w-3 h-3" />
-                {opinion.department}
+                {opinion.department?.name}
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                2d
+                {new Date(opinion.created_at).toLocaleDateString()}
               </div>
             </div>
             <button
@@ -177,17 +168,22 @@ export function KanbanOpinion({ opinion, onEdit, onDelete, onAddRemark }: Kanban
         onSubmit={handleEdit}
         initialData={{
           title: opinion.title,
-          assignee: opinion.assignee || '',
-          department: opinion.department,
+          description: opinion.description,
+          department_id: opinion.department_id,
           priority: opinion.priority,
-          category: opinion.category,
-          subCategory: opinion.subCategory,
-          details: opinion.details,
-          submitter: {
-            name: opinion.submitter.name,
-            email: opinion.submitter.email,
-            description: opinion.submitter.description
-          }
+          category_id: opinion.category_id,
+          sub_category_id: opinion.sub_category_id,
+          request_statement: opinion.request_statement,
+          challenges_opportunities: opinion.challenges_opportunities,
+          subject_content: opinion.subject_content,
+          alternative_options: opinion.alternative_options,
+          expected_impact: opinion.expected_impact,
+          potential_risks: opinion.potential_risks,
+          studies_statistics: opinion.studies_statistics,
+          legal_financial_opinions: opinion.legal_financial_opinions,
+          stakeholder_feedback: opinion.stakeholder_feedback,
+          work_plan: opinion.work_plan,
+          decision_draft: opinion.decision_draft
         }}
         title="Edit Opinion"
       />

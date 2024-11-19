@@ -5,175 +5,156 @@ import axios from 'axios';
 import { DragEndEvent, DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { Filter, Search } from 'lucide-react';
-import { Opinion, Status, WorkflowStatusResponse, OpinionFormData, RemarkFormData, WorkflowStatus } from '../types';
+import { Opinion, Status, WorkflowStatus, OpinionResponse } from '../types';
 import { FilterDialog } from './FilterDialog';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { translations } from '@/components/custom/translation';
 import { KanbanBoardDnd } from './KanbanBoardDnd';
-import { TaskFilters } from '../types';
 
-const initialOpinions: Opinion[] = [
-	{
-	  id: '1',
-	  title: 'Infrastructure Development Proposal',
-	  status: 'unassigned',
-	  opinionId: 'GOV-15',
-	  department: 'Engineering',
-	  priority: 'high',
-	  category: 'Infrastructure, Land and Assets',
-	  subCategory: 'Land and Assets',
-	  details: {
-		requestStatement: 'Proposal for improving city roads and bridges',
-		challengesOpportunities: 'Address aging infrastructure and increasing traffic',
-		subjectContent: 'Comprehensive infrastructure upgrade plan',
-		alternativeOptions: 'Phased implementation vs complete overhaul',
-		expectedImpact: 'Improved traffic flow and safety',
-		potentialRisks: 'Construction delays and budget overruns',
-		studiesStatistics: 'Traffic analysis and structural assessments',
-		legalFinancialOpinions: 'Budget allocation and contractor requirements',
-		stakeholderFeedback: 'Community input and contractor proposals',
-		workPlan: 'Three-phase implementation over 18 months',
-		decisionDraft: 'Approve phase 1 of infrastructure upgrade'
-	  },
-	  submitter: {
-		name: 'John Smith',
-		email: 'john@example.com',
-		description: 'Proposal for improving city roads and bridges.',
-		documents: [
-		  { name: '42ArabicADEO.pdf', url: '#' },
-		  { name: '42CaseStudy.pdf', url: '#' }
-		]
-	  },
-	  remarks: []
-	},
-	{
-	  id: '2',
-	  title: 'Environmental Policy Update',
-	  status: 'assigned_to_expert',
-	  opinionId: 'GOV-16',
-	  assignee: 'YD',
-	  department: 'Product',
-	  priority: 'urgent',
-	  category: 'Policies and Strategies',
-	  subCategory: 'General Policy',
-	  details: {
-		requestStatement: 'Updates to environmental protection policies',
-		challengesOpportunities: 'Address climate change concerns and sustainability goals',
-		subjectContent: 'New environmental protection guidelines',
-		alternativeOptions: 'Gradual implementation vs immediate enforcement',
-		expectedImpact: 'Reduced environmental impact and improved sustainability',
-		potentialRisks: 'Business adaptation challenges and compliance costs',
-		studiesStatistics: 'Environmental impact assessments',
-		legalFinancialOpinions: 'Legal compliance requirements and cost analysis',
-		stakeholderFeedback: 'Industry feedback and public consultation',
-		workPlan: 'Six-month implementation timeline',
-		decisionDraft: 'Approve new environmental protection measures'
-	  },
-	  submitter: {
-		name: 'Sarah Johnson',
-		email: 'sarah@example.com',
-		description: 'Updates to environmental protection policies.',
-		documents: [
-		  { name: 'ADGazette.pdf', url: '#' },
-		  { name: 'DXBGazette.pdf', url: '#' }
-		]
-	  },
-	  remarks: []
-	},
-  ];
-
-export function KanbanBoard() {
-  const [isClient, setIsClient] = useState(false);
-  const { isArabic } = useLanguageStore();
-  const text = isArabic ? translations.ar : translations.en;
-  const [workflowStatuses, setWorkflowStatuses] = useState<WorkflowStatusResponse['items']>([]);
-  const [activeOpinion, setActiveOpinion] = useState<Opinion | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filters, setFilters] = useState<TaskFilters>({});
-  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [opinions, setOpinions] = useState<Opinion[]>(initialOpinions);
-
-  useEffect(() => {
-    setIsClient(true);
-    fetchWorkflowStatuses();
-  }, []);
-
-  const fetchWorkflowStatuses = async () => {
-    try {
-      const response = await axios.get<WorkflowStatusResponse>(
-        'http://localhost:8000/api/v1/opinions/workflow_status/',
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        }
-      );
-      setWorkflowStatuses(response.data.items);
-    } catch (err) {
-      setError('Failed to fetch workflow statuses');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+const isValidOpinion = (opinion: any): opinion is Opinion => {
+	return (
+	  opinion &&
+	  typeof opinion.id === 'number' &&
+	  typeof opinion.title === 'string' &&
+	  typeof opinion.reference_number === 'string' &&
+	  opinion.current_status &&
+	  typeof opinion.current_status.name === 'string' &&
+	  typeof opinion.current_status.description === 'string'
+	);
   };
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
+export function KanbanBoard() {
+	const [isClient, setIsClient] = useState(false);
+	const { isArabic } = useLanguageStore();
+	const text = isArabic ? translations.ar : translations.en;
+	const [opinions, setOpinions] = useState<Opinion[]>([]);
+	const [workflowStatuses, setWorkflowStatuses] = useState<WorkflowStatus[]>([]);
+	const [activeOpinion, setActiveOpinion] = useState<Opinion | null>(null);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [filters, setFilters] = useState({});
+	const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+
+
+	useEffect(() => {
+		setIsClient(true);
+		fetchData();
+	  }, []);
+	
+	  const fetchData = async () => {
+		try {
+		  setLoading(true);
+		  
+		  // Fetch workflow statuses
+		  const statusResponse = await axios.get<{ total: number; items: WorkflowStatus[] }>(
+			'http://localhost:8000/api/v1/opinions/workflow_status/',
+			{
+			  headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			  }
+			}
+		  );
+		  setWorkflowStatuses(statusResponse.data.items);
+	  
+		  // Fetch opinions
+		  const opinionResponse = await axios.get<Opinion[]>(
+			'http://localhost:8000/api/v1/opinions/requests/',
+			{
+			  headers: {
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			  }
+			}
+		  );
+		  
+		  if (opinionResponse.data && Array.isArray(opinionResponse.data)) {
+			const validOpinions = opinionResponse.data.filter(isValidOpinion);
+			if (validOpinions.length !== opinionResponse.data.length) {
+			  console.warn('Some opinions were invalid and filtered out');
+			}
+			setOpinions(validOpinions);
+		  } else {
+			console.error('Invalid opinion response format:', opinionResponse.data);
+			setError('Invalid data format received');
+		  }
+		} catch (err) {
+		  console.error('Failed to fetch data:', err);
+		  setError('Failed to fetch data');
+		} finally {
+		  setLoading(false);
+		}
+	  };
+	
+	  const filteredOpinions = opinions.filter(opinion => {
+		const matchesSearch = 
+		  opinion.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+		  opinion.reference_number.toLowerCase().includes(searchQuery.toLowerCase());
+		
+		const matchesAssignee = !filters.assignee || 
+		  opinion.current_status.name === filters.assignee;
+		
+		const matchesDepartment = !filters.department || 
+		  opinion.department.id === filters.department;
+		
+		return matchesSearch && matchesAssignee && matchesDepartment;
+	  });
+	
+	  if (loading) return <div>Loading...</div>;
+	  if (error) return <div>Error: {error}</div>;
+
+
 
   const handleDragStart = (event: DragStartEvent) => {
     const opinion = opinions.find((t) => t.id === event.active.id);
     setActiveOpinion(opinion || null);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    
-    if (!over) return;
-
-    const activeOpinionId = active.id.toString();
-    const overColumnId = over.id.toString();
-
-    const activeOpinion = opinions.find((t) => t.id === activeOpinionId);
-    
-    if (!activeOpinion) return;
-
-    if (workflowStatuses.some(status => status.name === overColumnId)) {
-      setOpinions(opinions.map((t) => {
-        if (t.id === activeOpinionId) {
-          return { ...t, status: overColumnId as Status };
-        }
-        return t;
-      }));
-    } else {
-      const overOpinion = opinions.find((t) => t.id === overColumnId);
-      if (!overOpinion) return;
-
-      const activeIndex = opinions.findIndex((t) => t.id === activeOpinionId);
-      const overIndex = opinions.findIndex((t) => t.id === overColumnId);
-
-      if (activeOpinion.status === overOpinion.status) {
-        setOpinions(arrayMove(opinions, activeIndex, overIndex));
-      } else {
-        const newOpinions = opinions.map((t) => {
-          if (t.id === activeOpinionId) {
-            return { ...t, status: overOpinion.status };
-          }
-          return t;
-        });
-        setOpinions(newOpinions);
-      }
-    }
-    
-    setActiveOpinion(null);
+  const handleDragEnd = async (event: DragEndEvent) => {
+	const { active, over } = event;
+	
+	if (!over) return;
+  
+	const activeOpinionId = Number(active.id);
+	const overColumnId = over.id.toString();
+  
+	const activeOpinion = opinions.find((t) => t.id === activeOpinionId);
+	
+	if (!activeOpinion) return;
+  
+	if (workflowStatuses.some(status => status.name === overColumnId)) {
+	  try {
+		// Update status in backend
+		await axios.patch(
+		  `http://localhost:8000/api/v1/opinions/requests/${activeOpinionId}/status`,
+		  { status: overColumnId },
+		  {
+			headers: {
+			  Authorization: `Bearer ${localStorage.getItem('token')}`
+			}
+		  }
+		);
+  
+		// Update local state
+		setOpinions(opinions.map((t) => {
+		  if (t.id === activeOpinionId) {
+			return { 
+			  ...t, 
+			  current_status: {
+				...t.current_status,
+				name: overColumnId as Status
+			  }
+			};
+		  }
+		  return t;
+		}));
+	  } catch (error) {
+		console.error('Failed to update opinion status:', error);
+	  }
+	}
+	
+	setActiveOpinion(null);
   };
-
   const handleAddOpinion = (status: Status, data: OpinionFormData) => {
     const newOpinion: Opinion = {
       id: Math.random().toString(36).substr(2, 9),
@@ -244,17 +225,7 @@ export function KanbanBoard() {
     }));
   };
 
-  const filteredOpinions = opinions.filter(opinion => {
-    const matchesSearch = opinion.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         opinion.opinionId.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesAssignee = !filters.assignee || opinion.assignee === filters.assignee;
-    const matchesDepartment = !filters.department || opinion.department === filters.department;
-    
-    return matchesSearch && matchesAssignee && matchesDepartment;
-  });
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
   <div className="min-h-screen bg-[#f8f9fa]">
@@ -300,7 +271,7 @@ export function KanbanBoard() {
             onApplyFilters={setFilters}
           />
 
-          {isClient && (
+{isClient && workflowStatuses.length > 0 && (
             <KanbanBoardDnd 
               workflowStatuses={workflowStatuses}
               filteredOpinions={filteredOpinions}

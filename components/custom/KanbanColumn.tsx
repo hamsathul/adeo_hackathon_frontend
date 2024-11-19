@@ -32,7 +32,7 @@ export function KanbanColumn({
   const { setNodeRef } = useDroppable({ id: status });
   const { isArabic } = useLanguageStore();
   const text = isArabic ? translations.ar : translations.en;
-
+  console.log(`Rendering column ${status} with items:`, items); 
   const getStatusColor = (status: Status): string => {
     const colorMap: Record<Status, string> = {
       'unassigned': 'bg-gray-100 border-t-gray-300',

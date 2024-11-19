@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Brain, Send, Upload, Save } from 'lucide-react';
+import { X, User, Calendar, Tag, Flag, Pencil, MessageSquare, FileText, Info, Brain, Send, Upload, Save, Loader2 } from 'lucide-react';
 import { Opinion, RemarkFormData } from '../types';
 import { DocumentAnalysis } from './DocumentAnalysis';
 import { analyzeDocument, DocumentAnalysisResponse } from '../services/documentAnalysis';
@@ -24,15 +24,16 @@ const priorityConfig: Record<string, { color: string; icon: string }> = {
 };
 
 const statusColors: Record<string, string> = {
-  'unassigned': 'bg-gray-100 text-gray-700',
-  'todo': 'bg-gray-100 text-gray-700',
-  'in-progress': 'bg-blue-100 text-blue-700',
-  'testing': 'bg-purple-100 text-purple-700',
-  'review': 'bg-yellow-100 text-yellow-700',
-  'done': 'bg-green-100 text-green-700',
-  'on-hold': 'bg-orange-100 text-orange-700',
-  'rejected': 'bg-red-100 text-red-700',
-};
+	'unassigned': 'bg-gray-100 text-gray-700',
+	'assigned_to_department': 'bg-gray-100 text-gray-700',
+	'assigned_to_expert': 'bg-blue-100 text-blue-700',
+	'expert_opinion_submitted': 'bg-purple-100 text-purple-700',
+	'head_review_pending': 'bg-yellow-100 text-yellow-700',
+	'head_approved': 'bg-green-100 text-green-700',
+	'pending_other_department': 'bg-orange-100 text-orange-700',
+	'rejected': 'bg-red-100 text-red-700',
+  };
+  
 
 export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRemark }: KanbanDetailsDialogProps) {
   const [activeTab, setActiveTab] = useState<'details' | 'remarks'>('details');
@@ -49,19 +50,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
 
   if (!isOpen) return null;
 
-  const details = opinion.details || {
-    requestStatement: '',
-    challengesOpportunities: '',
-    subjectContent: '',
-    alternativeOptions: '',
-    expectedImpact: '',
-    potentialRisks: '',
-    studiesStatistics: '',
-    legalFinancialOpinions: '',
-    stakeholderFeedback: '',
-    workPlan: '',
-    decisionDraft: ''
-  };
+
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -97,45 +86,23 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
     setUploadedFiles(prev => [...prev, ...newFiles]);
   };
 
-  const handleAnalyzeDocument = async (documentUrl: string, fileName: string) => {
-    try {
-      setIsAnalyzing(true);
-      setAnalysisError(null);
-      setSelectedDocument(fileName);
-      setShowAiPanel(true);
-
-      let file: File;
-      
-      if (documentUrl === '#') {
-        const response = await fetch(`/${fileName}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch document: ${response.statusText}`);
-        }
-        const blob = await response.blob();
-        const fileType = fileName.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 
-                        fileName.toLowerCase().endsWith('.xlsx') ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' :
-                        fileName.toLowerCase().endsWith('.xls') ? 'application/vnd.ms-excel' :
-                        fileName.toLowerCase().endsWith('.docx') ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
-                        fileName.toLowerCase().endsWith('.doc') ? 'application/msword' : 'application/octet-stream';
-        
-        file = new File([blob], fileName, { type: fileType });
-      } else {
-        const response = await fetch(documentUrl);
-        if (!response.ok) {
-          throw new Error('Failed to fetch document');
-        }
-        const blob = await response.blob();
-        file = new File([blob], fileName, { type: blob.type });
-      }
-
-      const result = await analyzeDocument(file);
-      setDocumentAnalysis(result);
-    } catch (error) {
-      console.error('Document analysis error:', error);
-      setAnalysisError(error instanceof Error ? error.message : 'Failed to analyze document');
-    } finally {
-      setIsAnalyzing(false);
-    }
+  const handleAnalyzeDocument = async (doc: { id: number; file_name: string }) => {
+	try {
+	  setIsAnalyzing(true);
+	  setAnalysisError(null);
+	  setSelectedDocument(doc.file_name);
+	  setShowAiPanel(true);
+  
+	  try {
+		const result = await analyzeDocument(doc.id);
+		setDocumentAnalysis(result);
+	  } catch (error) {
+		console.error('Analysis error:', error);
+		setAnalysisError(error instanceof Error ? error.message : 'Failed to analyze document');
+	  }
+	} finally {
+	  setIsAnalyzing(false);
+	}
   };
 
   const handleRemoveFile = (index: number) => {
@@ -176,25 +143,26 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-sm font-medium text-blue-600">{opinion.opinionId}</span>
-                <span className="text-sm text-gray-500">•</span>
-                <span className="text-sm text-gray-500">{opinion.department}</span>
-                <div className={cn(
-                  'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium',
-                  priorityConfig[opinion.priority].icon,
-                  priorityConfig[opinion.priority].color
-                )}>
-                  <Flag className="w-3 h-3" />
-                  {opinion.priority.charAt(0).toUpperCase() + opinion.priority.slice(1)}
-                </div>
-                <div className={cn(
-                  'px-2 py-1 rounded-full text-xs font-medium',
-                  statusColors[opinion.status]
-                )}>
-                  {opinion.status.replace('-', ' ').toUpperCase()}
-                </div>
-              </div>
+			// In the header section, update the status display:
+<div className="flex items-center gap-2 mb-1">
+  <span className="text-sm font-medium text-blue-600">{opinion.reference_number}</span>
+  <span className="text-sm text-gray-500">•</span>
+  <span className="text-sm text-gray-500">{opinion.department?.name}</span>
+  <div className={cn(
+    'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium',
+    priorityConfig[opinion.priority].icon,
+    priorityConfig[opinion.priority].color
+  )}>
+    <Flag className="w-3 h-3" />
+    {opinion.priority.charAt(0).toUpperCase() + opinion.priority.slice(1)}
+  </div>
+  <div className={cn(
+    'px-2 py-1 rounded-full text-xs font-medium',
+    statusColors[opinion.current_status.name]
+  )}>
+    {opinion.current_status.description}
+  </div>
+</div>
               <h2 className="text-xl font-semibold text-gray-900">{opinion.title}</h2>
             </div>
             <div className="flex items-center gap-2">
@@ -266,118 +234,114 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
           <div className="flex-1 overflow-y-auto">
             {activeTab === 'details' ? (
               <div className="p-6">
-                {/* Basic Information */}
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-4">{text.basicInfo}</h3>
-                  <div className="grid grid-cols-2 gap-6 bg-gray-50 rounded-lg p-4">
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-500 flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        {text.submittedby}
-                      </div>
-                      <div className="font-medium">{opinion.submitter.name}</div>
-                      <div className="text-sm text-gray-500">{opinion.submitter.email}</div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-500 flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {text.submissionDate}
-                      </div>
-                      <div className="font-medium">March 15, 2024</div>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-500 flex items-center gap-2">
-                        <Tag className="w-4 h-4" />
-                        {text.category}
-                      </div>
-                      <div className="font-medium">{opinion.category}</div>
-                      {opinion.subCategory && (
-                        <div className="text-sm text-gray-500">{opinion.subCategory}</div>
-                      )}
-                    </div>
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-500">{text.assignmentStatus}</div>
-                      <div className="font-medium">
-                        {opinion.assignee ? (
-                          <div className="flex items-center gap-2">
-                            <div className={cn(
-                              'w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium',
-                              opinion.assignee === 'BS' ? 'bg-blue-500' :
-                              opinion.assignee === 'YD' ? 'bg-yellow-500' :
-                              'bg-green-500'
-                            )}>
-                              {opinion.assignee}
-                            </div>
-                            <span>{text.assignedTo} {opinion.assignee}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-500">{text.unassigned}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+               {/* Basic Information */}
+<div className="mb-8">
+  <h3 className="text-lg font-semibold mb-4">{text.basicInfo}</h3>
+  <div className="grid grid-cols-2 gap-6 bg-gray-50 rounded-lg p-4">
+    <div className="space-y-1">
+      <div className="text-sm text-gray-500 flex items-center gap-2">
+        <User className="w-4 h-4" />
+        {text.submittedby}
+      </div>
+      <div className="font-medium">{opinion.requester.username}</div>
+      <div className="text-sm text-gray-500">{opinion.requester.email}</div>
+    </div>
+    <div className="space-y-1">
+      <div className="text-sm text-gray-500 flex items-center gap-2">
+        <Calendar className="w-4 h-4" />
+        {text.submissionDate}
+      </div>
+      <div className="font-medium">
+        {new Date(opinion.created_at).toLocaleDateString()}
+      </div>
+    </div>
+    <div className="space-y-1">
+      <div className="text-sm text-gray-500 flex items-center gap-2">
+        <Tag className="w-4 h-4" />
+        {text.category}
+      </div>
+      <div className="font-medium">{opinion.category_rel.name}</div>
+      {opinion.subcategory_rel && (
+        <div className="text-sm text-gray-500">{opinion.subcategory_rel.name}</div>
+      )}
+    </div>
+    <div className="space-y-1">
+      <div className="text-sm text-gray-500">{text.assignmentStatus}</div>
+      <div className="font-medium">
+        {opinion.assignments && opinion.assignments.length > 0 ? (
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-medium">
+              {opinion.assignments[0].expert?.username?.charAt(0)}
+            </div>
+            <span>{text.assignedTo} {opinion.assignments[0].expert?.username}</span>
+          </div>
+        ) : (
+          <span className="text-gray-500">{text.unassigned}</span>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
 
-                {/* Opinion Details */}
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-4">{text.opinionDetails}</h3>
-                  <DetailSection
-                    title={text.requestStatement}
-                    content={opinion.details.requestStatement}
-                    description="Clearly mention what is required from the committee, stating the purpose and reasoning"
-                  />
-                  <DetailSection
-                    title={text.challengesOpportunities}
-                    content={opinion.details.challengesOpportunities}
-                    description="Mention the reasons for submitting the request and provide supporting information"
-                  />
-                  <DetailSection
-                    title={text.subjectContent}
-                    content={opinion.details.subjectContent}
-                    description="Provide details on the requested topic with supporting documents"
-                  />
-                  <DetailSection
-                    title={text.alternativeOptions}
-                    content={opinion.details.alternativeOptions}
-                    description="Compare alternatives with the proposed solution"
-                  />
-                  <DetailSection
-                    title={text.expectedImpact}
-                    content={opinion.details.expectedImpact}
-                    description="Describe implementation feasibility and impacts"
-                  />
-                  <DetailSection
-                    title={text.potentialRisks}
-                    content={opinion.details.potentialRisks}
-                    description="List risks and recommended solutions"
-                  />
-                  <DetailSection
-                    title={text.studiesStatistics}
-                    content={opinion.details.studiesStatistics}
-                    description="Include relevant studies and statistics"
-                  />
-                  <DetailSection
-                    title={text.legalFinancialOpinions}
-                    content={opinion.details.legalFinancialOpinions}
-                    description="Include approved legal and financial opinions"
-                  />
-                  <DetailSection
-                    title={text.stakeholderFeedback}
-                    content={opinion.details.stakeholderFeedback}
-                    description="Include feedback from relevant stakeholders"
-                  />
-                  <DetailSection
-                    title={text.workPlan}
-                    content={opinion.details.workPlan}
-                    description="Detail implementation stages and timeline"
-                  />
-                  <DetailSection
-                    title={text.decisionDraft}
-                    content={opinion.details.decisionDraft}
-                    description="Proposed draft text of the decision"
-                  />
-                </div>
 
+<div className="mb-8">
+  <h3 className="text-lg font-semibold mb-4">{text.opinionDetails}</h3>
+  <DetailSection
+    title={text.requestStatement}
+    content={opinion.request_statement || ''}
+    description="Clearly mention what is required from the committee, stating the purpose and reasoning"
+  />
+  <DetailSection
+    title={text.challengesOpportunities}
+    content={opinion.challenges_opportunities || ''}
+    description="Mention the reasons for submitting the request and provide supporting information"
+  />
+  <DetailSection
+    title={text.subjectContent}
+    content={opinion.subject_content || ''}
+    description="Provide details on the requested topic with supporting documents"
+  />
+  <DetailSection
+    title={text.alternativeOptions}
+    content={opinion.alternative_options || ''}
+    description="Compare alternatives with the proposed solution"
+  />
+  <DetailSection
+    title={text.expectedImpact}
+    content={opinion.expected_impact || ''}
+    description="Describe implementation feasibility and impacts"
+  />
+  <DetailSection
+    title={text.potentialRisks}
+    content={opinion.potential_risks || ''}
+    description="List risks and recommended solutions"
+  />
+  <DetailSection
+    title={text.studiesStatistics}
+    content={opinion.studies_statistics || ''}
+    description="Include relevant studies and statistics"
+  />
+  <DetailSection
+    title={text.legalFinancialOpinions}
+    content={opinion.legal_financial_opinions || ''}
+    description="Include approved legal and financial opinions"
+  />
+  <DetailSection
+    title={text.stakeholderFeedback}
+    content={opinion.stakeholder_feedback || ''}
+    description="Include feedback from relevant stakeholders"
+  />
+  <DetailSection
+    title={text.workPlan}
+    content={opinion.work_plan || ''}
+    description="Detail implementation stages and timeline"
+  />
+  <DetailSection
+    title={text.decisionDraft}
+    content={opinion.decision_draft || ''}
+    description="Proposed draft text of the decision"
+  />
+</div>
                 {/* Documents Section */}
                 <div>
                   <h3 className="text-lg font-semibold mb-4">{text.supportingDocuments}</h3>
@@ -415,34 +379,49 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                   </div>
 
                   {/* Document List */}
-                  <div className="grid gap-2">
-                    {/* Existing Documents */}
-                    {opinion.submitter.documents.map((doc, index) => (
-                      <div
-                        key={`existing-${index}`}
-                        className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-100 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <FileText className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-gray-900 group-hover:text-blue-600">
-                              {doc.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {text.existingDocument}
-                            </div>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => handleAnalyzeDocument('#', doc.name)}
-                          className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
-                        >
-                          <Brain className="w-4 h-4 text-blue-600" />
-                        </button>
-                      </div>
-                    ))}
+<div className="grid gap-2">
+  {/* Existing Documents */}
+  {opinion.documents.map((doc) => (
+  <div
+    key={doc.id}
+    className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-colors group"
+  >
+    <div className="flex items-center gap-3">
+      <div className="p-2 bg-blue-100 rounded-lg text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+        <FileText className="w-5 h-5" />
+      </div>
+      <div>
+        <div className="font-medium text-gray-900 group-hover:text-blue-600">
+          {doc.file_name}
+        </div>
+        <div className="text-sm text-gray-500">
+          {formatFileSize(doc.file_size)}
+        </div>
+      </div>
+    </div>
+    <div className="flex items-center gap-2">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleAnalyzeDocument(doc);
+        }}
+        disabled={isAnalyzing}
+        className={cn(
+          "p-2 rounded-lg transition-colors",
+          isAnalyzing 
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed" 
+            : "hover:bg-blue-100 text-blue-600"
+        )}
+      >
+        {isAnalyzing ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Brain className="w-4 h-4" />
+        )}
+      </button>
+    </div>
+  </div>
+))}
                     
                     {/* Newly Uploaded Documents */}
                     {uploadedFiles.map((doc, index) => (
@@ -465,7 +444,7 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
                         </div>
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleAnalyzeDocument(doc.url, doc.name)}
+                            onClick={() =>  handleAnalyzeDocument(doc)}
                             className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
                           >
                             <Brain className="w-4 h-4 text-blue-600" />
@@ -563,3 +542,11 @@ export function KanbanDetailsDialog({ isOpen, onClose, opinion, onEdit, onAddRem
     </div>
   );
 }
+
+const formatFileSize = (bytes: number) => {
+	if (bytes === 0) return '0 Bytes';
+	const k = 1024;
+	const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+	const i = Math.floor(Math.log(bytes) / Math.log(k));
+	return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
