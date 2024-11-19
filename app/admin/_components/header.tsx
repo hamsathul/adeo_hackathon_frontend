@@ -11,11 +11,11 @@ export default function Header() {
   const text = isArabic ? translations.ar : translations.en
   const router = useRouter()
 
-const handleLogout = () => {
-	localStorage.removeItem('token')
-	router.push('/login')
-}
-
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    router.push('/login')
+  }
+  
 return (
   <header className="bg-gray-300 text-gray-900 py-4 px-6">
     <div className="max-w-8xl mx-auto flex items-center justify-between relative">
