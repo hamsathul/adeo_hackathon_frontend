@@ -26,7 +26,7 @@ const statusColors: Record<Status, string> = {
 };
 
 const sampleOpinion: Opinion = {
-  id: '1',
+  id: 'sample-1',
   title: 'Urban Development Initiative',
   status: 'in-progress',
   opinionId: 'GOV-42',
@@ -59,13 +59,13 @@ const sampleOpinion: Opinion = {
   },
   remarks: [
     {
-      id: '1',
+      id: 'remark-1',
       content: 'Environmental impact assessment looks promising. Suggested minor adjustments to green space allocation.',
       author: 'Environmental Review Team',
       timestamp: '2024-03-15 14:30'
     },
     {
-      id: '2',
+      id: 'remark-2',
       content: 'Financial projections have been validated. ROI timeline seems realistic.',
       author: 'Financial Department',
       timestamp: '2024-03-16 09:15'
@@ -79,8 +79,12 @@ export function UserDashboard() {
   const [editingOpinion, setEditingOpinion] = useState<Opinion | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [myOpinions, setMyOpinions] = useState<Opinion[]>([sampleOpinion]);
-  const { isArabic, toggleLanguage } = useLanguageStore()
-  const text = isArabic ? translations.ar : translations.en
+  const { isArabic } = useLanguageStore();
+  const text = isArabic ? translations.ar : translations.en;
+
+  const generateUniqueId = () => {
+    return `opinion-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
 
   const handleSubmitOpinion = (opinionData: Opinion) => {
     if (!priorityConfig[opinionData.priority]) {
@@ -115,7 +119,14 @@ export function UserDashboard() {
       ));
       setEditingOpinion(null);
     } else {
-      setMyOpinions([...myOpinions, opinionData]);
+      const newOpinion = {
+        ...opinionData,
+        id: generateUniqueId(),
+        opinionId: `GOV-${Math.floor(Math.random() * 10000)}`,
+        status: 'unassigned' as Status,
+        remarks: []
+      };
+      setMyOpinions(prev => [...prev, newOpinion]);
     }
     setIsSubmissionDialogOpen(false);
   };
